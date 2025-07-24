@@ -1,0 +1,168 @@
+name: Manual deploy to dev
+
+on:
+  workflow_call:
+    inputs:
+      run_e2e:
+        description: "Run E2E tests"
+        required: false
+        default: true
+        type: boolean
+      e2e_tag:
+        description: "Tag of E2E image to run"
+        required: false
+        default: latest
+        type: string
+    secrets:
+      STATUS_API_KEY:
+        description: "API key for status API"
+        required: true
+      NAIS_WORKLOAD_IDENTITY_PROVIDER:
+        description: "Identity provider for nais/docker-build-push"
+        required: true
+      READER_TOKEN:
+        description: "Token for reading from GitHub Package Registry"
+        required: true
+  workflow_dispatch:
+    inputs:
+      run_e2e:
+        description: "Run E2E tests"
+        required: false
+        default: false
+        type: boolean
+      e2e_tag:
+        description: "Tag of E2E image to run"
+        required: false
+        default: latest
+        type: string
+
+run-name: Dev deploy of ${{ github.ref_name }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.17
+
+      - name: Install common dependencies
+        shell: bash
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          echo -e "\n[install.scopes]\n\"@navikt\" = { token = \"$BUN_AUTH_TOKEN\", url = \"https://npm.pkg.github.com/\" }" >> bunfig.toml
+          bun install --frozen-lockfile
+
+      - name: Install frontend dependencies
+        shell: bash
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          cd frontend
+          echo -e "\n[install.scopes]\n\"@navikt\" = { token = \"$BUN_AUTH_TOKEN\", url = \"https://npm.pkg.github.com/\" }" >> bunfig.toml
+          bun install --frozen-lockfile
+
+      - name: Build frontend
+        shell: bash
+        env:
+          VERSION: ${{ github.sha }}
+        run: |
+          cd frontend
+          bun run build
+
+      - name: Test frontend
+        shell: bash
+        run: |
+          cd frontend
+          bun test
+
+      - name: Install server dependencies
+        shell: bash
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          cd server
+          echo -e "\n[install.scopes]\n\"@navikt\" = { token = \"$BUN_AUTH_TOKEN\", url = \"https://npm.pkg.github.com/\" }" >> bunfig.toml
+          bun install --frozen-lockfile
+
+      - name: Test server
+        shell: bash
+        run: |
+          cd server
+          bun test
+
+      - name: Build server
+        shell: bash
+        run: |
+          cd server
+          bun run build
+
+      - name: Generate version number
+        id: version
+        run: echo "version=$(TZ="Europe/Oslo" git show -s --format=%cd --date='format-local:%Y-%m-%dT%H:%M:%S')" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push Docker image
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: klage # required
+          tag: ${{ github.sha }} # optional
+          push_image: true # optional, default true
+          dockerfile: Dockerfile # optional, default Dockerfile
+          docker_context: . # optional, default .
+          image_suffix: frontend # optional, default empty
+          cache_from: type=gha # optional, default type=gha
+          cache_to: type=gha,mode=max # optional, default type=gha,mode=max
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
+          build_args: |
+            VERSION=${{ steps.version.outputs.version }}
+
+  deploy_to_dev:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to dev
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          VARS: nais/dev.yaml
+          RESOURCE: nais/nais.yaml
+          VAR: image=${{ needs.build.outputs.image }}
+
+  e2e_test:
+    name: E2E
+    needs: deploy_to_dev
+    # if: ${{ inputs.run_e2e }}
+    if: false
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kaptein-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: ${{ inputs.e2e_tag }}
+          nais_management_project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          nais_workload_identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}

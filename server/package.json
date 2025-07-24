@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "description": "",
+  "version": "1.0.0",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "bun run build --watch & node --watch --trace-warnings dist/server.js",
+    "prod": "node --trace-warnings dist/server.js",
+    "build": "bun build ./src/server.ts --target node --format esm --sourcemap --outdir dist",
+    "watch": "bun run build --watch",
+    "lint": "biome check",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@biomejs/biome": "2.1.2",
+    "@fastify/cors": "11.0.1",
+    "@fastify/http-proxy": "11.3.0",
+    "@navikt/oasis": "^3.7.0",
+    "@types/node": "24.1.0",
+    "fastify": "5.4.0",
+    "fastify-metrics": "12.1.0",
+    "prom-client": "15.1.3"
+  },
+  "devDependencies": {
+    "@types/bun": "1.2.19",
+    "typescript": "5.8.3"
+  }
+}
