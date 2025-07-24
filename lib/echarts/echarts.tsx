@@ -1,0 +1,112 @@
+'use client';
+
+import { BarChart, LineChart, PieChart } from 'echarts/charts';
+import {
+  DatasetComponent,
+  GridComponent,
+  LegendComponent,
+  TitleComponent,
+  ToolboxComponent,
+  TooltipComponent,
+  TransformComponent,
+} from 'echarts/components';
+// biome-ignore lint/performance/noNamespaceImport: https://echarts.apache.org/handbook/en/basics/import
+import * as Echarts from 'echarts/core';
+import { LabelLayout, UniversalTransition } from 'echarts/features';
+import { SVGRenderer } from 'echarts/renderers';
+import type { ECBasicOption } from 'echarts/types/dist/shared';
+import { useEffect, useRef, useState } from 'react';
+import { AppTheme, useAppTheme } from '@/lib/app-theme';
+import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
+
+Echarts.use([
+  BarChart,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  DatasetComponent,
+  TransformComponent,
+  LegendComponent,
+  ToolboxComponent,
+  LabelLayout,
+  UniversalTransition,
+  SVGRenderer,
+  LineChart,
+  PieChart,
+]);
+
+Echarts.registerTheme(AppTheme.DARK, DARK_THEME);
+Echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
+
+interface Props {
+  option: ECBasicOption;
+  width?: string;
+  height?: string;
+  className?: string;
+}
+
+export const EChart = ({ option, width = '100%', height = '100%', className }: Props) => {
+  const theme = useAppTheme();
+  const ref = useRef<HTMLDivElement>(null);
+  const eChartsRef = useRef<Echarts.ECharts | null>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  // Create ResizeObserver to update chart size when container size changes
+  useEffect(() => {
+    if (ref.current === null) {
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+
+        setSize({ width, height });
+      }
+    });
+
+    observer.observe(ref.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Resize ECharts when container size changes
+  useEffect(() => {
+    if (eChartsRef.current === null) {
+      return;
+    }
+
+    eChartsRef.current.resize();
+  }, [size.width, size.height]);
+
+  // Update ECharts options when option prop changes
+  useEffect(() => {
+    if (eChartsRef.current === null) {
+      return;
+    }
+
+    eChartsRef.current.setOption(option);
+  }, [option]);
+
+  // Initialize ECharts instance
+  useEffect(() => {
+    if (ref.current === null || eChartsRef.current !== null) {
+      return;
+    }
+
+    eChartsRef.current = Echarts.init(ref.current, theme);
+
+    eChartsRef.current.setOption(option);
+  }, [option, theme]);
+
+  // Update theme when it changes
+  useEffect(() => {
+    if (eChartsRef.current === null) {
+      return;
+    }
+
+    eChartsRef.current.setTheme(theme);
+  }, [theme]);
+
+  return <div style={{ width, height }} ref={ref} className={className} />;
+};
