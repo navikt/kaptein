@@ -1,0 +1,81 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: kaptein
+  namespace: klage
+  labels:
+    team: klage
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 8k
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+spec:
+  port: 3000
+  image: {{ image }}
+  replicas:
+    min: 2
+    max: 4
+  resources:
+    requests:
+      cpu: 20m
+      memory: 128Mi
+  liveness:
+    failureThreshold: 10
+    periodSeconds: 5
+    timeout: 1
+    initialDelay: 0
+    path: /isAlive
+  readiness:
+    failureThreshold: 10
+    periodSeconds: 5
+    timeout: 1
+    initialDelay: 0
+    path: /isReady
+  kafka:
+    pool: {{kafka_pool}}
+  azure:
+    application:
+      enabled: true
+      tenant: {{tenant}}
+      claims:
+        groups:
+        {{#each roles as |role|}}
+          - id: {{role}}
+        {{/each}}
+        extra:
+          - NAVident
+    sidecar:
+      enabled: true
+      autoLogin: true
+  prometheus:
+    enabled: true
+    path: /metrics
+  accessPolicy:
+    outbound:
+      rules:
+        - application: kaptein-api
+        - application: kabal-api
+        - application: klage-kodeverk-api
+        - application: kabal-innstillinger
+        - application: logging
+          namespace: nais-system
+      external:
+        - host: login.microsoftonline.com
+        - host: hooks.slack.com
+  ingresses:
+  {{#each ingresses as |url|}}
+    - {{url}}
+  {{/each}}
+  envFrom:
+    - secret: slack-url
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: nodejs
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+  ingresses:
+  {{#each ingresses as |url|}}
+    - {{url}}
+  {{/each}}
