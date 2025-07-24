@@ -1,0 +1,9 @@
+ingresses:
+  - https://kaptein.intern.nav.no
+  - https://kaptein.ansatt.nav.no
+tenant: nav.no
+roles:
+  - 1c006e8b-c667-4622-9df7-43ed2fd494d6 # KABAL_OPPGAVESTYRING_ALLE_ENHETER
+  - 2b671b60-9650-4839-9139-40999bbb0f71 # KABAL_SAKSBEHANDLING
+  - e9de217a-7244-45ac-8a06-1994905d7964 # KABAL_INNSYN_EGEN_ENHET
+  - 90805436-8a2b-430a-a699-73b29205f25d # KABAL_ADMIN
