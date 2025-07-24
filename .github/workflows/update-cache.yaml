@@ -1,0 +1,62 @@
+name: Update TypeScript shared cache
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-cache:
+    strategy:
+      fail-fast: false
+      matrix:
+        apps: [frontend, server]
+    name: Update TypeScript ${{ matrix.apps }} shared cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.17
+
+      - name: Install common dependencies
+        shell: bash
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          echo -e "\n[install.scopes]\n\"@navikt\" = { token = \"$BUN_AUTH_TOKEN\", url = \"https://npm.pkg.github.com/\" }" >> bunfig.toml
+          bun install --frozen-lockfile
+
+      - name: Install ${{ matrix.apps }} dependencies
+        shell: bash
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          cd ${{ matrix.apps }}
+          echo -e "\n[install.scopes]\n\"@navikt\" = { token = \"$BUN_AUTH_TOKEN\", url = \"https://npm.pkg.github.com/\" }" >> bunfig.toml
+          bun install --frozen-lockfile
+
+      - name: Restore cache for ${{ matrix.apps }}
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{matrix.apps}}/.tsbuildinfo
+          key: ${{ matrix.apps }}-shared-${{ hashFiles(format('{0}/tsconfig.json', matrix.apps)) }} # This will never hit, but it is required.
+          restore-keys: ${{ matrix.apps }}-shared-${{ hashFiles(format('{0}/tsconfig.json', matrix.apps)) }}
+
+      - name: Typecheck ${{ matrix.apps }}
+        shell: bash
+        run: |
+          cd ${{ matrix.apps }}
+          bun run typecheck
+
+      - name: Save shared cache for ${{ matrix.apps }}
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            ${{matrix.apps}}/.tsbuildinfo
+          key: ${{ matrix.apps }}-shared-${{ hashFiles(format('{0}/tsconfig.json', matrix.apps)) }}-${{ github.run_id }}

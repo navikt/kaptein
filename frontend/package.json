@@ -1,0 +1,47 @@
+{
+  "name": "kaptein",
+  "version": "1.0.0",
+  "description": "Kabal produksjonsinfo",
+  "type": "module",
+  "scripts": {
+    "start": "vite & tsc --watch",
+    "build": "vite build",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@happy-dom/global-registrator": "18.0.1",
+    "@tailwindcss/vite": "4.1.11",
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.3.0",
+    "@types/qs": "6.14.0",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "@types/react-redux": "7.1.34",
+    "@vitejs/plugin-react-oxc": "0.3.0",
+    "rolldown-vite": "7.0.10",
+    "tailwindcss": "4.1.11",
+    "vite-tsconfig-paths": "5.1.4"
+  },
+  "dependencies": {
+    "@grafana/faro-react": "1.19.0",
+    "@grafana/faro-web-sdk": "1.19.0",
+    "@grafana/faro-web-tracing": "1.19.0",
+    "@navikt/aksel-icons": "7.25.1",
+    "@navikt/ds-css": "7.25.1",
+    "@navikt/ds-react": "7.25.1",
+    "@navikt/ds-tailwind": "7.25.1",
+    "@navikt/fnrvalidator": "2.1.5",
+    "@reduxjs/toolkit": "2.8.2",
+    "qs": "6.14.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-redux": "9.2.0",
+    "react-router": "7.7.0",
+    "react-router-dom": "7.7.0",
+    "styled-components": "6.1.19"
+  }
+}
