@@ -1,0 +1,47 @@
+name: Sanity Build
+
+on: [pull_request]
+
+jobs:
+  sanity-build:
+    strategy:
+      fail-fast: false
+    name: Sanity Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+          registry-url: https://npm.pkg.github.com/
+          scope: "@navikt"
+          
+      - name: Generate bunfig.toml
+        run: |
+          echo -e "[install.scopes]\n\"@navikt\" = { token = \"${{ secrets.READER_TOKEN }}\", url = \"https://npm.pkg.github.com/\" }" > bunfig.toml
+
+      - name: Install dependencies
+        shell: bash
+        env:
+          BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          bun install --frozen-lockfile
+          
+      - name: Typecheck
+        shell: bash
+        run: |
+          bun run typecheck
+            
+      - name: Lint
+        shell: bash
+        run: |
+          bun run lint
+    
+      - name: Test
+        if: false # No unit tests yet
+        shell: bash
+        run: |
+          bun test
