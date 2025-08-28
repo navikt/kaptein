@@ -45,6 +45,7 @@ spec:
       rules:
         - application: kabal-api
         - application: klage-kodeverk-api
+        - application: kabal-innstillinger
         - application: logging
           namespace: nais-system
       external:

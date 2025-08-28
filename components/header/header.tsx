@@ -11,8 +11,8 @@ export const Header = ({ user }: { user: IUserData }) => (
   <Themed>
     <InternalHeader>
       <InternalHeader.Title href="/">Kaptein</InternalHeader.Title>
-      <InternalHeader.Button as="a" href="/statistikk">
-        Statistikk
+      <InternalHeader.Button as="a" href="/behandlinger">
+        Behandlinger
       </InternalHeader.Button>
 
       <Spacer />

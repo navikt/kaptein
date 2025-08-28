@@ -3,26 +3,28 @@ import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
 import { generateTraceParent, getFromKabal } from '@/lib/server/fetch';
-import type { IUserData, IYtelse } from '@/lib/server/types';
+import type { IUserData } from '@/lib/server/types';
+import { ytelser } from '@/lib/server/ytelser';
 
 const logger = getLogger('api');
 
-const _KABAL_INNSTILLINGER = isLocal ? 'https://kaptein.intern.dev.nav.no/api/' : 'http://kabal-innstillinger/api';
-const KLAGE_KODEVERK = isLocal ? 'https://kaptein.intern.dev.nav.no/kodeverk/' : 'http://klage-kodeverk-api/kodeverk';
+const KABAL_API = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-api/api/kaptein';
+const _KABAL_INNSTILLINGER = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-innstillinger/api';
+const _KLAGE_KODEVERK = isLocal ? 'https://kaptein.intern.dev.nav.no/kodeverk' : 'http://klage-kodeverk-api/kodeverk';
 
-const getData = async <T>(headers: Headers, url: string): Promise<T> => {
+const _getData = async <T>(headers: Headers, url: string): Promise<T> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
 
   try {
     const res = await (isLocal ? fetch(url, { headers }) : getFromKabal(url, headers, traceparent));
 
     if (res.status === 401) {
-      logger.warn('Unauthorized fetch of cases', traceId, spanId);
+      logger.warn('Unauthorized', traceId, spanId, { url });
       throw new UnauthorizedError();
     }
 
     if (!res.ok) {
-      logger.error(`Failed to fetch cases - ${res.status}`, traceId, spanId);
+      logger.error(`Failed to fetch - ${res.status}`, traceId, spanId, { url });
       throw new InternalServerError(res.status, 'Kunne ikke hente data');
     }
 
@@ -30,7 +32,8 @@ const getData = async <T>(headers: Headers, url: string): Promise<T> => {
 
     return data;
   } catch (error) {
-    logger.error('Failed to fetch cases', traceId, spanId, {
+    logger.error('Failed to fetch', traceId, spanId, {
+      url,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? (error.stack ?? '') : '',
     });
@@ -63,4 +66,7 @@ export const getUser = async (): Promise<IUserData> => {
   };
 };
 
-export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
+// export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
+export const getBehandlinger = async () => _getData<unknown[]>(await headers(), `${KABAL_API}/behandlinger`);
+
+export const getYtelser = () => Promise.resolve(ytelser);
