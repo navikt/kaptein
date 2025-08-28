@@ -50,6 +50,8 @@ const subtextStyle = {
 
 const backgroundColor = 'var(--ax-bg-neutral-soft)';
 
+const _legendTextColor = 'var(--ax-text-neutral-subtle)';
+
 const color = [
   'var(--ax-accent-500)',
   'var(--ax-warning-500)',
@@ -121,6 +123,10 @@ export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
       title: { ...(option.title ?? {}), textStyle, subtextStyle },
       textStyle,
       backgroundColor,
+      legend: {
+        ...(option.legend ?? {}),
+        textStyle,
+      },
     });
   }, [option, theme]);
 

@@ -3,14 +3,16 @@ import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
 import { generateTraceParent, getFromKabal } from '@/lib/server/fetch';
-import type { IUserData } from '@/lib/server/types';
+import type { BehandlingResponse, IKodeverkSimpleValue, IUserData } from '@/lib/server/types';
 import { ytelser } from '@/lib/server/ytelser';
 
 const logger = getLogger('api');
 
 const KABAL_API = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-api/api/kaptein';
 const _KABAL_INNSTILLINGER = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-innstillinger/api';
-const _KLAGE_KODEVERK = isLocal ? 'https://kaptein.intern.dev.nav.no/kodeverk' : 'http://klage-kodeverk-api/kodeverk';
+const KLAGE_KODEVERK = isLocal
+  ? 'https://kaptein.intern.dev.nav.no/api/kodeverk'
+  : 'http://klage-kodeverk-api/kodeverk';
 
 export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
@@ -24,7 +26,7 @@ export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
     }
 
     if (!res.ok) {
-      logger.error(`Failed to fetch - ${res.status}`, traceId, spanId, { url });
+      logger.error(`Failed to fetch ${url} - ${res.status}`, traceId, spanId, { url });
       throw new InternalServerError(res.status, 'Kunne ikke hente data');
     }
 
@@ -67,6 +69,9 @@ export const getUser = async (): Promise<IUserData> => {
 };
 
 // export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
-export const getBehandlinger = async () => getData<unknown[]>(await headers(), `${KABAL_API}/behandlinger`);
+export const getBehandlinger = async () => getData<BehandlingResponse>(await headers(), `${KABAL_API}/behandlinger`);
+export const getKodeverk = async (path: string) => getData(await headers(), `${KLAGE_KODEVERK}/${path}`);
+export const getSakstyper = async (): Promise<IKodeverkSimpleValue[]> =>
+  getData(await headers(), `${KLAGE_KODEVERK}/sakstyper`);
 
 export const getYtelser = () => Promise.resolve(ytelser);
