@@ -55,3 +55,47 @@ export interface IYtelse extends IKodeverkSimpleValue {
   enheter: IKodeverkSimpleValue[];
   klageenheter: IKodeverkSimpleValue[];
 }
+
+export interface BehandlingResponse {
+  anonymizedBehandlingList: Behandling[];
+  total: number;
+}
+
+export interface Behandling {
+  ageKA: number;
+  avsluttetAvSaksbehandlerDate: string | null;
+  created: string;
+  datoSendtMedunderskriver: string | null;
+  fagsystemId: string;
+  feilregistrering: string | null;
+  fraNAVEnhet: string;
+  frist: string;
+  hjemmelIdList: string[];
+  id: string;
+  isAvsluttetAvSaksbehandler: boolean;
+  kjennelseMottatt: string | null;
+  modified: string;
+  mottattKlageinstans: string;
+  mottattVedtaksinstans: string;
+  resultat: {
+    id: string;
+    utfallId: string;
+    extraUtfallIdSet: string[];
+  };
+  sattPaaVent: string | null;
+  sendtTilTrygderetten: string | null;
+  temaId: string;
+  tilbakekreving: boolean;
+  timesPreviouslyExtended: number;
+  typeId: Sakstype;
+  varsletFrist: string | null;
+  ytelseId: string;
+}
+
+export enum Sakstype {
+  KLAGE = '1',
+  ANKE = '2',
+  ANKE_I_TRYGDERETTEN = '3',
+  BEHANDLING_ETTER_TR_OPPHEVET = '4',
+  OMGJØRINGSKRAV = '5',
+}
