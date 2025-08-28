@@ -1,6 +1,7 @@
 import '@/app/globals.css';
 import { Faro } from '@/components/faro';
 import { Header } from '@/components/header/header';
+import { Themed } from '@/components/themed';
 import { getUser } from '@/lib/server/api';
 
 interface Props {
@@ -23,7 +24,7 @@ export const Decorator = async ({ children }: Readonly<Props>) => {
 
       <body className="h-full flex flex-col">
         <Header user={user} />
-        <div className="grow flex">{children}</div>
+        <Themed className="grow flex">{children}</Themed>
       </body>
     </html>
   );

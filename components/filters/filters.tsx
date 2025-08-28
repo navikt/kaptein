@@ -1,14 +1,19 @@
-import { Select } from '@navikt/ds-react';
-import { getYtelser } from '@/lib/server/api';
+'use client';
 
-export const Filters = async () => {
-  const ytelser = await getYtelser();
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Ytelser } from '@/components/filters/ytelser';
+import type { IYtelse } from '@/lib/server/types';
 
-  const options = ytelser.map((ytelse) => (
-    <option key={ytelse.id} value={ytelse.id}>
-      {ytelse.navn}
-    </option>
-  ));
+export const Filters = ({ ytelser }: { ytelser: IYtelse[] }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  return <Select label="Ytelse">{options}</Select>;
+  const createQueryString = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+
+    router.push(`?${params.toString()}`);
+  };
+
+  return <Ytelser ytelser={ytelser} onChange={(value) => createQueryString('ytelser', value.join(','))} />;
 };
