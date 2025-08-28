@@ -3,14 +3,14 @@ import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
 import { generateTraceParent, getFromKabal } from '@/lib/server/fetch';
-import type { IUserData } from '@/lib/server/types';
+import type { BehandlingResponse, IKodeverkSimpleValue, IUserData } from '@/lib/server/types';
 import { ytelser } from '@/lib/server/ytelser';
 
 const logger = getLogger('api');
 
 const KABAL_API = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-api/api/kaptein';
 const _KABAL_INNSTILLINGER = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-innstillinger/api';
-const _KLAGE_KODEVERK = isLocal ? 'https://kaptein.intern.dev.nav.no/kodeverk' : 'http://klage-kodeverk-api/kodeverk';
+const KLAGE_KODEVERK = isLocal ? 'https://kaptein.intern.dev.nav.no/kodeverk' : 'http://klage-kodeverk-api/kodeverk';
 
 export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
@@ -67,6 +67,7 @@ export const getUser = async (): Promise<IUserData> => {
 };
 
 // export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
-export const getBehandlinger = async () => getData<unknown[]>(await headers(), `${KABAL_API}/behandlinger`);
+export const getBehandlinger = async () => getData<BehandlingResponse>(await headers(), `${KABAL_API}/behandlinger`);
+export const getKodeverk = async () => getData<IKodeverkSimpleValue[]>(await headers(), `${KLAGE_KODEVERK}`);
 
 export const getYtelser = () => Promise.resolve(ytelser);
