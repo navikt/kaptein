@@ -3,10 +3,6 @@ import { getYtelser } from '@/lib/server/api';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const ytelser = await getYtelser();
-  // const behandlinger = await getBehandlinger();
-
-  const behandlinger = await fetch('/api/behandlinger');
-  console.log(behandlinger);
 
   return (
     <div className="grow flex">

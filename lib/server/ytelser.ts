@@ -29778,4 +29778,4 @@ export const ytelser: IYtelse[] = [
       },
     ],
   },
-];
+] as IYtelse[];

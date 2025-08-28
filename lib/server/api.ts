@@ -12,7 +12,7 @@ const KABAL_API = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://ka
 const _KABAL_INNSTILLINGER = isLocal ? 'https://kaptein.intern.dev.nav.no/api' : 'http://kabal-innstillinger/api';
 const _KLAGE_KODEVERK = isLocal ? 'https://kaptein.intern.dev.nav.no/kodeverk' : 'http://klage-kodeverk-api/kodeverk';
 
-const _getData = async <T>(headers: Headers, url: string): Promise<T> => {
+export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
 
   try {
@@ -67,6 +67,6 @@ export const getUser = async (): Promise<IUserData> => {
 };
 
 // export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
-export const getBehandlinger = async () => _getData<unknown[]>(await headers(), `${KABAL_API}/behandlinger`);
+export const getBehandlinger = async () => getData<unknown[]>(await headers(), `${KABAL_API}/behandlinger`);
 
 export const getYtelser = () => Promise.resolve(ytelser);
