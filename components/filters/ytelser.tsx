@@ -1,6 +1,4 @@
-'use client';
-
-import { UNSAFE_Combobox } from '@navikt/ds-react';
+import { Loader, UNSAFE_Combobox } from '@navikt/ds-react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useMemo, useState } from 'react';
 import type { IYtelse } from '@/lib/server/types';
@@ -42,7 +40,7 @@ export const YtelserInternal = ({ ytelser, onChange }: { ytelser: IYtelse[]; onC
 
 export const Ytelser = ({ ytelser, onChange }: { ytelser: IYtelse[]; onChange: (value: string[]) => void }) => {
   return (
-    <Suspense>
+    <Suspense fallback={<Loader />}>
       <YtelserInternal ytelser={ytelser} onChange={onChange} />
     </Suspense>
   );
