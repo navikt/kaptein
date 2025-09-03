@@ -10,7 +10,7 @@ const logger = getLogger('api');
 const DEV_DOMAIN = 'https://kaptein.intern.dev.nav.no';
 
 const KABAL_API = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-api/api/kaptein';
-const _KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger/api';
+const KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger';
 const KLAGE_KODEVERK = isLocal ? `${DEV_DOMAIN}/api/kodeverk` : 'http://klage-kodeverk-api/kodeverk';
 
 export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
@@ -43,30 +43,7 @@ export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
   }
 };
 
-// export const getUser = async (): Promise<IUserData> =>
-//   getData(await headers(), 'https://kabal.intern.dev.nav.no/api/kabal-innstillinger/me/brukerdata');
-
-export const getUser = async (): Promise<IUserData> => {
-  return Promise.resolve({
-    navIdent: 'Z994862',
-    navn: 'F_Z994862 E_Z994862',
-    roller: [],
-    enheter: [
-      {
-        id: '4295',
-        navn: 'Nav Klageinstans nord',
-        lovligeYtelser: [],
-      },
-    ],
-    ansattEnhet: {
-      id: '4295',
-      navn: 'Nav Klageinstans nord',
-      lovligeYtelser: [],
-    },
-    tildelteYtelser: [],
-  });
-};
-
+export const getUser = async (): Promise<IUserData> => getData(await headers(), `${KABAL_INNSTILLINGER}/me/brukerdata`);
 export const getBehandlinger = async () => getData<BehandlingResponse>(await headers(), `${KABAL_API}/behandlinger`);
 export const getKodeverk = async (path: string) => getData(await headers(), `${KLAGE_KODEVERK}/${path}`);
 export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
