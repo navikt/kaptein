@@ -10,7 +10,7 @@ const logger = getLogger('api');
 const DEV_DOMAIN = 'https://kaptein.intern.dev.nav.no';
 
 const KABAL_API = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-api/api/kaptein';
-const _KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger/api';
+const KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger/api';
 const KLAGE_KODEVERK = isLocal ? `${DEV_DOMAIN}/api/kodeverk` : 'http://klage-kodeverk-api/kodeverk';
 
 export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
@@ -43,8 +43,8 @@ export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
   }
 };
 
-// export const getUser = async (): Promise<IUserData> =>
-//   getData(await headers(), 'https://kabal.intern.dev.nav.no/api/kabal-innstillinger/me/brukerdata');
+export const getUserFromApi = async (): Promise<IUserData> =>
+  getData(await headers(), `${KABAL_INNSTILLINGER}/me/brukerdata`);
 
 export const getUser = async (): Promise<IUserData> => {
   return Promise.resolve({

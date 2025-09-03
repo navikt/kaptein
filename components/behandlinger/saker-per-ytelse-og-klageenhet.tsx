@@ -49,13 +49,13 @@ export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klage
         title: {
           text: 'Saker per ytelse og klageenhet',
         },
+        legend: {},
         tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow',
           },
         },
-        legend: {},
         xAxis: {
           type: 'value',
         },
