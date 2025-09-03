@@ -96,6 +96,8 @@ export interface Behandling {
   typeId: Sakstype;
   varsletFrist: string | null;
   ytelseId: string;
+  isTildelt: boolean;
+  tildeltEnhet: string | null;
 }
 
 export enum Sakstype {

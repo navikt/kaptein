@@ -9,7 +9,7 @@ export const Tildeling = () => {
 
   return (
     <ToggleGroup
-      label="Tildeling (funker ikke ennå)"
+      label="Tildeling"
       value={ledige ?? LedigeFilter.ALL}
       onChange={(v) => {
         setLedige(isLedigeFilter(v) ? v : LedigeFilter.ALL);
