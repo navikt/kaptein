@@ -47,7 +47,7 @@ export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
 //   getData(await headers(), 'https://kabal.intern.dev.nav.no/api/kabal-innstillinger/me/brukerdata');
 
 export const getUser = async (): Promise<IUserData> => {
-  return {
+  return Promise.resolve({
     navIdent: 'Z994862',
     navn: 'F_Z994862 E_Z994862',
     roller: [],
@@ -64,12 +64,10 @@ export const getUser = async (): Promise<IUserData> => {
       lovligeYtelser: [],
     },
     tildelteYtelser: [],
-  };
+  });
 };
 
 export const getBehandlinger = async () => getData<BehandlingResponse>(await headers(), `${KABAL_API}/behandlinger`);
-// export const getBehandlinger = async () => Promise.resolve(behandlinger);
-
 export const getKodeverk = async (path: string) => getData(await headers(), `${KLAGE_KODEVERK}/${path}`);
 export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
 export const getKlageenheter = async () =>

@@ -10,17 +10,16 @@ interface Props {
   behandlinger: Behandling[];
 }
 
-export const PåVent = ({ behandlinger, total }: Props) => {
+export const LedigeVsTildelte = ({ behandlinger, total }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
-      const value = curr.sattPaaVent === null;
-      const existing = acc.get(value);
+      const existing = acc.get(curr.isTildelt);
 
       if (existing) {
         existing.value += 1;
       } else {
-        acc.set(value, {
-          name: value ? 'Ikke på vent' : 'På vent',
+        acc.set(curr.isTildelt, {
+          name: curr.isTildelt ? 'Tildelt' : 'Ledig',
           value: 1,
         });
       }
