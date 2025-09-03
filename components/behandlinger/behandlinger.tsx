@@ -4,11 +4,15 @@ import { HStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { LedigeFilter, parseAsLedigeFilter } from '@/app/custom-parses';
+import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { PåVent } from '@/components/behandlinger/på-vent';
+import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
 import { SakerPerKlageenhet } from '@/components/behandlinger/saker-per-klageenhet';
+import { SakerPerKlageenhetOgYtelse } from '@/components/behandlinger/saker-per-klageenhet-og-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse';
 import { SakerPerYtelseHosKlageenhet } from '@/components/behandlinger/saker-per-ytelse-hos-klageenhet';
+import { SakerPerYtelseOgKlageenhet } from '@/components/behandlinger/saker-per-ytelse-og-klageenhet';
 import { Card } from '@/components/cards';
 import type { Behandling, IKodeverkSimpleValue, IKodeverkValue, IYtelse } from '@/lib/server/types';
 
@@ -36,6 +40,29 @@ export const Behandlinger = ({
       </Card>
 
       <Card>
+        <LedigeVsTildelte behandlinger={data} total={behandlinger.length} />
+      </Card>
+
+      <Card>
+        <PåVent behandlinger={data} total={behandlinger.length} />
+      </Card>
+
+      <Card>
+        <SakerPerYtelseOgKlageenhet
+          behandlinger={data}
+          ytelsekodeverk={ytelseKodeverk}
+          klageenheterkodeverk={klageenheterKodeverk}
+        />
+      </Card>
+      <Card>
+        <SakerPerKlageenhetOgYtelse
+          behandlinger={data}
+          ytelsekodeverk={ytelseKodeverk}
+          klageenheterkodeverk={klageenheterKodeverk}
+        />
+      </Card>
+
+      <Card>
         <SakerPerYtelseHosKlageenhet
           behandlinger={data}
           total={behandlinger.length}
@@ -45,7 +72,7 @@ export const Behandlinger = ({
       </Card>
 
       <Card>
-        <PåVent
+        <PåVentPerYtelse
           behandlinger={data}
           total={behandlinger.length}
           ytelsekodeverk={ytelseKodeverk}
@@ -78,11 +105,10 @@ const useData = (behandlinger: Behandling[]) => {
   const ledige = ledigeFilter ?? LedigeFilter.ALL;
 
   return useMemo(() => {
-    // TODO: Filter for tildeltSaksbehandler when field is availble from BE
     const filteredForLedige =
       ledige === LedigeFilter.ALL
         ? behandlinger
-        : behandlinger.filter((b) => b.tilbakekreving === (ledige === LedigeFilter.LEDIGE));
+        : behandlinger.filter((b) => b.isTildelt === (ledige === LedigeFilter.LEDIGE));
 
     const filteredForSakstyper =
       sakstyper.length === 0 ? filteredForLedige : filteredForLedige.filter((b) => sakstyper.includes(b.typeId));
