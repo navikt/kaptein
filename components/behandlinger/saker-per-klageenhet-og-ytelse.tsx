@@ -11,9 +11,21 @@ interface Props {
 }
 
 export const SakerPerKlageenhetOgYtelse = ({ behandlinger, ytelsekodeverk, klageenheterkodeverk }: Props) => {
+  const relevantYtelser = useMemo(() => {
+    const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
+
+    return ids
+      .map((id) => {
+        const kodeverk = ytelsekodeverk.find((k) => k.id === id);
+
+        return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
+      })
+      .toSorted((a, b) => a.navn.localeCompare(b.navn));
+  }, [behandlinger, ytelsekodeverk]);
+
   const series = useMemo(
     () =>
-      ytelsekodeverk.map((ytelse) => ({
+      relevantYtelser.map((ytelse) => ({
         type: 'bar',
         stack: 'total',
         label: { show: true },
@@ -28,7 +40,7 @@ export const SakerPerKlageenhetOgYtelse = ({ behandlinger, ytelsekodeverk, klage
           )
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, ytelsekodeverk, klageenheterkodeverk],
+    [behandlinger, relevantYtelser, klageenheterkodeverk],
   );
 
   return (
@@ -43,7 +55,9 @@ export const SakerPerKlageenhetOgYtelse = ({ behandlinger, ytelsekodeverk, klage
             type: 'shadow',
           },
         },
-        legend: {},
+        legend: {
+          type: 'scroll',
+        },
         xAxis: {
           type: 'value',
         },
