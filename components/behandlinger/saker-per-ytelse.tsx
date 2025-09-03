@@ -15,7 +15,7 @@ export const SakerPerYtelse = ({ behandlinger, total, ytelser }: Props) => {
   const data = useMemo(() => {
     const map = new Map<string, { value: number; name: string }>();
 
-    behandlinger.forEach((b) => {
+    behandlinger.slice(0, 10).forEach((b) => {
       const existing = map.get(b.ytelseId);
 
       if (existing) {
@@ -66,6 +66,7 @@ export const SakerPerYtelse = ({ behandlinger, total, ytelser }: Props) => {
           {
             data: values,
             type: 'bar',
+            barCategoryGap: '-90%',
           },
         ],
       }}

@@ -42,7 +42,7 @@ export const PåVent = ({ behandlinger, total }: Props) => {
     <EChart
       option={{
         title: {
-          text: 'Tildelte/ledige saker',
+          text: 'Tildelte saker på vent / ikke på vent',
           left: 'center',
         },
         tooltip: {

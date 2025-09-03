@@ -36,6 +36,14 @@ export const Behandlinger = ({
   return (
     <HStack gap="8" wrap className="h-fit" padding="6">
       <Card>
+        <SakerPerKlageenhetOgYtelse
+          behandlinger={data}
+          ytelsekodeverk={ytelseKodeverk}
+          klageenheterkodeverk={klageenheterKodeverk}
+          sakstyperkoderverk={sakstyper}
+        />
+      </Card>
+      <Card>
         <SakerPerSakstype behandlinger={data} sakstyper={sakstyper} total={behandlinger.length} />
       </Card>
 
@@ -49,13 +57,6 @@ export const Behandlinger = ({
 
       <Card>
         <SakerPerYtelseOgKlageenhet
-          behandlinger={data}
-          ytelsekodeverk={ytelseKodeverk}
-          klageenheterkodeverk={klageenheterKodeverk}
-        />
-      </Card>
-      <Card>
-        <SakerPerKlageenhetOgYtelse
           behandlinger={data}
           ytelsekodeverk={ytelseKodeverk}
           klageenheterkodeverk={klageenheterKodeverk}

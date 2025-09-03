@@ -16,17 +16,16 @@ export const Header = ({ user }: { user: IUserData }) => {
     <InternalHeader>
       <InternalHeader.Title href="/">Kaptein</InternalHeader.Title>
 
-      <InternalHeader.Button as={Link} prefetch className={pathname === '/alle' ? ACTIVE_CLASS : ''} href="/alle">
+      <InternalHeader.Button as={Link} className={pathname === '/alle' ? ACTIVE_CLASS : ''} href="/alle">
         Alle saker
       </InternalHeader.Button>
 
-      <InternalHeader.Button as={Link} prefetch className={pathname === '/aktive' ? ACTIVE_CLASS : ''} href="/aktive">
+      <InternalHeader.Button as={Link} className={pathname === '/aktive' ? ACTIVE_CLASS : ''} href="/aktive">
         Aktive saker
       </InternalHeader.Button>
 
       <InternalHeader.Button
         as={Link}
-        prefetch
         className={pathname === '/ferdigstilte' ? ACTIVE_CLASS : ''}
         href="/ferdigstilte"
       >
