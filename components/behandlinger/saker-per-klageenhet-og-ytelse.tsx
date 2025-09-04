@@ -1,5 +1,6 @@
 'use client';
 
+import { VStack } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
@@ -19,6 +20,21 @@ export const SakerPerKlageenhetOgYtelse = ({
 }: Props) => {
   const filteredBehandlinger = useMemo(() => behandlinger.filter((b) => b.tildeltEnhet !== null), [behandlinger]);
 
+  const groupedByKlageenhet = useMemo(
+    () =>
+      filteredBehandlinger.reduce<Record<string, Behandling[]>>((acc, curr) => {
+        if (curr.tildeltEnhet === null) {
+          return acc;
+        }
+
+        const existing = acc[curr.tildeltEnhet] ?? [];
+        existing.push(curr);
+        acc[curr.tildeltEnhet] = existing;
+        return acc;
+      }, {}),
+    [filteredBehandlinger],
+  );
+
   const relevantYtelser = useMemo(() => {
     const ids = Array.from(new Set(filteredBehandlinger.map((b) => b.ytelseId)));
 
@@ -31,32 +47,55 @@ export const SakerPerKlageenhetOgYtelse = ({
       .toSorted((a, b) => a.navn.localeCompare(b.navn));
   }, [filteredBehandlinger, ytelsekodeverk]);
 
+  return (
+    <VStack className="h-full overflow-scroll">
+      {relevantYtelser.map((ytelse) => (
+        <Group
+          key={ytelse.id}
+          behandlinger={filteredBehandlinger.filter((b) => b.ytelseId === ytelse.id)}
+          klageenheterkodeverk={klageenheterkodeverk}
+          sakstyperkoderverk={sakstyperkoderverk}
+          title={ytelse.navn}
+        />
+      ))}
+    </VStack>
+  );
+};
+
+interface GroupProps {
+  behandlinger: Behandling[];
+  klageenheterkodeverk: IKodeverkSimpleValue[];
+  sakstyperkoderverk: IKodeverkSimpleValue[];
+  title: string;
+}
+
+const Group = ({ behandlinger, klageenheterkodeverk, sakstyperkoderverk, title }: GroupProps) => {
   const series = useMemo(
     () =>
-      relevantYtelser.map((ytelse) => ({
+      sakstyperkoderverk.map((type) => ({
         type: 'bar',
         stack: 'total',
         label: { show: true },
         emphasis: { focus: 'series' },
-        name: ytelse.navn,
+        name: type.navn,
         data: klageenheterkodeverk
           .map(({ id }) =>
             behandlinger.reduce(
-              (acc, curr) => (curr.tildeltEnhet === id && curr.ytelseId === ytelse.id ? acc + 1 : acc),
+              (acc, curr) => (curr.tildeltEnhet === id && curr.typeId === type.id ? acc + 1 : acc),
               0,
             ),
           )
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, relevantYtelser, klageenheterkodeverk],
+    [behandlinger, sakstyperkoderverk, klageenheterkodeverk],
   );
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Saker per klageenhet og ytelse',
-          subtext: `Totalt: ${filteredBehandlinger.length} tildelte saker`,
+          text: title,
+          // subtext: `Totalt: ${filteredBehandlinger.length} tildelte saker`,
         },
         tooltip: {
           confine: true,
@@ -64,9 +103,6 @@ export const SakerPerKlageenhetOgYtelse = ({
           axisPointer: {
             type: 'shadow',
           },
-        },
-        legend: {
-          type: 'scroll',
         },
         xAxis: {
           type: 'value',

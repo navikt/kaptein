@@ -47,28 +47,28 @@ export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klage
     (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
   );
 
-  const option = {
-    title: {
-      text: 'Saker per ytelse og klageenhet',
-    },
-    legend: {},
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
-    },
-    xAxis: {
-      type: 'value',
-    },
-    yAxis: {
-      type: 'category',
-      data: labels,
-    },
-    series,
-  };
-
-  console.log(option);
-
-  return <EChart option={option} />;
+  return (
+    <EChart
+      option={{
+        title: {
+          text: 'Saker per ytelse og klageenhet',
+        },
+        legend: {},
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
+        },
+        xAxis: {
+          type: 'value',
+        },
+        yAxis: {
+          type: 'category',
+          data: labels,
+        },
+        series,
+      }}
+    />
+  );
 };

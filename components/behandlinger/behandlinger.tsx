@@ -106,10 +106,12 @@ const useData = (behandlinger: Behandling[]) => {
   const ledige = ledigeFilter ?? LedigeFilter.ALL;
 
   return useMemo(() => {
+    const filteredForAnkeITR = behandlinger.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
+
     const filteredForLedige =
       ledige === LedigeFilter.ALL
-        ? behandlinger
-        : behandlinger.filter((b) => b.isTildelt === (ledige === LedigeFilter.LEDIGE));
+        ? filteredForAnkeITR
+        : filteredForAnkeITR.filter((b) => b.isTildelt === (ledige === LedigeFilter.LEDIGE));
 
     const filteredForSakstyper =
       sakstyper.length === 0 ? filteredForLedige : filteredForLedige.filter((b) => sakstyper.includes(b.typeId));
@@ -130,3 +132,5 @@ const useData = (behandlinger: Behandling[]) => {
     return filteredForHjemler;
   }, [behandlinger, ytelser, klageenheter, hjemler, ledige, sakstyper]);
 };
+
+const ANKE_I_TRYGDERETTEN_ID = '3';

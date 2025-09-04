@@ -65,4 +65,12 @@ export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/$
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/ytelser');
 export const getKlageenheter = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/klageenheter');
 export const getSakstyper = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
+
+const ANKE_I_TRYGDERETTEN_ID = '3';
+
+export const getSakstyperWithoutAnkeITR = async () => {
+  const data = await getSakstyper();
+
+  return data.filter((s) => s.id !== ANKE_I_TRYGDERETTEN_ID);
+};
 export const getPåVentReasons = () => getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
