@@ -8,6 +8,8 @@ const logger = getLogger('obo-token');
 
 export enum AppName {
   KABAL_API = 'kabal-api',
+  KABAL_INNSTILLINGER = 'kabal-innstillinger',
+  KLAGE_KODEVERK = 'klage-kodeverk',
 }
 
 export const getOboToken = async (appName: AppName, headers: ReadonlyHeaders) => {
@@ -20,6 +22,8 @@ export const getOboToken = async (appName: AppName, headers: ReadonlyHeaders) =>
   }
 
   const [, token] = authorization.split(' ');
+
+  logger.debug(`Got token for ${appName}: ${token}`, traceId, spanId);
 
   const validation = await validateToken(token);
 
