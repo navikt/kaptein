@@ -39,7 +39,7 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
         label={label}
         isMultiSelect
         onChange={setValue}
-        selectedOptions={selectedOptions}
+        selectedOptions={selectedOptions.length === 0 ? ['Alle'] : selectedOptions}
         options={options}
         onToggleSelected={(option, isSelected) => {
           if (!isSelected && (selected === null || selected.length === 0)) {

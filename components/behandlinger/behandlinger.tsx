@@ -5,14 +5,11 @@ import { useMemo } from 'react';
 import { parseAsLedigeFilter, TildeltFilter } from '@/app/custom-parses';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { PåVent } from '@/components/behandlinger/på-vent';
-import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
 import { SakerPerKlageenhet } from '@/components/behandlinger/saker-per-klageenhet';
-import { SakerPerKlageenhetOgYtelse } from '@/components/behandlinger/saker-per-klageenhet-og-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse';
-import { SakerPerYtelseHosKlageenhet } from '@/components/behandlinger/saker-per-ytelse-hos-klageenhet';
 import { SakerPerYtelseOgKlageenhet } from '@/components/behandlinger/saker-per-ytelse-og-klageenhet';
-import { Card, DoubleHeightCard } from '@/components/cards';
+import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
+import { Card } from '@/components/cards';
 import type { Behandling, IKodeverkSimpleValue, IKodeverkValue, IYtelse } from '@/lib/server/types';
 
 interface Props {
@@ -34,19 +31,12 @@ export const Behandlinger = ({
 
   return (
     <div className="grid w-full auto-rows-[768px] grid-cols-1 gap-6 p-6 xl:grid-cols-2 2xl:grid-cols-3">
-      <DoubleHeightCard>
-        <SakerPerKlageenhetOgYtelse
-          behandlinger={data}
-          ytelsekodeverk={ytelseKodeverk}
-          klageenheterkodeverk={klageenheterKodeverk}
-          sakstyperkoderverk={sakstyper}
-        />
-      </DoubleHeightCard>
       <Card>
-        <SakerPerYtelseOgKlageenhet
+        <SakerPerYtelse
           behandlinger={data}
-          ytelsekodeverk={ytelseKodeverk}
-          klageenheterkodeverk={klageenheterKodeverk}
+          total={behandlinger.length}
+          ytelser={ytelseKodeverk}
+          sakstyper={sakstyper}
         />
       </Card>
 
@@ -61,6 +51,27 @@ export const Behandlinger = ({
       <Card>
         <PåVent behandlinger={data} total={behandlinger.length} />
       </Card>
+
+      <Card>
+        <SakerPerKlageenhet behandlinger={data} total={behandlinger.length} klageenheter={klageenheterKodeverk} />
+      </Card>
+
+      <Card>
+        <SakerPerYtelseOgKlageenhet
+          behandlinger={data}
+          ytelsekodeverk={ytelseKodeverk}
+          klageenheterkodeverk={klageenheterKodeverk}
+        />
+      </Card>
+
+      {/* <DoubleHeightCard>
+        <SakerPerKlageenhetOgYtelse
+          behandlinger={data}
+          ytelsekodeverk={ytelseKodeverk}
+          klageenheterkodeverk={klageenheterKodeverk}
+          sakstyperkoderverk={sakstyper}
+        />
+      </DoubleHeightCard>
 
       <Card>
         <SakerPerYtelseHosKlageenhet
@@ -78,15 +89,7 @@ export const Behandlinger = ({
           ytelsekodeverk={ytelseKodeverk}
           påVentReasons={påVentReasons}
         />
-      </Card>
-
-      <Card>
-        <SakerPerKlageenhet behandlinger={data} total={behandlinger.length} klageenheter={klageenheterKodeverk} />
-      </Card>
-
-      <Card>
-        <SakerPerYtelse behandlinger={data} total={behandlinger.length} ytelser={ytelseKodeverk} />
-      </Card>
+      </Card> */}
     </div>
   );
 };
