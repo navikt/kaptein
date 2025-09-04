@@ -3,6 +3,7 @@ import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
 import { generateTraceParent, getFromKabal } from '@/lib/server/fetch';
+import { AppName } from '@/lib/server/get-obo-token';
 import type { BehandlingResponse, IKodeverkSimpleValue, IKodeverkValue, IUserData, IYtelse } from '@/lib/server/types';
 
 const logger = getLogger('api');
@@ -10,14 +11,27 @@ const logger = getLogger('api');
 const DEV_DOMAIN = 'https://kaptein.intern.dev.nav.no';
 
 const KABAL_API = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-api/api/kaptein';
-const KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger/api';
+const KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger';
 const KLAGE_KODEVERK = isLocal ? `${DEV_DOMAIN}/api/kodeverk` : 'http://klage-kodeverk-api/kodeverk';
 
-export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
+const getUrl = (appName: AppName) => {
+  switch (appName) {
+    case AppName.KABAL_API:
+      return KABAL_API;
+    case AppName.KABAL_INNSTILLINGER:
+      return KABAL_INNSTILLINGER;
+    case AppName.KLAGE_KODEVERK:
+      return KLAGE_KODEVERK;
+  }
+};
+
+export const getData = async <T>(appName: AppName, path: string): Promise<T> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
+  const h = await headers();
+  const url = getUrl(appName) + path;
 
   try {
-    const res = await (isLocal ? fetch(url, { headers }) : getFromKabal(url, headers, traceparent));
+    const res = await (isLocal ? fetch(url, { headers: h }) : getFromKabal(appName, url, h, traceparent));
 
     if (res.status === 401) {
       logger.warn('Unauthorized', traceId, spanId, { url });
@@ -43,36 +57,33 @@ export const getData = async <T>(headers: Headers, url: string): Promise<T> => {
   }
 };
 
-export const getUserFromApi = async (): Promise<IUserData> =>
-  getData(await headers(), `${KABAL_INNSTILLINGER}/me/brukerdata`);
+export const getUser = () => getData<IUserData>(AppName.KABAL_INNSTILLINGER, '/me/brukerdata');
 
-export const getUser = async (): Promise<IUserData> => {
-  return Promise.resolve({
-    navIdent: 'Z994862',
-    navn: 'F_Z994862 E_Z994862',
-    roller: [],
-    enheter: [
-      {
-        id: '4295',
-        navn: 'Nav Klageinstans nord',
-        lovligeYtelser: [],
-      },
-    ],
-    ansattEnhet: {
-      id: '4295',
-      navn: 'Nav Klageinstans nord',
-      lovligeYtelser: [],
-    },
-    tildelteYtelser: [],
-  });
-};
+// export const getUser = async (): Promise<IUserData> => {
+//   return Promise.resolve({
+//     navIdent: 'Z994862',
+//     navn: 'F_Z994862 E_Z994862',
+//     roller: [],
+//     enheter: [
+//       {
+//         id: '4295',
+//         navn: 'Nav Klageinstans nord',
+//         lovligeYtelser: [],
+//       },
+//     ],
+//     ansattEnhet: {
+//       id: '4295',
+//       navn: 'Nav Klageinstans nord',
+//       lovligeYtelser: [],
+//     },
+//     tildelteYtelser: [],
+//   });
+// };
 
-export const getBehandlinger = async () => getData<BehandlingResponse>(await headers(), `${KABAL_API}/behandlinger`);
-export const getKodeverk = async (path: string) => getData(await headers(), `${KLAGE_KODEVERK}/${path}`);
-export const getYtelser = async () => getData<IYtelse[]>(await headers(), `${KLAGE_KODEVERK}/ytelser`);
-export const getKlageenheter = async () =>
-  getData<IKodeverkSimpleValue[]>(await headers(), `${KLAGE_KODEVERK}/klageenheter`);
-export const getSakstyper = async (): Promise<IKodeverkSimpleValue[]> =>
-  getData(await headers(), `${KLAGE_KODEVERK}/sakstyper`);
-export const getPåVentReasons = async (): Promise<IKodeverkValue[]> =>
-  getData(await headers(), `${KLAGE_KODEVERK}/satt-paa-vent-reasons`);
+export const getBehandlinger = () => getData<BehandlingResponse>(AppName.KABAL_API, '/behandlinger');
+
+export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/${path}`);
+export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/ytelser');
+export const getKlageenheter = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/klageenheter');
+export const getSakstyper = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
+export const getPåVentReasons = () => getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
