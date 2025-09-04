@@ -13,7 +13,7 @@ import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse';
 import { SakerPerYtelseHosKlageenhet } from '@/components/behandlinger/saker-per-ytelse-hos-klageenhet';
 import { SakerPerYtelseOgKlageenhet } from '@/components/behandlinger/saker-per-ytelse-og-klageenhet';
-import { Card } from '@/components/cards';
+import { Card, DoubleHeightCard } from '@/components/cards';
 import type { Behandling, IKodeverkSimpleValue, IKodeverkValue, IYtelse } from '@/lib/server/types';
 
 interface Props {
@@ -35,14 +35,14 @@ export const Behandlinger = ({
 
   return (
     <HStack gap="8" wrap className="h-fit" padding="6">
-      <Card>
+      <DoubleHeightCard>
         <SakerPerKlageenhetOgYtelse
           behandlinger={data}
           ytelsekodeverk={ytelseKodeverk}
           klageenheterkodeverk={klageenheterKodeverk}
           sakstyperkoderverk={sakstyper}
         />
-      </Card>
+      </DoubleHeightCard>
       <Card>
         <SakerPerYtelseOgKlageenhet
           behandlinger={data}
