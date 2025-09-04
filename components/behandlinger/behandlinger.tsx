@@ -1,6 +1,5 @@
 'use client';
 
-import { HStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { LedigeFilter, parseAsLedigeFilter } from '@/app/custom-parses';
@@ -34,7 +33,7 @@ export const Behandlinger = ({
   const data = useData(behandlinger);
 
   return (
-    <HStack gap="8" wrap className="h-fit" padding="6">
+    <div className="grid w-full auto-rows-[768px] grid-cols-1 gap-6 p-6 xl:grid-cols-2 2xl:grid-cols-3">
       <DoubleHeightCard>
         <SakerPerKlageenhetOgYtelse
           behandlinger={data}
@@ -88,7 +87,7 @@ export const Behandlinger = ({
       <Card>
         <SakerPerYtelse behandlinger={data} total={behandlinger.length} ytelser={ytelseKodeverk} />
       </Card>
-    </HStack>
+    </div>
   );
 };
 
