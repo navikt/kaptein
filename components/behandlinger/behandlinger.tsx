@@ -31,6 +31,8 @@ export const Behandlinger = ({
   påVentReasons,
   klageenheterKodeverk,
 }: Props) => {
+  console.log(behandlinger);
+
   const data = useData(behandlinger);
 
   return (
