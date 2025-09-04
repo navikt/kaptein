@@ -9,9 +9,9 @@ import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse'
 import { SakerPerKlageenhet } from '@/components/behandlinger/saker-per-klageenhet';
 import { SakerPerKlageenhetOgYtelse } from '@/components/behandlinger/saker-per-klageenhet-og-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse';
 import { SakerPerYtelseHosKlageenhet } from '@/components/behandlinger/saker-per-ytelse-hos-klageenhet';
 import { SakerPerYtelseOgKlageenhet } from '@/components/behandlinger/saker-per-ytelse-og-klageenhet';
+import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { Card, DoubleHeightCard } from '@/components/cards';
 import type { Behandling, IKodeverkSimpleValue, IKodeverkValue, IYtelse } from '@/lib/server/types';
 
@@ -85,7 +85,12 @@ export const Behandlinger = ({
       </Card>
 
       <Card>
-        <SakerPerYtelse behandlinger={data} total={behandlinger.length} ytelser={ytelseKodeverk} />
+        <SakerPerYtelse
+          behandlinger={data}
+          total={behandlinger.length}
+          ytelser={ytelseKodeverk}
+          sakstyper={sakstyper}
+        />
       </Card>
     </div>
   );
