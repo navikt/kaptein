@@ -20,21 +20,6 @@ export const SakerPerKlageenhetOgYtelse = ({
 }: Props) => {
   const filteredBehandlinger = useMemo(() => behandlinger.filter((b) => b.tildeltEnhet !== null), [behandlinger]);
 
-  const groupedByKlageenhet = useMemo(
-    () =>
-      filteredBehandlinger.reduce<Record<string, Behandling[]>>((acc, curr) => {
-        if (curr.tildeltEnhet === null) {
-          return acc;
-        }
-
-        const existing = acc[curr.tildeltEnhet] ?? [];
-        existing.push(curr);
-        acc[curr.tildeltEnhet] = existing;
-        return acc;
-      }, {}),
-    [filteredBehandlinger],
-  );
-
   const relevantYtelser = useMemo(() => {
     const ids = Array.from(new Set(filteredBehandlinger.map((b) => b.ytelseId)));
 
@@ -47,10 +32,32 @@ export const SakerPerKlageenhetOgYtelse = ({
       .toSorted((a, b) => a.navn.localeCompare(b.navn));
   }, [filteredBehandlinger, ytelsekodeverk]);
 
+  const max = useMemo(() => {
+    const values = filteredBehandlinger.reduce<Record<string, Record<string, number>>>((acc, curr) => {
+      if (curr.tildeltEnhet === null) {
+        return acc;
+      }
+
+      const existing = acc[curr.ytelseId];
+
+      if (existing === undefined) {
+        acc[curr.ytelseId] = { [curr.tildeltEnhet]: 1 };
+      } else {
+        existing[curr.tildeltEnhet] = existing[curr.tildeltEnhet] ?? 0;
+        existing[curr.tildeltEnhet]++;
+      }
+
+      return acc;
+    }, {});
+
+    return Math.max(...Object.values(values).flatMap(Object.values));
+  }, [filteredBehandlinger]);
+
   return (
     <VStack className="h-full overflow-scroll">
-      {relevantYtelser.map((ytelse) => (
+      {relevantYtelser.map((ytelse, i) => (
         <Group
+          max={max}
           key={ytelse.id}
           behandlinger={filteredBehandlinger.filter((b) => b.ytelseId === ytelse.id)}
           klageenheterkodeverk={klageenheterkodeverk}
@@ -67,9 +74,10 @@ interface GroupProps {
   klageenheterkodeverk: IKodeverkSimpleValue[];
   sakstyperkoderverk: IKodeverkSimpleValue[];
   title: string;
+  max: number;
 }
 
-const Group = ({ behandlinger, klageenheterkodeverk, sakstyperkoderverk, title }: GroupProps) => {
+const Group = ({ behandlinger, klageenheterkodeverk, sakstyperkoderverk, title, max }: GroupProps) => {
   const series = useMemo(
     () =>
       sakstyperkoderverk.map((type) => ({
@@ -90,29 +98,40 @@ const Group = ({ behandlinger, klageenheterkodeverk, sakstyperkoderverk, title }
     [behandlinger, sakstyperkoderverk, klageenheterkodeverk],
   );
 
+  const option = {
+    grid: {
+      left: 0,
+      top: 50,
+      bottom: 0,
+      right: 0,
+    },
+    title: {
+      text: title,
+      textStyle: {
+        fontSize: '0.875rem',
+      },
+    },
+    tooltip: {
+      confine: true,
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+    },
+    xAxis: {
+      type: 'value',
+      max,
+    },
+    yAxis: {
+      type: 'category',
+      data: klageenheterkodeverk.map((y) => y.navn),
+    },
+    series,
+  };
+
   return (
-    <EChart
-      option={{
-        title: {
-          text: title,
-          // subtext: `Totalt: ${filteredBehandlinger.length} tildelte saker`,
-        },
-        tooltip: {
-          confine: true,
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        xAxis: {
-          type: 'value',
-        },
-        yAxis: {
-          type: 'category',
-          data: klageenheterkodeverk.map((y) => y.navn),
-        },
-        series,
-      }}
-    />
+    <div className="h-60 shrink-0">
+      <EChart option={option} />
+    </div>
   );
 };
