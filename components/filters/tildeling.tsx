@@ -2,7 +2,7 @@
 
 import { ToggleGroup } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
-import { isLedigeFilter, LedigeFilter, parseAsLedigeFilter } from '@/app/custom-parses';
+import { isLedigeFilter, parseAsLedigeFilter, TildeltFilter } from '@/app/custom-parses';
 
 export const Tildeling = () => {
   const [ledige, setLedige] = useQueryState('ledige', parseAsLedigeFilter);
@@ -10,14 +10,14 @@ export const Tildeling = () => {
   return (
     <ToggleGroup
       label="Tildeling"
-      value={ledige ?? LedigeFilter.ALL}
+      value={ledige ?? TildeltFilter.ALL}
       onChange={(v) => {
-        setLedige(isLedigeFilter(v) ? v : LedigeFilter.ALL);
+        setLedige(isLedigeFilter(v) ? v : TildeltFilter.ALL);
       }}
     >
-      <ToggleGroup.Item value={LedigeFilter.LEDIGE}>Ledige</ToggleGroup.Item>
-      <ToggleGroup.Item value={LedigeFilter.TILDELTE}>Tildelte</ToggleGroup.Item>
-      <ToggleGroup.Item value={LedigeFilter.ALL}>Alle</ToggleGroup.Item>
+      <ToggleGroup.Item value={TildeltFilter.LEDIGE}>Ledige</ToggleGroup.Item>
+      <ToggleGroup.Item value={TildeltFilter.TILDELTE}>Tildelte</ToggleGroup.Item>
+      <ToggleGroup.Item value={TildeltFilter.ALL}>Alle</ToggleGroup.Item>
     </ToggleGroup>
   );
 };

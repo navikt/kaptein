@@ -11,8 +11,10 @@ interface Props {
 }
 
 export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klageenheterkodeverk }: Props) => {
+  const filtered = useMemo(() => behandlinger.filter((b) => b.tildeltEnhet !== null), [behandlinger]);
+
   const relevantYtelser = useMemo(() => {
-    const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
+    const ids = Array.from(new Set(filtered.map((b) => b.ytelseId)));
 
     return ids
       .map((id) => {
@@ -21,11 +23,11 @@ export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klage
         return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
       })
       .toSorted((a, b) => a.navn.localeCompare(b.navn));
-  }, [behandlinger, ytelsekodeverk]);
+  }, [filtered, ytelsekodeverk]);
 
   const series = useMemo(
     () =>
-      [...klageenheterkodeverk, { id: null, navn: 'Ikke tildelt' }].map((enhet) => ({
+      klageenheterkodeverk.map((enhet) => ({
         type: 'bar',
         stack: 'total',
         label: { show: true },
@@ -52,6 +54,7 @@ export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klage
       option={{
         title: {
           text: 'Saker per ytelse og klageenhet',
+          subtext: `Totalt antall tildelte saker: ${filtered.length}`,
         },
         legend: {},
         tooltip: {

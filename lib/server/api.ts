@@ -2,9 +2,10 @@ import { headers } from 'next/headers';
 import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
+import { behandlingerDump } from '@/lib/server/behandlnger-dump';
 import { generateTraceParent, getFromKabal } from '@/lib/server/fetch';
 import { AppName } from '@/lib/server/get-obo-token';
-import type { BehandlingResponse, IKodeverkSimpleValue, IKodeverkValue, IUserData, IYtelse } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IKodeverkValue, IUserData, IYtelse } from '@/lib/server/types';
 
 const logger = getLogger('api');
 
@@ -59,7 +60,8 @@ export const getData = async <T>(appName: AppName, path: string): Promise<T> => 
 
 export const getUser = () => getData<IUserData>(AppName.KABAL_INNSTILLINGER, '/me/brukerdata');
 
-export const getBehandlinger = () => getData<BehandlingResponse>(AppName.KABAL_API, '/behandlinger');
+// export const getBehandlinger = () => getData<BehandlingResponse>(AppName.KABAL_API, '/behandlinger');
+export const getBehandlinger = () => Promise.resolve(behandlingerDump);
 
 export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/${path}`);
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/ytelser');

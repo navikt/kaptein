@@ -1,25 +1,25 @@
 import { createParser } from 'nuqs';
 
-export enum LedigeFilter {
+export enum TildeltFilter {
   ALL = 'all',
   LEDIGE = 'ledige',
   TILDELTE = 'tildelte',
 }
 
-const LEDIGE_FILTER_VALUES = Object.values(LedigeFilter);
-export const isLedigeFilter = (value: string): value is LedigeFilter => LEDIGE_FILTER_VALUES.some((v) => v === value);
+const TILDELT_FILTER_VALUES = Object.values(TildeltFilter);
+export const isLedigeFilter = (value: string): value is TildeltFilter => TILDELT_FILTER_VALUES.some((v) => v === value);
 
 export const parseAsLedigeFilter = createParser({
-  parse: (value): LedigeFilter => {
-    if (value === LedigeFilter.LEDIGE) {
-      return LedigeFilter.LEDIGE;
+  parse: (value): TildeltFilter => {
+    if (value === TildeltFilter.LEDIGE) {
+      return TildeltFilter.LEDIGE;
     }
 
-    if (value === LedigeFilter.TILDELTE) {
-      return LedigeFilter.TILDELTE;
+    if (value === TildeltFilter.TILDELTE) {
+      return TildeltFilter.TILDELTE;
     }
 
-    return LedigeFilter.ALL;
+    return TildeltFilter.ALL;
   },
 
   serialize(value) {

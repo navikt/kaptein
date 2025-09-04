@@ -1,9 +1,8 @@
 'use client';
 
-import { HStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { LedigeFilter, parseAsLedigeFilter } from '@/app/custom-parses';
+import { parseAsLedigeFilter, TildeltFilter } from '@/app/custom-parses';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { PåVent } from '@/components/behandlinger/på-vent';
 import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
@@ -34,7 +33,7 @@ export const Behandlinger = ({
   const data = useData(behandlinger);
 
   return (
-    <HStack gap="8" wrap className="h-fit" padding="6">
+    <div className="grid w-full auto-rows-[768px] grid-cols-1 gap-6 p-6 xl:grid-cols-2 2xl:grid-cols-3">
       <DoubleHeightCard>
         <SakerPerKlageenhetOgYtelse
           behandlinger={data}
@@ -88,7 +87,7 @@ export const Behandlinger = ({
       <Card>
         <SakerPerYtelse behandlinger={data} total={behandlinger.length} ytelser={ytelseKodeverk} />
       </Card>
-    </HStack>
+    </div>
   );
 };
 
@@ -103,18 +102,18 @@ const useData = (behandlinger: Behandling[]) => {
   const klageenheter = klageenheterFilter ?? [];
   const hjemler = hjemlerFilter ?? [];
   const sakstyper = sakstyperFilter ?? [];
-  const ledige = ledigeFilter ?? LedigeFilter.ALL;
+  const ledige = ledigeFilter ?? TildeltFilter.ALL;
 
   return useMemo(() => {
     const filteredForAnkeITR = behandlinger.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
 
-    const filteredForLedige =
-      ledige === LedigeFilter.ALL
+    const filteredForTildelte =
+      ledige === TildeltFilter.ALL
         ? filteredForAnkeITR
-        : filteredForAnkeITR.filter((b) => b.isTildelt === (ledige === LedigeFilter.LEDIGE));
+        : filteredForAnkeITR.filter((b) => b.isTildelt === (ledige === TildeltFilter.LEDIGE));
 
     const filteredForSakstyper =
-      sakstyper.length === 0 ? filteredForLedige : filteredForLedige.filter((b) => sakstyper.includes(b.typeId));
+      sakstyper.length === 0 ? filteredForTildelte : filteredForTildelte.filter((b) => sakstyper.includes(b.typeId));
 
     const filteredForYtelser =
       ytelser.length === 0 ? filteredForSakstyper : filteredForSakstyper.filter((b) => ytelser.includes(b.ytelseId));
