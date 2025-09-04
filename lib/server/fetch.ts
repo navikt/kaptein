@@ -1,13 +1,14 @@
 import { AppName, getOboToken } from '@/lib/server/get-obo-token';
 
 export const getFromKabal = async (
+  appName: AppName,
   url: string,
   incomingHeaders: Headers,
-  traceparent?: string,
+  traceparent: string,
 ): ReturnType<typeof fetch> => {
-  const token = await getOboToken(AppName.KABAL_API, incomingHeaders);
+  const token = await getOboToken(appName, incomingHeaders);
 
-  const headers: HeadersInit = { authorization: `Bearer ${token}` };
+  const headers: HeadersInit = appName === AppName.KABAL_INNSTILLINGER ? { authorization: `Bearer ${token}` } : {};
 
   if (traceparent !== undefined) {
     headers.traceparent = traceparent;
