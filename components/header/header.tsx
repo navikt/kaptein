@@ -4,7 +4,8 @@ import { LeaveIcon } from '@navikt/aksel-icons';
 import { ActionMenu, Spacer } from '@navikt/ds-react';
 import { InternalHeader } from '@navikt/ds-react/InternalHeader';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
 import { AppThemeSwitcher } from '@/components/header/app-theme';
 import type { IUserData } from '@/lib/server/types';
 
@@ -12,22 +13,41 @@ const ACTIVE_CLASS = '!bg-ax-bg-neutral-moderate-pressed';
 
 export const Header = ({ user }: { user: IUserData }) => {
   const pathname = usePathname();
+  const params = useSearchParams();
+
+  const defaultParams = params.toString();
+  const ferdigstilteParams = useMemo(() => {
+    const searchParams = new URLSearchParams(defaultParams);
+    searchParams.delete('tildeling');
+    searchParams.delete('klageenheter');
+
+    return searchParams.toString();
+  }, [defaultParams]);
+
   return (
     <InternalHeader>
       <InternalHeader.Title href="/">Kaptein</InternalHeader.Title>
 
-      <InternalHeader.Button as={Link} className={pathname === '/alle' ? ACTIVE_CLASS : ''} href="/alle">
+      <InternalHeader.Button
+        as={Link}
+        className={pathname === '/alle' ? ACTIVE_CLASS : ''}
+        href={`/alle?${defaultParams}`}
+      >
         Alle saker
       </InternalHeader.Button>
 
-      <InternalHeader.Button as={Link} className={pathname === '/aktive' ? ACTIVE_CLASS : ''} href="/aktive">
+      <InternalHeader.Button
+        as={Link}
+        className={pathname === '/aktive' ? ACTIVE_CLASS : ''}
+        href={`/aktive?${defaultParams}`}
+      >
         Aktive saker
       </InternalHeader.Button>
 
       <InternalHeader.Button
         as={Link}
         className={pathname === '/ferdigstilte' ? ACTIVE_CLASS : ''}
-        href="/ferdigstilte"
+        href={`/ferdigstilte?${ferdigstilteParams}`}
       >
         Ferdigstilte saker
       </InternalHeader.Button>

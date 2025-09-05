@@ -12,29 +12,28 @@ interface Props {
 }
 
 type TildeltBehandling = Omit<Behandling, 'tildeltEnhet'> & { tildeltEnhet: string };
-const isTildeltBehandling = (b: Behandling): b is TildeltBehandling => b.tildeltEnhet !== null;
-
 export const SakerPerKlageenhet = ({ behandlinger, total, klageenheter }: Props) => {
-  const filtered = useMemo(() => behandlinger.filter(isTildeltBehandling), [behandlinger]);
+  const data = useMemo<{ name: string; value: number }[]>(() => {
+    const map = new Map<string | null, { value: number; name: string }>();
 
-  const data = useMemo(() => {
-    const map = new Map<string, { value: number; name: string }>();
-
-    filtered.forEach((b) => {
+    behandlinger.forEach((b) => {
       const existing = map.get(b.tildeltEnhet);
 
       if (existing) {
         existing.value += 1;
       } else {
         map.set(b.tildeltEnhet, {
-          name: klageenheter.find((k) => k.id === b.tildeltEnhet)?.navn ?? b.tildeltEnhet,
+          name:
+            b.tildeltEnhet === null
+              ? 'Ikke tildelt'
+              : (klageenheter.find((k) => k.id === b.tildeltEnhet)?.navn ?? b.tildeltEnhet),
           value: 1,
         });
       }
     });
 
     return Object.values(Object.fromEntries(map));
-  }, [filtered, klageenheter]);
+  }, [behandlinger, klageenheter]);
 
   const labels = useMemo(() => data.map((d) => d.name), [data]);
   const values = useMemo(() => data.map((d) => d.value), [data]);
@@ -52,7 +51,7 @@ export const SakerPerKlageenhet = ({ behandlinger, total, klageenheter }: Props)
       option={{
         title: {
           text: 'Saker per klageenhet',
-          subText: `Viser data for ${filtered.length} saker som er tildelt`,
+          // subText: `Viser data for ${filtered.length} saker som er tildelt`,
         },
         tooltip: {
           trigger: 'axis',

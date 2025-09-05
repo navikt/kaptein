@@ -1,8 +1,9 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsLedigeFilter, TildeltFilter } from '@/app/custom-parses';
+import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-parses';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { PåVent } from '@/components/behandlinger/på-vent';
 import { SakerPerKlageenhet } from '@/components/behandlinger/saker-per-klageenhet';
@@ -28,6 +29,10 @@ export const Behandlinger = ({
   klageenheterKodeverk,
 }: Props) => {
   const data = useData(behandlinger);
+  const [tildelingFilter] = useQueryState('tildeling', parseAsLedigeFilter);
+  const pathname = usePathname();
+
+  const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
 
   return (
     <div className="grid w-full auto-rows-[768px] grid-cols-1 gap-6 p-6 xl:grid-cols-2 2xl:grid-cols-3">
@@ -99,21 +104,21 @@ const useData = (behandlinger: Behandling[]) => {
   const [klageenheterFilter] = useQueryState('klageenheter', parseAsArrayOf(parseAsString));
   const [hjemlerFilter] = useQueryState('hjemler', parseAsArrayOf(parseAsString));
   const [sakstyperFilter] = useQueryState('sakstyper', parseAsArrayOf(parseAsString));
-  const [tildeltFilter] = useQueryState('tildeling', parseAsLedigeFilter);
+  const [tildelingFilter] = useQueryState('tildeling', parseAsLedigeFilter);
 
   const ytelser = ytelseFilter ?? [];
   const klageenheter = klageenheterFilter ?? [];
   const hjemler = hjemlerFilter ?? [];
   const sakstyper = sakstyperFilter ?? [];
-  const tildelte = tildeltFilter ?? TildeltFilter.ALL;
+  const tildeling = tildelingFilter ?? TildelingFilter.ALL;
 
   return useMemo(() => {
     const filteredForAnkeITR = behandlinger.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
 
     const filteredForTildelte =
-      tildelte === TildeltFilter.ALL
+      tildeling === TildelingFilter.ALL
         ? filteredForAnkeITR
-        : filteredForAnkeITR.filter((b) => b.isTildelt === (tildelte === TildeltFilter.TILDELTE));
+        : filteredForAnkeITR.filter((b) => b.isTildelt === (tildeling === TildelingFilter.TILDELTE));
 
     const filteredForSakstyper =
       sakstyper.length === 0 ? filteredForTildelte : filteredForTildelte.filter((b) => sakstyper.includes(b.typeId));
@@ -132,7 +137,7 @@ const useData = (behandlinger: Behandling[]) => {
         : filteredForKlageenheter.filter((b) => hjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)));
 
     return filteredForHjemler;
-  }, [behandlinger, ytelser, klageenheter, hjemler, tildelte, sakstyper]);
+  }, [behandlinger, ytelser, klageenheter, hjemler, tildeling, sakstyper]);
 };
 
 const ANKE_I_TRYGDERETTEN_ID = '3';
