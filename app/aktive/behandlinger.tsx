@@ -1,0 +1,72 @@
+'use client';
+
+import { useQueryState } from 'nuqs';
+import { useMemo } from 'react';
+import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-parses';
+import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { SakerPerKlageenhet } from '@/components/behandlinger/saker-per-klageenhet';
+import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
+import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/saker-per-ytelse-og-klageenhet';
+import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
+import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
+import { useData } from '@/components/behandlinger/use-data';
+import { Card } from '@/components/cards';
+import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
+import type { Behandling, IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
+
+interface Props {
+  behandlinger: Behandling[];
+  sakstyper: IKodeverkSimpleValue[];
+  ytelseKodeverk: IYtelse[];
+  klageenheterKodeverk: IKodeverkSimpleValue[];
+}
+
+export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
+  const { withTildelteFilter: data, withoutTildelteFilter } = useData(behandlinger);
+  const [tildelingFilter] = useQueryState('tildeling', parseAsLedigeFilter);
+  const showsTildelte = tildelingFilter === TildelingFilter.TILDELTE;
+  const showsAlle = tildelingFilter === TildelingFilter.ALL;
+
+  const tildelte = useMemo(() => withoutTildelteFilter.filter((b) => b.isTildelt), [withoutTildelteFilter]);
+
+  return (
+    <ChartsWrapper>
+      <Card>
+        <SakerPerYtelse
+          behandlinger={data}
+          total={behandlinger.length}
+          ytelser={ytelseKodeverk}
+          sakstyper={sakstyper}
+        />
+      </Card>
+
+      <Card>
+        <SakerPerSakstype behandlinger={data} sakstyper={sakstyper} total={behandlinger.length} />
+      </Card>
+
+      {showsAlle ? (
+        <Card>
+          <LedigeVsTildelte behandlinger={data} total={behandlinger.length} />
+        </Card>
+      ) : null}
+
+      {showsTildelte ? (
+        <Card>
+          <TildelteSakerPåVentIkkePåVent behandlinger={data} total={behandlinger.length} />
+        </Card>
+      ) : null}
+
+      <Card>
+        <SakerPerKlageenhet behandlinger={tildelte} total={behandlinger.length} klageenheter={klageenheterKodeverk} />
+      </Card>
+
+      <Card>
+        <TildelteSakerPerYtelseOgKlageenhet
+          behandlinger={tildelte}
+          ytelsekodeverk={ytelseKodeverk}
+          klageenheterkodeverk={klageenheterKodeverk}
+        />
+      </Card>
+    </ChartsWrapper>
+  );
+};

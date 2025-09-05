@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, VStack } from '@navikt/ds-react';
 import { useMemo } from 'react';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
@@ -11,8 +11,7 @@ interface Props {
   klageenheter: IKodeverkSimpleValue[];
 }
 
-type TildeltBehandling = Omit<Behandling, 'tildeltEnhet'> & { tildeltEnhet: string };
-export const SakerPerKlageenhet = ({ behandlinger, total, klageenheter }: Props) => {
+export const SakerPerKlageenhet = ({ behandlinger, klageenheter }: Props) => {
   const data = useMemo<{ name: string; value: number }[]>(() => {
     const map = new Map<string | null, { value: number; name: string }>();
 
@@ -39,19 +38,15 @@ export const SakerPerKlageenhet = ({ behandlinger, total, klageenheter }: Props)
   const values = useMemo(() => data.map((d) => d.value), [data]);
 
   if (data.length === 0) {
-    return (
-      <VStack align="center" justify="center" className="grow">
-        <Alert variant="info">Ingen data</Alert>
-      </VStack>
-    );
+    return <NoData />;
   }
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Saker per klageenhet',
-          // subText: `Viser data for ${filtered.length} saker som er tildelt`,
+          text: 'Tildelte Saker per klageenhet',
+          subtext: `Viser data for ${behandlinger.length} tildelte saker`,
         },
         tooltip: {
           trigger: 'axis',

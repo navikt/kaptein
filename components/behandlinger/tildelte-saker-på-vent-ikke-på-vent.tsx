@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, VStack } from '@navikt/ds-react';
 import { useMemo } from 'react';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/server/types';
 
@@ -10,7 +10,7 @@ interface Props {
   behandlinger: Behandling[];
 }
 
-export const PåVent = ({ behandlinger, total }: Props) => {
+export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, total }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
       const value = curr.sattPaaVent === null;
@@ -31,11 +31,7 @@ export const PåVent = ({ behandlinger, total }: Props) => {
   }, [behandlinger]);
 
   if (data.length === 0) {
-    return (
-      <VStack align="center" justify="center" className="grow">
-        <Alert variant="info">Ingen data</Alert>
-      </VStack>
-    );
+    return <NoData />;
   }
 
   return (
@@ -43,7 +39,7 @@ export const PåVent = ({ behandlinger, total }: Props) => {
       option={{
         title: {
           text: 'Tildelte saker på vent / ikke på vent',
-          left: 'center',
+          subtext: `Viser data for ${total} saker`,
         },
         tooltip: {
           trigger: 'item',

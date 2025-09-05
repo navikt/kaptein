@@ -44,6 +44,7 @@ export const SakerPerYtelse = ({ behandlinger, ytelser, sakstyper }: Props) => {
   const labels = relevantYtelser.map(
     (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
   );
+
   return (
     <EChart
       option={{

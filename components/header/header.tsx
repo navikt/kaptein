@@ -15,14 +15,15 @@ export const Header = ({ user }: { user: IUserData }) => {
   const pathname = usePathname();
   const params = useSearchParams();
 
-  const defaultParams = params.toString();
+  const aktiveParams = params.toString();
+
   const ferdigstilteParams = useMemo(() => {
-    const searchParams = new URLSearchParams(defaultParams);
+    const searchParams = new URLSearchParams(aktiveParams);
     searchParams.delete('tildeling');
     searchParams.delete('klageenheter');
 
     return searchParams.toString();
-  }, [defaultParams]);
+  }, [aktiveParams]);
 
   return (
     <InternalHeader>
@@ -30,16 +31,8 @@ export const Header = ({ user }: { user: IUserData }) => {
 
       <InternalHeader.Button
         as={Link}
-        className={pathname === '/alle' ? ACTIVE_CLASS : ''}
-        href={`/alle?${defaultParams}`}
-      >
-        Alle saker
-      </InternalHeader.Button>
-
-      <InternalHeader.Button
-        as={Link}
         className={pathname === '/aktive' ? ACTIVE_CLASS : ''}
-        href={`/aktive?${defaultParams}`}
+        href={`/aktive?${aktiveParams}`}
       >
         Aktive saker
       </InternalHeader.Button>

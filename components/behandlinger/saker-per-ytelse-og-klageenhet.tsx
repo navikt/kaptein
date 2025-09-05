@@ -10,7 +10,7 @@ interface Props {
   klageenheterkodeverk: IKodeverkSimpleValue[];
 }
 
-export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klageenheterkodeverk }: Props) => {
+export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klageenheterkodeverk }: Props) => {
   const relevantYtelser = useMemo(() => {
     const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
 
@@ -51,7 +51,8 @@ export const SakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klage
     <EChart
       option={{
         title: {
-          text: 'Saker per ytelse og klageenhet',
+          text: 'Tildelte saker per ytelse og klageenhet',
+          subtext: `Viser data for ${behandlinger.length} tildelte saker`,
         },
         legend: {},
         tooltip: {
