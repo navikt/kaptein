@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { EChart } from '@/lib/echarts/echarts';
-import { getSakstypeColor } from '@/lib/echarts/use-colors';
+import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
 interface Props {

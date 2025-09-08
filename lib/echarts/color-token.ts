@@ -157,4 +157,5 @@ export enum ColorToken {
 }
 
 const tokenNames = Object.values(ColorToken);
+
 export const isToken = (token: string): token is ColorToken => tokenNames.some((name) => name === token);
