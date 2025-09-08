@@ -48,11 +48,12 @@ export const streamData = async <T>(
   }
 
   const totalCount = parseTotalCount(res.headers.get('Kaptein-Total'));
-  let count = 0;
 
   const reader = res.body.getReader();
   const textDecoder = new TextDecoder(); // Defaults to 'utf-8'
-  let buffer = '';
+
+  let count = 0;
+  const batch: ParsedLine<T>[] = [];
 
   const stream = new ReadableStream<ParsedLine<T>>({
     // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
@@ -65,11 +66,10 @@ export const streamData = async <T>(
           break;
         }
 
-        buffer += textDecoder.decode(value, { stream: true });
-        const lines = buffer.split(separator);
-        buffer = lines.pop() ?? '';
+        const chunk = textDecoder.decode(value, { stream: true });
+        const lines = chunk.split(separator);
 
-        console.debug(`Received ${lines.length} lines, buffer length: ${buffer.length}`);
+        console.debug(`Received ${lines.length} lines`);
 
         for (const line of lines) {
           if (line.trim().length === 0) {
@@ -78,27 +78,22 @@ export const streamData = async <T>(
 
           try {
             count++;
-            controller.enqueue(parseLine(line, parser, count, totalCount));
+            if (count === totalCount || count % 100 === 0) {
+              for (const item of batch) {
+                controller.enqueue(item);
+              }
+
+              batch.length = 0;
+            }
+
+            batch.push(parseLine(line, parser, count, totalCount));
           } catch (e) {
             controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
           }
         }
       }
 
-      console.debug(`Stream ended, final buffer length: ${buffer.length}`);
-
-      // Process any remaining data in the buffer after the stream ends
-      if (buffer.trim().length !== 0) {
-        console.debug(`Processing remaining buffer: ${buffer}`);
-        try {
-          count++;
-          controller.enqueue(parseLine(buffer, parser, count, totalCount));
-        } catch (e) {
-          controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
-        }
-      }
-
-      controller.close();
+      setTimeout(() => controller.close());
     },
     cancel() {
       reader.cancel();
