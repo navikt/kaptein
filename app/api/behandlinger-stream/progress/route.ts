@@ -12,7 +12,7 @@ export interface StreamProgressEvent {
 export async function GET(request: Request) {
   try {
     const encoder = new TextEncoder();
-    const customReadable = new ReadableStream({
+    const eventStream = new ReadableStream({
       start(controller) {
         // Initial data or setup
         controller.enqueue(
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
       },
     });
 
-    return new Response(customReadable, {
+    return new Response(eventStream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',

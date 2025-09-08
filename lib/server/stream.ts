@@ -54,6 +54,7 @@ export const streamData = async <T>(
 
   let count = 0;
   const batch: ParsedLine<T>[] = [];
+  let buffer = '';
 
   const stream = new ReadableStream<ParsedLine<T>>({
     // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
@@ -66,8 +67,9 @@ export const streamData = async <T>(
           break;
         }
 
-        const chunk = textDecoder.decode(value, { stream: true });
-        const lines = chunk.split(separator);
+        buffer += textDecoder.decode(value, { stream: true });
+        const lines = buffer.split(separator);
+        buffer = lines.pop() ?? ''; // Keep the last incomplete line, if any
 
         console.debug(`Received ${lines.length} lines`);
 
@@ -78,22 +80,34 @@ export const streamData = async <T>(
 
           try {
             count++;
-            if (count === totalCount || count % 100 === 0) {
+
+            if (totalCount === null) {
+              controller.enqueue(parseLine(line, parser, count, totalCount));
+              continue;
+            }
+
+            batch.push(parseLine(line, parser, count, totalCount));
+
+            if (batch.length === 100 || count === totalCount) {
               for (const item of batch) {
                 controller.enqueue(item);
               }
 
               batch.length = 0;
             }
-
-            batch.push(parseLine(line, parser, count, totalCount));
           } catch (e) {
+            console.error(line);
             controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
           }
         }
       }
 
-      setTimeout(() => controller.close());
+      // Process any remaining data in the buffer
+      if (buffer.trim().length !== 0) {
+        controller.enqueue(parseLine(buffer, parser, count, totalCount));
+      }
+
+      controller.close();
     },
     cancel() {
       reader.cancel();
