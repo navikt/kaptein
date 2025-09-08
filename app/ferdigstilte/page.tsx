@@ -1,19 +1,17 @@
-import { Loader } from '@navikt/ds-react';
 import { Suspense } from 'react';
 import { Behandlinger } from '@/app/ferdigstilte/behandlinger';
+import { BehandlingerProgress } from '@/components/behandlinger/progress';
 import { useBehandlinger } from '@/components/behandlinger/use-behandlinger';
-import { getBehandlinger, getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
+import { getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
+import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
 
 async function BehandlingerData() {
-  const behandlinger = await getBehandlinger();
+  const behandlinger = await BEHANDLINGER_DATA_LOADER.load();
   const sakstyper = await getSakstyperWithoutAnkeITR();
   const ytelser = await getYtelser();
   const klageenheter = await getKlageenheter();
 
-  const filteredBehandlinger = useBehandlinger(
-    behandlinger.anonymizedBehandlingList,
-    (b) => b.isAvsluttetAvSaksbehandler,
-  );
+  const filteredBehandlinger = useBehandlinger(behandlinger, (b) => b.isAvsluttetAvSaksbehandler);
 
   return (
     <Behandlinger
@@ -27,13 +25,7 @@ async function BehandlingerData() {
 
 export default async function Page() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex grow items-center justify-center">
-          <Loader size="3xlarge" className="size-fit" />
-        </div>
-      }
-    >
+    <Suspense fallback={<BehandlingerProgress />}>
       <BehandlingerData />
     </Suspense>
   );
