@@ -2,7 +2,7 @@
 
 import { ChevronDownIcon } from '@navikt/aksel-icons';
 import { ActionMenu, Button, HStack, TextField } from '@navikt/ds-react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface MultiSelectFilterProps {
   label: string;
@@ -14,7 +14,6 @@ interface MultiSelectFilterProps {
 
 export const MultiselectFilter = ({ selected, setSelected, options, label }: MultiSelectFilterProps) => {
   const [value, setValue] = useState('');
-  const textFieldRef = useRef<HTMLInputElement | null>(null);
 
   const selectedOptions = useMemo(
     () =>
@@ -34,17 +33,21 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
   return (
     <ActionMenu>
       <ActionMenu.Trigger>
-        <Button variant="secondary-neutral" icon={<ChevronDownIcon aria-hidden />} iconPosition="right">
+        <Button
+          variant="secondary-neutral"
+          icon={<ChevronDownIcon aria-hidden />}
+          iconPosition="right"
+          className="!justify-between"
+        >
           {label} ({selectedOptions.length})
         </Button>
       </ActionMenu.Trigger>
 
-      <ActionMenu.Content>
-        <HStack wrap={false}>
+      <ActionMenu.Content className="relative">
+        <HStack wrap={false} className="sticky top-0 z-1 bg-ax-bg-default">
           <TextField
             className="grow"
             placeholder="Filtrer"
-            ref={textFieldRef}
             label={label}
             value={value}
             onChange={(e) => setValue(e.target.value)}

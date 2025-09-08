@@ -32,7 +32,7 @@ const getUrl = (appName: AppName) => {
   }
 };
 
-export const getData = async <T>(appName: AppName, path: string): Promise<T> => {
+export const getResponse = async (appName: AppName, path: string): Promise<Response> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
   const h = await headers();
   const url = getUrl(appName) + path;
@@ -53,9 +53,7 @@ export const getData = async <T>(appName: AppName, path: string): Promise<T> => 
       throw new InternalServerError(res.status, 'Kunne ikke hente data');
     }
 
-    const data: T = await res.json();
-
-    return data;
+    return res;
   } catch (error) {
     logger.error('Failed to fetch', traceId, spanId, {
       url,
@@ -67,6 +65,18 @@ export const getData = async <T>(appName: AppName, path: string): Promise<T> => 
   }
 };
 
+export const getData = async <T>(appName: AppName, path: string): Promise<T> => {
+  try {
+    const res = await getResponse(appName, path);
+
+    const data: T = await res.json();
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getUser = () => getData<IUserData>(AppName.KABAL_INNSTILLINGER, '/me/brukerdata');
 
 export const getBehandlinger = () => getData<BehandlingResponse>(AppName.KABAL_API, '/behandlinger');
@@ -74,6 +84,8 @@ export const getBehandlinger = () => getData<BehandlingResponse>(AppName.KABAL_A
 export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/${path}`);
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/ytelser');
 export const getKlageenheter = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/klageenheter');
+export const getLovkildeToRegistreringshjemler = () =>
+  getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/lovkildetoregistreringshjemler');
 export const getSakstyper = () => getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
 
 const ANKE_I_TRYGDERETTEN_ID = '3';
