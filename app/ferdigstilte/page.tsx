@@ -10,7 +10,10 @@ async function BehandlingerData() {
   const ytelser = await getYtelser();
   const klageenheter = await getKlageenheter();
 
-  const filteredBehandlinger = useBehandlinger(behandlinger, (b) => b.isAvsluttetAvSaksbehandler);
+  const filteredBehandlinger = useBehandlinger(
+    behandlinger.anonymizedBehandlingList,
+    (b) => b.isAvsluttetAvSaksbehandler,
+  );
 
   return (
     <Behandlinger

@@ -6,11 +6,10 @@ import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/server/types';
 
 interface Props {
-  total: number;
   behandlinger: Behandling[];
 }
 
-export const LedigeVsTildelte = ({ behandlinger, total }: Props) => {
+export const LedigeVsTildelte = ({ behandlinger }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
       const existing = acc.get(curr.isTildelt);

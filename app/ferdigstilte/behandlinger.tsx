@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -17,7 +18,12 @@ interface Props {
 }
 
 export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
-  const { withTildelteFilter: data } = useData(behandlinger);
+  const ferdigstilte = useMemo(
+    () => behandlinger.filter((b) => b.avsluttetAvSaksbehandlerDate !== null),
+    [behandlinger],
+  );
+
+  const { withTildelteFilter: data } = useData(ferdigstilte);
 
   return (
     <ChartsWrapper>

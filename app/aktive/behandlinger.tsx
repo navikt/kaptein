@@ -2,7 +2,7 @@
 
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-parses';
+import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-parsers';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
@@ -22,7 +22,8 @@ interface Props {
 }
 
 export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
-  const { withTildelteFilter: data, withoutTildelteFilter } = useData(behandlinger);
+  const aktive = useMemo(() => behandlinger.filter((b) => b.avsluttetAvSaksbehandlerDate === null), [behandlinger]);
+  const { withTildelteFilter: data, withoutTildelteFilter } = useData(aktive);
   const [tildelingFilter] = useQueryState('tildeling', parseAsLedigeFilter);
   const showsTildelte = tildelingFilter === TildelingFilter.TILDELTE;
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
@@ -47,7 +48,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
 
       {showsAlle ? (
         <Card>
-          <LedigeVsTildelte behandlinger={data} total={behandlinger.length} />
+          <LedigeVsTildelte behandlinger={data} />
         </Card>
       ) : null}
 
