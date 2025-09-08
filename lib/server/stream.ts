@@ -1,37 +1,28 @@
 import { getResponse } from '@/lib/server/api';
 import type { AppName } from '@/lib/server/get-obo-token';
 
-interface WithTotal {
-  readonly totalCount: number;
-  /**
-   * Percentage of total count that has been processed so far (from 0 to 100).
-   * Only calculated when and if read.
-   */
-  readonly percentage: number;
-}
+export type ParserFn<T> = (line: string) => T;
 
-interface WithoutTotal {
-  readonly totalCount: null;
-  readonly percentage: null;
-}
-
-interface BaseParsedLine<T> {
+interface ParsedLine<T> {
   readonly data: T;
   readonly count: number;
+  readonly totalCount: number | null;
 }
 
-type ParsedLine<T> = BaseParsedLine<T> & Total;
-
-type Total = WithTotal | WithoutTotal;
-
-type ParserFn<T> = (line: string) => T;
+interface Result<T> {
+  stream: ReadableStream<ParsedLine<T>>;
+  totalCount: number | null;
+}
 
 /**
- * Fetches NDJSON data from the specified path and returns a ReadableStream of parsed objects.
+ * Fetches data from the specified path and returns a ReadableStream of parsed data.
  *
- * @template T - The type of objects to be parsed from the NDJSON stream.
+ * @template T - The type of objects to be parsed from the stream.
  * @param {AppName} appName - The name of the application to fetch data for.
- * @param {string} path - The API endpoint path to fetch the NDJSON data from.
+ * @param {string} path - The API endpoint path to fetch the stream from.
+ * @param {ParserFn<T>} [parser=JSON.parse] - A function to parse each line of the stream into an object of type T. Defaults to JSON.parse.
+ * @param {string} [contentType='application/x-ndjson'] - The expected Content-Type of the response. Defaults to 'application/x-ndjson'.
+ * @param {string} [separator='\n'] - The entry separator used in the stream. Defaults to newline character.
  * @returns {Promise<ReadableStream<T>>} A promise that resolves to a ReadableStream of parsed objects of type T.
  * @throws Will throw an error if the response body is null, or if the Content-Type or Transfer-Encoding headers are not as expected.
  */
@@ -39,26 +30,28 @@ export const streamData = async <T>(
   appName: AppName,
   path: string,
   parser: ParserFn<T> = JSON.parse,
-): Promise<ReadableStream<ParsedLine<T>>> => {
+  contentType = 'application/x-ndjson',
+  separator = '\n',
+): Promise<Result<T>> => {
   const res = await getResponse(appName, path);
-
-  if (res.body === null) {
-    throw new Error('Response body is null');
-  }
-
-  if (res.headers.get('Content-Type') !== 'application/x-ndjson') {
-    throw new Error(`Expected Content-Type application/x-ndjson but received ${res.headers.get('Content-Type')}`);
-  }
 
   if (res.headers.get('Transfer-Encoding') !== 'chunked') {
     throw new Error(`Expected Transfer-Encoding chunked but received ${res.headers.get('Transfer-Encoding')}`);
+  }
+
+  if (res.headers.get('Content-Type') !== contentType) {
+    throw new Error(`Expected Content-Type ${contentType} but received ${res.headers.get('Content-Type')}`);
+  }
+
+  if (res.body === null) {
+    throw new Error('Response body is null');
   }
 
   const totalCount = parseTotalCount(res.headers.get('Total-Count'));
   let count = 0;
 
   const reader = res.body.getReader();
-  const textDecoder = new TextDecoder();
+  const textDecoder = new TextDecoder(); // Defaults to 'utf-8'
   let buffer = '';
 
   const stream = new ReadableStream<ParsedLine<T>>({
@@ -73,7 +66,7 @@ export const streamData = async <T>(
         }
 
         buffer += textDecoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
+        const lines = buffer.split(separator);
         buffer = lines.pop() ?? '';
 
         for (const line of lines) {
@@ -83,9 +76,9 @@ export const streamData = async <T>(
 
           try {
             count++;
-            controller.enqueue(parseLine(line, count, totalCount, parser));
+            controller.enqueue(parseLine(line, parser, count, totalCount));
           } catch (e) {
-            controller.error(new Error(`Failed to parse JSON: ${e instanceof Error ? e.message : 'Unknown error'}`));
+            controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
           }
         }
       }
@@ -94,9 +87,9 @@ export const streamData = async <T>(
       if (buffer.trim().length !== 0) {
         try {
           count++;
-          controller.enqueue(parseLine(buffer, count, totalCount, parser));
+          controller.enqueue(parseLine(buffer, parser, count, totalCount));
         } catch (e) {
-          controller.error(new Error(`Failed to parse JSON: ${e instanceof Error ? e.message : 'Unknown error'}`));
+          controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
         }
       }
 
@@ -107,23 +100,14 @@ export const streamData = async <T>(
     },
   });
 
-  return stream;
+  return { stream, totalCount };
 };
 
-const parseLine = <T>(line: string, count: number, totalCount: number | null, parser: (line:string): T) => {
-  if (totalCount === null) {
-    return { data: JSON.parse(line), count, totalCount: null, percentage: null };
-  }
-
-  return {
-    data: JSON.parse(line),
-    count,
-    totalCount,
-    get percentage() {
-      return (count / totalCount) * 100;
-    },
-  };
-};
+const parseLine = <T>(line: string, parser: ParserFn<T>, count: number, totalCount: number | null): ParsedLine<T> => ({
+  data: parser(line),
+  count,
+  totalCount,
+});
 
 const parseTotalCount = (totalCountHeader: string | null): number | null => {
   if (totalCountHeader === null) {
