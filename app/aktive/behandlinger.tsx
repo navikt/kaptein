@@ -4,6 +4,7 @@ import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-query-parsers';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { OverVarsletFrist } from '@/components/behandlinger/over-varslet-frist';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -78,6 +79,10 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
           />
         </Card>
       )}
+
+      <Card>
+        <OverVarsletFrist behandlinger={data} />
+      </Card>
     </ChartsWrapper>
   );
 };

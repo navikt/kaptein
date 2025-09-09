@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { OverVarsletFrist } from '@/components/behandlinger/over-varslet-frist';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -54,6 +55,9 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
           ytelsekodeverk={ytelseKodeverk}
           klageenheterkodeverk={klageenheterKodeverk}
         />
+      </Card>
+      <Card>
+        <OverVarsletFrist behandlinger={data} />
       </Card>
     </ChartsWrapper>
   );
