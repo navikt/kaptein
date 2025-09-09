@@ -30,11 +30,23 @@ const behandlingParser: ParserFn<Behandling> = (data) => {
 
 const hasKey: HasKeyFn<Behandling> = (item, key) => item.id === key;
 
-export const BEHANDLINGER_DATA_LOADER = new DataLoader<Behandling>(
-  AppName.KABAL_API,
-  '/behandlinger-stream',
-  behandlingParser,
-  hasKey,
-  'klage.kaptein-behandling.v1',
-  'Behandlinger',
-);
+declare global {
+  var __BEHANDLINGER_DATA_LOADER__: DataLoader<Behandling> | undefined;
+}
+
+function getBehandlingerDataLoader(): DataLoader<Behandling> {
+  if (globalThis.__BEHANDLINGER_DATA_LOADER__ === undefined) {
+    globalThis.__BEHANDLINGER_DATA_LOADER__ = new DataLoader<Behandling>(
+      AppName.KABAL_API,
+      '/behandlinger-stream',
+      behandlingParser,
+      hasKey,
+      'klage.kaptein-behandling.v1',
+      'Behandlinger',
+    );
+  }
+
+  return globalThis.__BEHANDLINGER_DATA_LOADER__;
+}
+
+export const BEHANDLINGER_DATA_LOADER = getBehandlingerDataLoader();
