@@ -10,9 +10,8 @@ const log = getLogger('stream');
 export type ParserFn<T> = (line: string) => T;
 
 interface CheckEvent<T> {
-  readonly data: T[];
+  readonly data: T;
   readonly count: number;
-  readonly totalCount: number | null;
 }
 
 interface Result<T> {
@@ -75,13 +74,10 @@ export const streamData = async <T>(
     throw new Error('Invalid Kaptein-Total header');
   }
 
-  const batchSize = Math.max(1, Math.floor(totalCount / 200)); // Aim for ~200 events (0.5% per event)
-
   const reader = res.body.getReader();
   const textDecoder = new TextDecoder(); // Defaults to 'utf-8'
 
   let count = 0;
-  const batch: T[] = [];
   let buffer = '';
 
   const stream = new ReadableStream<CheckEvent<T>>({
@@ -99,8 +95,6 @@ export const streamData = async <T>(
         const lines = buffer.split(separator);
         buffer = lines.pop() ?? ''; // Keep the last incomplete line, if any
 
-        log.debug(`Received ${lines.length} lines`, traceId, spanId);
-
         for (const line of lines) {
           if (line.trim().length === 0) {
             continue;
@@ -108,12 +102,7 @@ export const streamData = async <T>(
 
           try {
             count++;
-            batch.push(parser(line));
-
-            if (batch.length === batchSize || count === totalCount) {
-              controller.enqueue({ data: batch, count, totalCount });
-              batch.length = 0;
-            }
+            controller.enqueue({ data: parser(line), count });
           } catch (e) {
             log.error(`Could not parse Kafka value: "${line}"`, traceId, spanId);
             controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
@@ -124,7 +113,11 @@ export const streamData = async <T>(
       // Process any remaining data in the buffer
       if (buffer.trim().length !== 0) {
         const data = buffer.split(separator).map(parser);
-        controller.enqueue({ data, count: count + data.length, totalCount });
+
+        for (const item of data) {
+          count++;
+          controller.enqueue({ data: item, count });
+        }
       }
 
       controller.close();

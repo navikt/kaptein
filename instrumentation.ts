@@ -20,9 +20,14 @@ export async function register() {
       );
     });
 
+    const removeDataListener = BEHANDLINGER_DATA_LOADER.addDataListener((data) => {
+      log.info(`${BEHANDLINGER_DATA_LOADER.name} DataLoader data: ${data.length}`, traceId, spanId);
+    });
+
     await BEHANDLINGER_DATA_LOADER.init();
 
     removeProgressListener();
+    removeDataListener();
   } catch (error) {
     if (error instanceof Error) {
       log.error(`Error initializing data loaders: ${error.message}`, traceId, spanId);

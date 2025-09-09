@@ -30,7 +30,7 @@
     "react-dom": "19.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.2",
+    "@biomejs/biome": "2.2.3",
     "@navikt/ds-tailwind": "7.29.1",
     "@tailwindcss/postcss": "4.1.13",
     "@types/bun": "1.2.21",

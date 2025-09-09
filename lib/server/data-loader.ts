@@ -17,6 +17,7 @@ export class DataLoader<T> {
   readonly #hasKey: HasKeyFn<T>;
   readonly #kafkaTopic: string | undefined;
   readonly #log: ReturnType<typeof getLogger>;
+  readonly #instanceId: string = crypto.randomUUID();
 
   #isInitialized = false;
   #progressListeners: Set<ProgressListener> = new Set();
@@ -41,14 +42,24 @@ export class DataLoader<T> {
     this.name = name;
     this.#hasKey = hasKey;
     this.#kafkaTopic = kafkaTopic;
-    this.#log = getLogger(`dataloader-${name.toLowerCase()}`);
+    this.#log = getLogger(`dataloader-${name.toLowerCase()}`, {
+      app_name: appName,
+      path,
+      topic: kafkaTopic,
+      instance_id: this.#instanceId,
+      name,
+    });
+
+    this.#log.debug(
+      `${this.name} DataLoader: instance created (${this.#instanceId})`,
+      generateTraceId(),
+      generateSpanId(),
+    );
   }
 
   #startKafka = async (kafkaTopic: string, traceId: string) => {
     const spanId = generateSpanId();
-    this.#log.debug(`${this.name} DataLoader: Kafka consumer starting with topic "${kafkaTopic}"...`, traceId, spanId, {
-      topic: kafkaTopic,
-    });
+    this.#log.debug(`${this.name} DataLoader: Kafka consumer starting with topic "${kafkaTopic}"...`, traceId, spanId);
 
     try {
       this.#kafkaConsumer = new KafkaConsumer(kafkaTopic, this.#parser);
@@ -59,7 +70,6 @@ export class DataLoader<T> {
         spanId,
         {
           error: error instanceof Error ? error.message : 'Unknown error',
-          topic: kafkaTopic,
         },
       );
 
@@ -76,20 +86,44 @@ export class DataLoader<T> {
 
       let found = false;
 
+      const start = performance.now();
+
       for (let i = this.#data.length - 1; i >= 0; i--) {
         if (this.#hasKey(this.#data[i], key)) {
           this.#data[i] = value;
           found = true;
+
+          const duration = performance.now() - start;
+
+          this.#log.debug(
+            `${this.name} DataLoader: Kafka consumer looked through ${this.#data.length - i} items in ${duration}ms`,
+            traceId,
+            spanId,
+            {
+              duration,
+            },
+          );
+
           break;
         }
       }
 
       if (!found) {
-        this.#log.debug(`${this.name} DataLoader: New item added via Kafka`, traceId, spanId, { topic: kafkaTopic });
+        const duration = performance.now() - start;
+        this.#log.debug(
+          `${this.name} DataLoader: Kafka consumer looked through ${this.#data.length} items in ${duration}ms`,
+          traceId,
+          spanId,
+          {
+            duration,
+          },
+        );
+
+        this.#log.debug(`${this.name} DataLoader: New item added via Kafka`, traceId, spanId);
         this.#data.push(value);
         this.#count = this.#data.length;
       } else {
-        this.#log.debug(`${this.name} DataLoader: Item updated via Kafka`, traceId, spanId, { topic: kafkaTopic });
+        this.#log.debug(`${this.name} DataLoader: Item updated via Kafka`, traceId, spanId);
       }
 
       this.#notifyListeners();
@@ -97,19 +131,19 @@ export class DataLoader<T> {
 
     await this.#kafkaConsumer.init(traceId);
 
-    this.#log.debug(`${this.name} DataLoader: Kafka consumer started`, traceId, spanId, { topic: kafkaTopic });
+    this.#log.debug(`${this.name} DataLoader: Kafka consumer started`, traceId, spanId);
   };
 
   public init = async () => {
     const { traceId, spanId } = generateTraceParent();
 
     if (this.#isInitialized === true) {
-      this.#log.debug(`${this.name} DataLoader: Already initialized`, traceId, spanId, { topic: this.#kafkaTopic });
+      this.#log.debug(`${this.name} DataLoader: Already initialized`, traceId, spanId);
       return;
     }
 
     this.#isInitialized = true;
-    this.#log.debug(`${this.name} DataLoader: Initialization started`, traceId, spanId, { topic: this.#kafkaTopic });
+    this.#log.debug(`${this.name} DataLoader: Initialization started`, traceId, spanId);
 
     await this.#load(traceId);
 
@@ -118,7 +152,7 @@ export class DataLoader<T> {
       await this.#startKafka(this.#kafkaTopic, traceId);
     }
 
-    this.#log.debug(`${this.name} DataLoader: Initialization completed`, traceId, spanId, { topic: this.#kafkaTopic });
+    this.#log.debug(`${this.name} DataLoader: Initialization completed`, traceId, spanId);
   };
 
   public getData = () => this.#data;
@@ -191,6 +225,10 @@ export class DataLoader<T> {
 
     this.#initialTotal = totalCount;
 
+    this.#notifyProgressListeners();
+
+    const progressRateLimit = totalCount === null ? 1 : Math.max(1, Math.floor(totalCount / 200));
+
     const reader = stream.getReader();
 
     const results: T[] = [];
@@ -202,15 +240,17 @@ export class DataLoader<T> {
         break;
       }
 
-      const { data, count, totalCount } = value;
+      const { data, count } = value;
 
-      results.push(...data);
+      results.push(data);
 
       this.#data = results;
       this.#count = count;
-      this.#initialTotal = totalCount;
 
-      this.#notifyListeners();
+      // Rate limit progress notifications
+      if (count === this.#initialTotal || count % progressRateLimit === 0) {
+        this.#notifyProgressListeners();
+      }
     }
 
     this.#log.debug(
@@ -220,6 +260,7 @@ export class DataLoader<T> {
     );
 
     this.#loader = null;
+    this.#notifyListeners();
 
     return results;
   }
@@ -228,7 +269,9 @@ export class DataLoader<T> {
     for (const listener of this.#dataListeners) {
       listener(this.#data);
     }
+  }
 
+  #notifyProgressListeners() {
     const progress = this.getInitProgress();
 
     for (const listener of this.#progressListeners) {
