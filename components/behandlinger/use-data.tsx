@@ -82,7 +82,18 @@ export const useData = (behandlinger: Behandling[]) => {
         : filteredForHjemler.filter((b) => b.isTildelt === (tildeling === TildelingFilter.TILDELTE));
 
     return { withoutTildelteFilter: filteredForHjemler, withTildelteFilter: filteredForTildelte };
-  }, [behandlinger, ytelser, klageenheter, hjemler, tildeling, sakstyper, fromFilter, toFilter, tilbakekreving]);
+  }, [
+    behandlinger,
+    ytelser,
+    klageenheter,
+    hjemler,
+    tildeling,
+    sakstyper,
+    fromFilter,
+    toFilter,
+    tilbakekreving,
+    utfall,
+  ]);
 };
 
 const ANKE_I_TRYGDERETTEN_ID = '3';

@@ -50,6 +50,7 @@ export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
   const eChartsRef = useRef<Echarts.ECharts | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
+  // Create ResizeObserver to update chart size when container size changes
   useEffect(() => {
     if (ref.current === null) {
       return;
@@ -77,6 +78,7 @@ export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
     eChartsRef.current.resize();
   }, [size.width, size.height]);
 
+  // Update ECharts options when option prop changes
   useEffect(() => {
     if (eChartsRef.current === null) {
       return;
@@ -85,6 +87,7 @@ export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
     eChartsRef.current.setOption(option);
   }, [option]);
 
+  // Initialize ECharts instance
   useEffect(() => {
     if (ref.current === null || eChartsRef.current !== null) {
       return;
@@ -95,6 +98,7 @@ export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
     eChartsRef.current.setOption(option);
   }, [option, theme]);
 
+  // Update theme when it changes
   useEffect(() => {
     if (eChartsRef.current === null) {
       return;

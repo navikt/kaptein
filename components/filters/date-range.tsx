@@ -69,9 +69,9 @@ export const DateRange = () => {
   );
 
   return (
-    <VStack gap="3">
+    <VStack gap="4">
       <DatePicker {...datepickerProps} dropdownCaption>
-        <VStack>
+        <VStack gap="4">
           <DatePicker.Input
             {...fromInputProps}
             label={
@@ -88,23 +88,21 @@ export const DateRange = () => {
             }
           />
 
-          <HStack>
-            <DatePicker.Input
-              {...toInputProps}
-              label={
-                <HStack align="center" gap="1">
-                  <span>Til og med</span>
-                  <Button
-                    variant="tertiary"
-                    className="shrink"
-                    size="small"
-                    onClick={resetTo}
-                    icon={<ClockDashedIcon aria-hidden />}
-                  />
-                </HStack>
-              }
-            />
-          </HStack>
+          <DatePicker.Input
+            {...toInputProps}
+            label={
+              <HStack align="center" gap="1">
+                <span>Til og med</span>
+                <Button
+                  variant="tertiary"
+                  className="shrink"
+                  size="small"
+                  onClick={resetTo}
+                  icon={<ClockDashedIcon aria-hidden />}
+                />
+              </HStack>
+            }
+          />
         </VStack>
       </DatePicker>
 

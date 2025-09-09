@@ -7,7 +7,8 @@ import { LIGHT } from '@/lib/echarts/light';
 import { SAKSTYPE_COLORS } from '@/lib/echarts/sakstype-colors';
 import type { Behandling } from '@/lib/server/types';
 
-export const useColor = (behandlinger: Behandling[]) => {
+// Due to a bug in pie chart when hovering (emphasis) we have to hard code the colors instead of using tokens
+export const useSakstypeColor = (behandlinger: Behandling[]) => {
   const theme = useAppTheme();
 
   const relevantSakstyper = useMemo(() => Array.from(new Set(behandlinger.map((b) => b.typeId))), [behandlinger]);
