@@ -2,7 +2,7 @@
 
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-parsers';
+import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-query-parsers';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
@@ -13,6 +13,7 @@ import { useData } from '@/components/behandlinger/use-data';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   behandlinger: Behandling[];
@@ -24,7 +25,7 @@ interface Props {
 export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
   const aktive = useMemo(() => behandlinger.filter((b) => b.avsluttetAvSaksbehandlerDate === null), [behandlinger]);
   const { withTildelteFilter: data, withoutTildelteFilter } = useData(aktive);
-  const [tildelingFilter] = useQueryState('tildeling', parseAsLedigeFilter);
+  const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
   const showsTildelte = tildelingFilter === TildelingFilter.TILDELTE;
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;

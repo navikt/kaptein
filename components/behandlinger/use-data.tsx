@@ -9,19 +9,20 @@ import {
   parseAsTilbakekrevingFilter,
   TilbakekrevingFilter,
   TildelingFilter,
-} from '@/app/custom-parsers';
+} from '@/app/custom-query-parsers';
 import type { Behandling } from '@/lib/server/types';
+import { QueryParam } from '@/lib/types/query-param';
 
 export const useData = (behandlinger: Behandling[]) => {
-  const [ytelseFilter] = useQueryState('ytelser', parseAsArrayOf(parseAsString));
-  const [klageenheterFilter] = useQueryState('klageenheter', parseAsArrayOf(parseAsString));
-  const [hjemlerFilter] = useQueryState('hjemler', parseAsArrayOf(parseAsString));
-  const [sakstyperFilter] = useQueryState('sakstyper', parseAsArrayOf(parseAsString));
-  const [tildelingFilter] = useQueryState('tildeling', parseAsLedigeFilter);
-  const [fromFilter] = useQueryState('from', parseAsDate);
-  const [toFilter] = useQueryState('to', parseAsDate);
-  const [tilbakekrevingFilter] = useQueryState('tilbakekreving', parseAsTilbakekrevingFilter);
-  const [utfallFilter] = useQueryState('utfall', parseAsArrayOf(parseAsString));
+  const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
+  const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
+  const [hjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [sakstyperFilter] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
+  const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
+  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
+  const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
+  const [tilbakekrevingFilter] = useQueryState(QueryParam.TILBAKEKREVING, parseAsTilbakekrevingFilter);
+  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
 
   const ytelser = ytelseFilter ?? [];
   const klageenheter = klageenheterFilter ?? [];
@@ -82,7 +83,18 @@ export const useData = (behandlinger: Behandling[]) => {
         : filteredForHjemler.filter((b) => b.isTildelt === (tildeling === TildelingFilter.TILDELTE));
 
     return { withoutTildelteFilter: filteredForHjemler, withTildelteFilter: filteredForTildelte };
-  }, [behandlinger, ytelser, klageenheter, hjemler, tildeling, sakstyper, fromFilter, toFilter, tilbakekreving]);
+  }, [
+    behandlinger,
+    ytelser,
+    klageenheter,
+    hjemler,
+    tildeling,
+    sakstyper,
+    fromFilter,
+    toFilter,
+    tilbakekreving,
+    utfall,
+  ]);
 };
 
 const ANKE_I_TRYGDERETTEN_ID = '3';

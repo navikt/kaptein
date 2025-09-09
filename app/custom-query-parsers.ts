@@ -1,5 +1,6 @@
 import { format, isValid } from 'date-fns';
 import { createParser } from 'nuqs';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 
 export enum TildelingFilter {
   ALL = 'all',
@@ -70,8 +71,6 @@ export const parseAsDate = createParser({
   },
 
   serialize(value) {
-    return format(value, FORMAT);
+    return format(value, ISO_DATE_FORMAT);
   },
 });
-
-const FORMAT = 'yyyy-MM-dd';

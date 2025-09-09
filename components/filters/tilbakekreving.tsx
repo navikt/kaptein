@@ -2,10 +2,11 @@
 
 import { ToggleGroup } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
-import { isTilbakekrevingFilter, parseAsTilbakekrevingFilter, TilbakekrevingFilter } from '@/app/custom-parsers';
+import { isTilbakekrevingFilter, parseAsTilbakekrevingFilter, TilbakekrevingFilter } from '@/app/custom-query-parsers';
+import { QueryParam } from '@/lib/types/query-param';
 
 export const Tilbakekreving = () => {
-  const [tilbakekreving, setTilbakekreving] = useQueryState('tilbakekreving', parseAsTilbakekrevingFilter);
+  const [tilbakekreving, setTilbakekreving] = useQueryState(QueryParam.TILBAKEKREVING, parseAsTilbakekrevingFilter);
 
   return (
     <ToggleGroup

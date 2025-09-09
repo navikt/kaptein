@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import { useColor } from '@/lib/echarts/use-colors';
+import { useSakstypeColor } from '@/lib/echarts/use-colors';
 import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
 interface Props {
@@ -31,7 +31,7 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper, total }: Props) => {
     return Object.values(Object.fromEntries(map));
   }, [behandlinger, sakstyper]);
 
-  const color = useColor(behandlinger);
+  const color = useSakstypeColor(behandlinger);
 
   if (data.length === 0) {
     return <NoData />;

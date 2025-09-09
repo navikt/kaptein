@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { Behandlinger } from '@/app/ferdigstilte/behandlinger';
 import { BehandlingerProgress } from '@/components/behandlinger/progress';
-import { useBehandlinger } from '@/components/behandlinger/use-behandlinger';
 import { getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
 import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
 
@@ -11,7 +10,7 @@ async function BehandlingerData() {
   const ytelser = await getYtelser();
   const klageenheter = await getKlageenheter();
 
-  const filteredBehandlinger = useBehandlinger(behandlinger, (b) => b.isAvsluttetAvSaksbehandler);
+  const filteredBehandlinger = behandlinger.filter((b) => b.isAvsluttetAvSaksbehandler);
 
   return (
     <Behandlinger

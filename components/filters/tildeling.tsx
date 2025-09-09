@@ -2,10 +2,11 @@
 
 import { ToggleGroup } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
-import { isLedigeFilter, parseAsLedigeFilter, TildelingFilter } from '@/app/custom-parsers';
+import { isLedigeFilter, parseAsLedigeFilter, TildelingFilter } from '@/app/custom-query-parsers';
+import { QueryParam } from '@/lib/types/query-param';
 
 export const Tildeling = () => {
-  const [ledige, setLedige] = useQueryState('tildeling', parseAsLedigeFilter);
+  const [ledige, setLedige] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
 
   return (
     <ToggleGroup

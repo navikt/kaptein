@@ -1,46 +1,24 @@
 'use client';
 
 import { ChevronDownIcon } from '@navikt/aksel-icons';
-import { ActionMenu, BoxNew, Button, HStack, TextField, VStack } from '@navikt/ds-react';
+import { ActionMenu, Button, HStack, TextField } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
-import { MultiselectFilter } from '@/components/filters/multi-select-filter';
-import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
-
-interface Props {
-  ytelser: IYtelse[];
-  lovkildeToRegistreringshjemler: IKodeverkValue[];
-}
-
-export const YtelserAndHjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
-  const [selectedYtelser, setSelectedYtelser] = useQueryState('ytelser', parseAsArrayOf(parseAsString));
-
-  const ytelserOptions = useMemo(() => ytelser.map(({ navn, id }) => ({ label: navn, value: id })), [ytelser]);
-
-  return (
-    <VStack asChild gap="4">
-      <BoxNew padding="3" borderRadius="medium" borderColor="neutral" borderWidth="1">
-        <MultiselectFilter
-          label="Ytelser"
-          selected={selectedYtelser}
-          setSelected={setSelectedYtelser}
-          options={ytelserOptions}
-        />
-        <Hjemler ytelserkodeverk={ytelser} lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler} />
-      </BoxNew>
-    </VStack>
-  );
-};
+import { QueryParam } from '@/lib/types/query-param';
 
 interface HjemlerProps {
   ytelserkodeverk: IYtelse[];
   lovkildeToRegistreringshjemler: IKodeverkSimpleValue[];
 }
 
-const Hjemler = ({ ytelserkodeverk, lovkildeToRegistreringshjemler }: HjemlerProps) => {
-  const [selectedYtelser] = useQueryState('ytelser', parseAsArrayOf(parseAsString));
-  const [selectedHjemler, setSelectedHjemler] = useQueryState('hjemler', parseAsArrayOf(parseAsString));
+export const Registreringshjemler = ({ ytelserkodeverk, lovkildeToRegistreringshjemler }: HjemlerProps) => {
+  const [selectedYtelser] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
+  const [selectedHjemler, setSelectedHjemler] = useQueryState(
+    QueryParam.REGISTRERINGSHJEMLER,
+    parseAsArrayOf(parseAsString),
+  );
 
   const [value, setValue] = useState('');
 

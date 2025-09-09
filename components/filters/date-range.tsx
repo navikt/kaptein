@@ -5,7 +5,8 @@ import { Button, DatePicker, HGrid, HStack, useRangeDatepicker, VStack } from '@
 import { endOfMonth, endOfYear, isSameDay, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsDate } from '@/app/custom-parsers';
+import { parseAsDate } from '@/app/custom-query-parsers';
+import { QueryParam } from '@/lib/types/query-param';
 
 const TODAY = new Date();
 const START_OF_KABAL = new Date('2022-05-01');
@@ -21,8 +22,8 @@ const START_OF_LAST_YEAR = startOfYear(subYears(TODAY, 1));
 const END_OF_LAST_YEAR = endOfYear(subYears(TODAY, 1));
 
 export const DateRange = () => {
-  const [from, setFrom] = useQueryState('from', parseAsDate);
-  const [to, setTo] = useQueryState('to', parseAsDate);
+  const [from, setFrom] = useQueryState(QueryParam.FROM, parseAsDate);
+  const [to, setTo] = useQueryState(QueryParam.TO, parseAsDate);
 
   const { fromInputProps, toInputProps, datepickerProps, setSelected } = useRangeDatepicker({
     defaultSelected: { from: from === null ? TODAY : new Date(from), to: to === null ? TODAY : new Date(to) },
@@ -69,9 +70,9 @@ export const DateRange = () => {
   );
 
   return (
-    <VStack gap="3">
+    <VStack gap="4">
       <DatePicker {...datepickerProps} dropdownCaption>
-        <VStack>
+        <VStack gap="4">
           <DatePicker.Input
             {...fromInputProps}
             label={
@@ -88,23 +89,21 @@ export const DateRange = () => {
             }
           />
 
-          <HStack>
-            <DatePicker.Input
-              {...toInputProps}
-              label={
-                <HStack align="center" gap="1">
-                  <span>Til og med</span>
-                  <Button
-                    variant="tertiary"
-                    className="shrink"
-                    size="small"
-                    onClick={resetTo}
-                    icon={<ClockDashedIcon aria-hidden />}
-                  />
-                </HStack>
-              }
-            />
-          </HStack>
+          <DatePicker.Input
+            {...toInputProps}
+            label={
+              <HStack align="center" gap="1">
+                <span>Til og med</span>
+                <Button
+                  variant="tertiary"
+                  className="shrink"
+                  size="small"
+                  onClick={resetTo}
+                  icon={<ClockDashedIcon aria-hidden />}
+                />
+              </HStack>
+            }
+          />
         </VStack>
       </DatePicker>
 
