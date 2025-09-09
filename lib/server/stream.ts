@@ -69,7 +69,7 @@ export const streamData = async <T>(
     throw new Error('Response body is null');
   }
 
-  const totalCount = parseTotalCount(res.headers.get('Kaptein-Total'));
+  const totalCount = parseTotalCount(res.headers.get('Kaptein-Total'), traceId, spanId);
 
   if (totalCount === null) {
     throw new Error('Invalid Kaptein-Total header');
@@ -99,7 +99,7 @@ export const streamData = async <T>(
         const lines = buffer.split(separator);
         buffer = lines.pop() ?? ''; // Keep the last incomplete line, if any
 
-        console.debug(`Received ${lines.length} lines`);
+        log.debug(`Received ${lines.length} lines`, traceId, spanId);
 
         for (const line of lines) {
           if (line.trim().length === 0) {
@@ -115,7 +115,7 @@ export const streamData = async <T>(
               batch.length = 0;
             }
           } catch (e) {
-            console.error(line);
+            log.error(`Could not parse Kafka value: "${line}"`, traceId, spanId);
             controller.error(new Error(`Failed to parse line: ${e instanceof Error ? e.message : 'Unknown error'}`));
           }
         }
@@ -137,7 +137,7 @@ export const streamData = async <T>(
   return { stream, totalCount };
 };
 
-const parseTotalCount = (totalCountHeader: string | null): number | null => {
+const parseTotalCount = (totalCountHeader: string | null, traceId: string, spanId: string): number | null => {
   if (totalCountHeader === null) {
     return null;
   }
@@ -145,13 +145,13 @@ const parseTotalCount = (totalCountHeader: string | null): number | null => {
   const totalCount = Number.parseInt(totalCountHeader, 10);
 
   if (Number.isNaN(totalCount)) {
-    console.warn(`Invalid Kaptein-Total header value: ${totalCountHeader}`);
+    log.warn(`Invalid Kaptein-Total header value: ${totalCountHeader}`, traceId, spanId);
 
     return null;
   }
 
   if (totalCount < 0) {
-    console.warn(`Negative Kaptein-Total header value: ${totalCountHeader}`);
+    log.warn(`Negative Kaptein-Total header value: ${totalCountHeader}`, traceId, spanId);
 
     return null;
   }

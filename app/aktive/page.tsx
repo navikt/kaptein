@@ -9,7 +9,7 @@ async function BehandlingerData() {
   const ytelser = await getYtelser();
   const klageenheter = await getKlageenheter();
 
-  const behandlinger = await BEHANDLINGER_DATA_LOADER.load();
+  const behandlinger = BEHANDLINGER_DATA_LOADER.getData();
   const filteredBehandlinger = behandlinger.filter((b) => !b.isAvsluttetAvSaksbehandler);
 
   return (

@@ -42,6 +42,7 @@ export const SakerPerYtelse = ({ behandlinger, relevantYtelser, sakstyper }: Pro
           text: 'Saker per ytelse og sakstype',
           subtext: `Viser data for ${behandlinger.length} saker`,
         },
+        legend: {},
         tooltip: {
           trigger: 'axis',
           axisPointer: {

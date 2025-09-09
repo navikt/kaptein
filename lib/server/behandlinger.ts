@@ -35,5 +35,6 @@ export const BEHANDLINGER_DATA_LOADER = new DataLoader<Behandling>(
   '/behandlinger-stream',
   behandlingParser,
   hasKey,
+  'klage.kaptein-behandling.v1',
   'Behandlinger',
 );

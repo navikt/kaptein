@@ -3,8 +3,10 @@
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter, TildelingFilter } from '@/app/custom-query-parsers';
+import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { OvergåttVarsletFrist } from '@/components/behandlinger/overgått-varslet-frist';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -27,13 +29,14 @@ interface Props {
 }
 
 export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
-  const aktive = useMemo(() => behandlinger.filter((b) => b.avsluttetAvSaksbehandlerDate === null), [behandlinger]);
-  const { withTildelteFilter: data, withoutTildelteFilter } = useData(aktive);
+  const { withTildelteFilter: data, withoutTildelteFilter } = useData(behandlinger);
   const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
   const showsTildelte = tildelingFilter === TildelingFilter.TILDELTE;
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelseKodeverk);
+  console.log('aktive behandlinger', behandlinger);
+  console.log('aktive data', data);
 
   const tildelte = useMemo(() => withoutTildelteFilter.filter((b) => b.isTildelt), [withoutTildelteFilter]);
 
@@ -94,6 +97,14 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
 
       <Card>
         <VarsletFristPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
+      </Card>
+
+      <Card>
+        <OvergåttVarsletFrist behandlinger={data} />
+      </Card>
+
+      <Card>
+        <AlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
       </Card>
     </ChartsWrapper>
   );

@@ -2,51 +2,14 @@
 
 import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
+import { ExceededFrist, useFristPieChartColors } from '@/components/behandlinger/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
-import { AppTheme, useAppTheme } from '@/lib/app-theme';
-import { ColorToken } from '@/lib/echarts/color-token';
-import { DARK } from '@/lib/echarts/dark';
 import { EChart } from '@/lib/echarts/echarts';
-import { LIGHT } from '@/lib/echarts/light';
 import type { Behandling } from '@/lib/server/types';
 
 interface Props {
   behandlinger: Behandling[];
 }
-
-enum ExceededFrist {
-  EXCEEDED = 'Overskredet',
-  NOT_EXCEEDED = 'Innenfor varslet frist',
-  NULL = 'Ingen varslet frist',
-}
-
-const getTheme = (theme: AppTheme) => {
-  switch (theme) {
-    case AppTheme.LIGHT:
-      return LIGHT;
-    case AppTheme.DARK:
-      return DARK;
-  }
-};
-
-// Due to a bug in pie chart when hovering (emphasis) we have to hard code the colors instead of using tokens
-const useColor = (data: { name: string }[]) => {
-  const themeName = useAppTheme();
-  const theme = getTheme(themeName);
-
-  return data.map(({ name }) => {
-    switch (name) {
-      case ExceededFrist.EXCEEDED:
-        return theme[ColorToken.Danger600];
-      case ExceededFrist.NOT_EXCEEDED:
-        return theme[ColorToken.Success500];
-      case ExceededFrist.NULL:
-        return theme[ColorToken.Neutral400];
-      default:
-        return theme[ColorToken.Warning500];
-    }
-  });
-};
 
 const TODAY = new Date();
 
@@ -77,7 +40,7 @@ export const VarsletFrist = ({ behandlinger }: Props) => {
       .map(([name, value]) => ({ name, value }));
   }, [behandlinger]);
 
-  const color = useColor(data);
+  const color = useFristPieChartColors(data);
 
   if (data.length === 0) {
     return <NoData />;

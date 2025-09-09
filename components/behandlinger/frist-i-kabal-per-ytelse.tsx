@@ -16,15 +16,15 @@ const TODAY = new Date();
 const getData = (behandling: Behandling, exceeded: ExceededFrist): number => {
   switch (exceeded) {
     case ExceededFrist.NULL:
-      return behandling.varsletFrist === null ? 1 : 0;
+      return behandling.frist === null ? 1 : 0;
     case ExceededFrist.EXCEEDED:
-      return behandling.varsletFrist !== null && isBefore(new Date(behandling.varsletFrist), TODAY) ? 1 : 0;
+      return behandling.frist !== null && isBefore(new Date(behandling.frist), TODAY) ? 1 : 0;
     case ExceededFrist.NOT_EXCEEDED:
-      return behandling.varsletFrist !== null && !isBefore(new Date(behandling.varsletFrist), TODAY) ? 1 : 0;
+      return behandling.frist !== null && !isBefore(new Date(behandling.frist), TODAY) ? 1 : 0;
   }
 };
 
-export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
+export const FristIKabalPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
   const series = useMemo(
     () =>
       Object.values(ExceededFrist).map((type) => ({
@@ -36,9 +36,7 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
         color: getFristColor(type),
         data: relevantYtelser
           .map(({ id }) =>
-            behandlinger.reduce((acc, curr) => {
-              return curr.ytelseId === id ? acc + getData(curr, type) : acc;
-            }, 0),
+            behandlinger.reduce((acc, curr) => (curr.ytelseId === id ? acc + getData(curr, type) : acc), 0),
           )
           .map((value) => (value === 0 ? null : value)),
       })),
@@ -53,7 +51,7 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
     <EChart
       option={{
         title: {
-          text: 'Varslet frist per ytelse',
+          text: 'Frist i Kabal per ytelse',
           subtext: `Viser data for ${behandlinger.length} saker`,
         },
         tooltip: {

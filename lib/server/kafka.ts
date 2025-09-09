@@ -2,9 +2,7 @@ import { Consumer, type Message } from '@platformatic/kafka';
 import client, { register } from 'prom-client';
 import { requiredEnvString } from '@/lib/environment';
 import { getLogger } from '@/lib/logger';
-import { generateTraceParent, parseTraceParent } from '@/lib/server/traceparent';
-
-const log = getLogger('document-write-access-kafka-consumer');
+import { generateSpanId, generateTraceId, generateTraceParent, parseTraceParent } from '@/lib/server/traceparent';
 
 type ListenerFn<T> = (message: Message<string, T | null, string, string>) => void;
 type ParserFn<T> = (data: string) => T;
@@ -13,17 +11,22 @@ export class KafkaConsumer<T> {
   readonly #topic: string;
   readonly #parser: ParserFn<T>;
   readonly #consumer: Consumer<string, string, string, string>;
+  readonly #log: ReturnType<typeof getLogger>;
   #listeners: ListenerFn<T | null>[] = [];
 
   constructor(topic: string, parser: ParserFn<T>) {
     this.#topic = topic;
     this.#parser = parser;
+    this.#log = getLogger(`kafka-consumer-${topic}`);
+
+    const { traceId, spanId } = generateTraceParent();
 
     const kafkaBrokers = requiredEnvString('KAFKA_BROKERS')
       .split(',')
       .map((b) => b.trim());
 
     if (kafkaBrokers.length === 0) {
+      this.#log.error('KAFKA_BROKERS must contain at least one broker', traceId, spanId, { topic: this.#topic });
       throw new Error('KAFKA_BROKERS must contain at least one broker');
     }
 
@@ -48,49 +51,70 @@ export class KafkaConsumer<T> {
 
   #closeStream: (() => Promise<void>) | undefined;
 
-  async init(): Promise<void> {
-    const { traceId, spanId } = generateTraceParent();
-    log.debug(`Kafka consumer for topic "${this.#topic}" initializing...`, traceId, spanId);
+  async init(traceId = generateTraceId()): Promise<void> {
+    const spanId = generateSpanId();
+    this.#log.debug(`Kafka consumer for topic '${this.#topic}' initializing...`, traceId, spanId, {
+      topic: this.#topic,
+    });
 
     const initTimestamp = Date.now();
 
     try {
-      log.debug('Connecting to Kafka brokers...', traceId, spanId);
+      this.#log.debug(`Connecting to Kafka brokers for topic '${this.#topic}'...`, traceId, spanId, {
+        topic: this.#topic,
+      });
       await this.#consumer.connectToBrokers();
-      log.debug('Kafka consumer connected to brokers', traceId, spanId);
+      this.#log.debug(`Kafka consumer connected to brokers for topic '${this.#topic}'`, traceId, spanId, {
+        topic: this.#topic,
+      });
 
-      log.debug('Kafka consumer joining group...', traceId, spanId);
+      this.#log.debug(`Kafka consumer joining group for topic '${this.#topic}'...`, traceId, spanId, {
+        topic: this.#topic,
+      });
       const groupId = await this.#consumer.joinGroup({});
-      log.debug(`Kafka consumer joined group ${groupId}`, traceId, spanId, { group_id: groupId });
+      this.#log.debug(`Kafka consumer joined group ${groupId} for topic '${this.#topic}'`, traceId, spanId, {
+        group_id: groupId,
+        topic: this.#topic,
+      });
 
-      log.debug('Kafka consumer starting stream...', traceId, spanId);
+      this.#log.debug('Kafka consumer starting stream...', traceId, spanId, { topic: this.#topic });
 
       // Create a consumer stream to listen for future changes.
       const stream = await this.#consumer.consume({
         autocommit: false,
-        topics: ['klage.smart-document-write-access.v1'],
+        topics: [this.#topic],
         sessionTimeout: 10_000,
         heartbeatInterval: 500,
         mode: 'latest',
       });
 
-      log.info('Kafka consumer stream started', traceId, spanId);
+      this.#log.info(`Kafka consumer stream started for topic '${this.#topic}'`, traceId, spanId, {
+        topic: this.#topic,
+      });
 
       this.#closeStream = async () => {
-        log.debug('Closing Kafka consumer stream...', traceId, spanId);
+        this.#log.debug(`Closing Kafka consumer stream  for topic '${this.#topic}'...`, traceId, spanId, {
+          topic: this.#topic,
+        });
         await stream.close();
-        log.debug('Kafka consumer stream closed', traceId, spanId);
+        this.#log.debug(`Kafka consumer stream closed for topic '${this.#topic}'`, traceId, spanId, {
+          topic: this.#topic,
+        });
         this.#closeStream = undefined;
       };
 
       const readyPromise = new Promise<void>((resolve) => {
         stream.once('readable', () => {
-          log.debug('Kafka stream readable', traceId, spanId);
+          this.#log.debug(`Kafka stream readable for topic '${this.#topic}'`, traceId, spanId, {
+            topic: this.#topic,
+          });
           resolve();
         });
       });
 
-      log.debug('Kafka consumer stream listener starting...', traceId, spanId);
+      this.#log.debug(`Kafka consumer stream listener starting for topic '${this.#topic}'...`, traceId, spanId, {
+        topic: this.#topic,
+      });
 
       stream.on('data', (message) => {
         const { key, value, headers, timestamp } = message;
@@ -108,7 +132,12 @@ export class KafkaConsumer<T> {
           };
 
           if (payload === null) {
-            log.debug('Received tombstone message from Kafka, deleting access list entry', message_trace_id, spanId);
+            this.#log.debug(
+              `Received tombstone message from Kafka, deleting access list entry for topic '${this.#topic}'`,
+              message_trace_id,
+              spanId,
+              { topic: this.#topic },
+            );
 
             this.#notifyListeners(parsedMessage);
 
@@ -116,14 +145,14 @@ export class KafkaConsumer<T> {
           }
 
           if (timestamp < initTimestamp) {
-            return log.debug(`Received outdated message from Kafka for topic "${this.#topic}"`, traceId, spanId, {
+            return this.#log.debug(`Received outdated message from Kafka for topic '${this.#topic}'`, traceId, spanId, {
               topic: this.#topic,
               key,
               timestamp,
             });
           }
 
-          log.debug(`Received message from Kafka for topic "${this.#topic}"`, message_trace_id, spanId, {
+          this.#log.debug(`Received message from Kafka for topic '${this.#topic}'`, message_trace_id, spanId, {
             topic: this.#topic,
             key,
             timestamp,
@@ -131,7 +160,7 @@ export class KafkaConsumer<T> {
 
           this.#notifyListeners(parsedMessage);
         } catch (error) {
-          log.error('Failed to parse Kafka message', message_trace_id, spanId, {
+          this.#log.error(`Failed to parse Kafka message for topic '${this.#topic}'`, message_trace_id, spanId, {
             topic: this.#topic,
             key,
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -139,12 +168,19 @@ export class KafkaConsumer<T> {
         }
       });
 
-      log.debug('Kafka consumer stream listener started', traceId, spanId);
+      this.#log.debug(`Kafka consumer stream listener started for topic '${this.#topic}'`, traceId, spanId, {
+        topic: this.#topic,
+      });
 
-      return readyPromise;
+      await readyPromise;
+
+      this.#log.debug(`Kafka consumer ready for topic '${this.#topic}'`, traceId, spanId, {
+        topic: this.#topic,
+      });
     } catch (error) {
-      log.error('Failed to initialize Kafka consumer', traceId, spanId, {
+      this.#log.error(`Failed to initialize Kafka consumer for topic '${this.#topic}'`, traceId, spanId, {
         error: error instanceof Error ? error.message : 'Unknown error',
+        topic: this.#topic,
       });
 
       throw error;
@@ -187,7 +223,12 @@ export class KafkaConsumer<T> {
       return true;
     }
 
-    log.warn(`Smart Document Write Access is not processing - ${errors.join(', ')}`, traceId, spanId, { errors });
+    this.#log.warn(
+      `Kafka Consumer is not processing for topic '${this.#topic}' - ${errors.join(', ')}`,
+      traceId,
+      spanId,
+      { errors, topic: this.#topic },
+    );
 
     return false;
   };
@@ -195,20 +236,29 @@ export class KafkaConsumer<T> {
   public close = async () => {
     const { traceId, spanId } = generateTraceParent();
 
-    log.debug(`Closing Kafka consumer for topic "${this.#topic}"...`, traceId, spanId, { topic: this.#topic });
+    this.#log.debug(`Closing Kafka consumer for topic '${this.#topic}'...`, traceId, spanId, { topic: this.#topic });
 
     if (this.#closeStream === undefined) {
-      log.debug('Kafka consumer stream not initialized, nothing to close', traceId, spanId, { topic: this.#topic });
+      this.#log.debug(
+        `Kafka consumer stream not initialized for topic '${this.#topic}', nothing to close`,
+        traceId,
+        spanId,
+        {
+          topic: this.#topic,
+        },
+      );
     } else {
       await this.#closeStream?.();
     }
 
-    log.debug('Kafka consumer leaving group...', traceId, spanId, { topic: this.#topic });
+    this.#log.debug(`Kafka consumer leaving group for topic '${this.#topic}'...`, traceId, spanId, {
+      topic: this.#topic,
+    });
     await this.#consumer.leaveGroup();
-    log.debug('Kafka consumer left group', traceId, spanId, { topic: this.#topic });
+    this.#log.debug(`Kafka consumer left group for topic '${this.#topic}'`, traceId, spanId, { topic: this.#topic });
 
-    log.debug('Kafka consumer closing...', traceId, spanId, { topic: this.#topic });
+    this.#log.debug(`Kafka consumer closing for topic '${this.#topic}'...`, traceId, spanId, { topic: this.#topic });
     await this.#consumer.close();
-    log.debug('Kafka consumer closed', traceId, spanId, { topic: this.#topic });
+    this.#log.debug(`Kafka consumer closed for topic '${this.#topic}'`, traceId, spanId, { topic: this.#topic });
   };
 }

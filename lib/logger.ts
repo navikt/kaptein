@@ -7,7 +7,7 @@ enum LogLevel {
   ERROR = 'error',
 }
 
-type JsonValue = string | number | bigint | boolean | null | JsonObject | JsonValue[];
+type JsonValue = string | number | bigint | boolean | null | undefined | JsonObject | JsonValue[];
 interface JsonObject {
   [key: string]: JsonValue;
 }

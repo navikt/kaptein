@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
+import { OvergåttVarsletFrist } from '@/components/behandlinger/overgått-varslet-frist';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -9,6 +10,7 @@ import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/ti
 import { useData } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
 import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
+import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
@@ -21,13 +23,12 @@ interface Props {
 }
 
 export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
-  const ferdigstilte = useMemo(
-    () => behandlinger.filter((b) => b.avsluttetAvSaksbehandlerDate !== null),
-    [behandlinger],
-  );
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelseKodeverk);
 
-  const { withTildelteFilter: data } = useData(ferdigstilte);
+  const { withTildelteFilter: data } = useData(behandlinger);
+
+  console.log('ferdigstilte behandlinger', behandlinger);
+  console.log('ferdigstilte data', data);
 
   return (
     <ChartsWrapper>
@@ -66,6 +67,18 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
 
       <Card>
         <FristIKabal behandlinger={data} />
+      </Card>
+
+      <Card>
+        <VarsletFristPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
+      </Card>
+
+      <Card>
+        <OvergåttVarsletFrist behandlinger={data} />
+      </Card>
+
+      <Card>
+        <AlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
       </Card>
     </ChartsWrapper>
   );

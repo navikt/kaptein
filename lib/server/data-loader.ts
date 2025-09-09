@@ -1,4 +1,4 @@
-import { isLocal } from '@/lib/environment';
+import { isDeployed } from '@/lib/environment';
 import { getLogger } from '@/lib/logger';
 import type { AppName } from '@/lib/server/get-obo-token';
 import { KafkaConsumer } from '@/lib/server/kafka';
@@ -10,11 +10,12 @@ export type DataListener<T> = (data: T[]) => void;
 export type HasKeyFn<T> = (item: T, key: string) => boolean;
 
 export class DataLoader<T> {
+  readonly name: string;
   readonly #appName: AppName;
   readonly #path: string;
   readonly #parser: ParserFn<T>;
-  readonly #name: string;
   readonly #hasKey: HasKeyFn<T>;
+  readonly #kafkaTopic: string | undefined;
   readonly #log: ReturnType<typeof getLogger>;
 
   #isInitialized = false;
@@ -24,21 +25,48 @@ export class DataLoader<T> {
   #initialTotal: number | null = null;
   #data: T[] = [];
   #loader: Promise<T[]> | null = null;
+  #kafkaConsumer: KafkaConsumer<T> | null = null;
 
-  constructor(appName: AppName, path: string, parser: ParserFn<T>, hasKey: HasKeyFn<T>, name = 'Unnamed') {
+  constructor(
+    appName: AppName,
+    path: string,
+    parser: ParserFn<T>,
+    hasKey: HasKeyFn<T>,
+    kafkaTopic?: string,
+    name = 'Unnamed',
+  ) {
     this.#appName = appName;
     this.#path = path;
     this.#parser = parser;
-    this.#name = name;
+    this.name = name;
     this.#hasKey = hasKey;
+    this.#kafkaTopic = kafkaTopic;
     this.#log = getLogger(`dataloader-${name.toLowerCase()}`);
   }
 
-  #startKafka = (traceId: string) => {
+  #startKafka = async (kafkaTopic: string, traceId: string) => {
     const spanId = generateSpanId();
-    const kafkaConsumer = new KafkaConsumer('klage.kaptein-behandling.v1', this.#parser);
+    this.#log.debug(`${this.name} DataLoader: Kafka consumer starting with topic "${kafkaTopic}"...`, traceId, spanId, {
+      topic: kafkaTopic,
+    });
 
-    kafkaConsumer.addListener(({ key, value }) => {
+    try {
+      this.#kafkaConsumer = new KafkaConsumer(kafkaTopic, this.#parser);
+    } catch (error) {
+      this.#log.error(
+        `${this.name} DataLoader: Failed to create Kafka consumer for topic '${kafkaTopic}'`,
+        traceId,
+        spanId,
+        {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          topic: kafkaTopic,
+        },
+      );
+
+      throw error;
+    }
+
+    this.#kafkaConsumer.addListener(({ key, value }) => {
       if (value === null) {
         this.#data = this.#data.filter((entry) => !this.#hasKey(entry, key));
         this.#count = this.#data.length;
@@ -57,34 +85,40 @@ export class DataLoader<T> {
       }
 
       if (!found) {
+        this.#log.debug(`${this.name} DataLoader: New item added via Kafka`, traceId, spanId, { topic: kafkaTopic });
         this.#data.push(value);
         this.#count = this.#data.length;
+      } else {
+        this.#log.debug(`${this.name} DataLoader: Item updated via Kafka`, traceId, spanId, { topic: kafkaTopic });
       }
 
       this.#notifyListeners();
     });
 
-    this.#log.debug(`${this.#name} DataLoader: Kafka consumer started`, traceId, spanId);
+    await this.#kafkaConsumer.init(traceId);
+
+    this.#log.debug(`${this.name} DataLoader: Kafka consumer started`, traceId, spanId, { topic: kafkaTopic });
   };
 
   public init = async () => {
     const { traceId, spanId } = generateTraceParent();
 
-    if (this.#isInitialized) {
-      this.#log.debug(`${this.#name} DataLoader: Already initialized`, traceId, spanId);
+    if (this.#isInitialized === true) {
+      this.#log.debug(`${this.name} DataLoader: Already initialized`, traceId, spanId, { topic: this.#kafkaTopic });
       return;
     }
 
     this.#isInitialized = true;
-    this.#log.debug(`${this.#name} DataLoader: Initialization started`, traceId, spanId);
-    await this.load(traceId);
+    this.#log.debug(`${this.name} DataLoader: Initialization started`, traceId, spanId, { topic: this.#kafkaTopic });
 
-    if (!isLocal) {
+    await this.#load(traceId);
+
+    if (isDeployed && this.#kafkaTopic !== undefined) {
       // Kafka is not reachable outside NAIS.
-      this.#startKafka(traceId);
+      await this.#startKafka(this.#kafkaTopic, traceId);
     }
 
-    this.#log.debug(`${this.#name} DataLoader: Initialization completed`, traceId, spanId);
+    this.#log.debug(`${this.name} DataLoader: Initialization completed`, traceId, spanId, { topic: this.#kafkaTopic });
   };
 
   public getData = () => this.#data;
@@ -119,14 +153,39 @@ export class DataLoader<T> {
     };
   }
 
-  public isInitialized = () => this.#isInitialized;
-  public isReady = () => this.#isInitialized && this.#loader === null;
-
-  public async load(traceId: string = generateTraceId()): Promise<T[]> {
+  public isReady(traceId = generateTraceId()) {
     const spanId = generateSpanId();
-    this.#log.debug(`${this.#name} DataLoader: Loading data from ${this.#path}`, traceId, spanId);
 
-    const start = Date.now();
+    const errors: string[] = [];
+
+    if (this.#isInitialized === false) {
+      errors.push('Not initialized');
+    }
+
+    if (this.#loader !== null) {
+      errors.push('Still loading data');
+    }
+
+    if (this.#kafkaTopic !== undefined) {
+      if (this.#kafkaConsumer === null) {
+        errors.push('Kafka not initialized');
+      } else if (!this.#kafkaConsumer.isProcessing()) {
+        errors.push('Kafka not processing');
+      }
+    }
+
+    if (errors.length === 0) {
+      return true;
+    }
+
+    this.#log.warn(`${this.name} DataLoader is not ready - ${errors.join(', ')}`, traceId, spanId);
+  }
+
+  async #load(traceId: string = generateTraceId()): Promise<T[]> {
+    const spanId = generateSpanId();
+    this.#log.debug(`${this.name} DataLoader: Loading data from ${this.#appName}/${this.#path}`, traceId, spanId);
+
+    const start = performance.now();
 
     const { stream, totalCount } = await streamData(this.#appName, this.#path, this.#parser);
 
@@ -155,7 +214,7 @@ export class DataLoader<T> {
     }
 
     this.#log.debug(
-      `${this.#name} DataLoader: Loaded ${results.length} items in ${Date.now() - start}ms`,
+      `${this.name} DataLoader: Loaded ${results.length} items in ${performance.now() - start}ms`,
       traceId,
       spanId,
     );
