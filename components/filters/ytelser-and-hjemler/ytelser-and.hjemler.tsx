@@ -1,6 +1,7 @@
 'use client';
 
-import { BoxNew, VStack } from '@navikt/ds-react';
+import { ChevronRightIcon } from '@navikt/aksel-icons';
+import { HStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
@@ -14,7 +15,7 @@ interface Props {
   lovkildeToRegistreringshjemler: IKodeverkValue[];
 }
 
-export const YtelserAndHjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
+const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
   const [selectedYtelser, setSelectedYtelser] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
 
   const ytelserOptions = useMemo(() => ytelser.map(({ navn, id }) => ({ label: navn, value: id })), [ytelser]);
@@ -26,21 +27,53 @@ export const YtelserAndHjemler = ({ ytelser, lovkildeToRegistreringshjemler }: P
     [selectedYtelser, ytelser],
   );
 
+  return { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk };
+};
+
+const Tabbed = ({ children }: { children: React.ReactNode }) => (
+  <HStack align="center" className="flex">
+    <ChevronRightIcon fontSize={32} aria-hidden />
+    {children}
+  </HStack>
+);
+
+export const YtelserAndRegistreringshjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
+  const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
+
   return (
-    <VStack asChild gap="4">
-      <BoxNew padding="3" borderRadius="medium" borderColor="neutral" borderWidth="1">
-        <MultiselectFilter
-          label="Ytelser"
-          selected={selectedYtelser}
-          setSelected={setSelectedYtelser}
-          options={ytelserOptions}
-        />
+    <>
+      <MultiselectFilter
+        label="Ytelser"
+        selected={selectedYtelser}
+        setSelected={setSelectedYtelser}
+        options={ytelserOptions}
+      />
+
+      <Tabbed>
         <Registreringshjemler
           relevantYtelserkoderverk={relevantKodeverk}
           lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
         />
+      </Tabbed>
+    </>
+  );
+};
+
+export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }) => {
+  const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
+
+  return (
+    <>
+      <MultiselectFilter
+        label="Ytelser"
+        selected={selectedYtelser}
+        setSelected={setSelectedYtelser}
+        options={ytelserOptions}
+      />
+
+      <Tabbed>
         <Innsendingshjemler relevantYtelserkoderverk={relevantKodeverk} />
-      </BoxNew>
-    </VStack>
+      </Tabbed>
+    </>
   );
 };

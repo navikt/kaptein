@@ -117,7 +117,7 @@ export const Registreringshjemler = ({ relevantYtelserkoderverk, lovkildeToRegis
           variant="secondary-neutral"
           icon={<ChevronDownIcon aria-hidden />}
           iconPosition="right"
-          className="!justify-between"
+          className="!justify-between grow"
         >
           Registreringshjemler ({selectedOptions.length})
         </Button>

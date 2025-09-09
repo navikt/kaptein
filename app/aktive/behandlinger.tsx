@@ -10,6 +10,8 @@ import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-s
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
 import { useData } from '@/components/behandlinger/use-data';
+import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
+import { VarsletFristIKabal } from '@/components/behandlinger/varslet-frist-i-kabal';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
@@ -78,6 +80,14 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
           />
         </Card>
       )}
+
+      <Card>
+        <VarsletFrist behandlinger={data} />
+      </Card>
+
+      <Card>
+        <VarsletFristIKabal behandlinger={data} />
+      </Card>
     </ChartsWrapper>
   );
 };
