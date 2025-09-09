@@ -1,6 +1,7 @@
 ingresses:
   - https://kaptein.intern.dev.nav.no
   - https://kaptein.ansatt.dev.nav.no
+kafka_pool: nav-dev
 tenant: trygdeetaten.no
 roles:
   - 7ad08bfe-68d4-4c84-bddd-82d8894fb36e # KABAL_OPPGAVESTYRING_ALLE_ENHETER

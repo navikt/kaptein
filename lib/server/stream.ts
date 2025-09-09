@@ -1,5 +1,11 @@
-import { getResponse } from '@/lib/server/api';
+import { isDeployed } from '@/lib/environment';
+import { getLogger } from '@/lib/logger';
+import { getUrl } from '@/lib/server/api';
 import type { AppName } from '@/lib/server/get-obo-token';
+import { getToken } from '@/lib/server/token';
+import { generateTraceParent } from '@/lib/server/traceparent';
+
+const log = getLogger('stream');
 
 export type ParserFn<T> = (line: string) => T;
 
@@ -33,7 +39,23 @@ export const streamData = async <T>(
   contentType = 'application/x-ndjson',
   separator = '\n',
 ): Promise<Result<T>> => {
-  const res = await getResponse(appName, path);
+  const { traceparent, traceId, spanId } = generateTraceParent();
+
+  log.debug(`Starting data stream from ${appName}${path}`, traceId, spanId);
+
+  const headers = new Headers({
+    accept: 'application/json',
+    traceparent,
+  });
+
+  if (isDeployed) {
+    const { access_token } = await getToken(traceId);
+
+    headers.append('Authorization', `Bearer ${access_token}`);
+  }
+
+  const url = getUrl(appName) + path;
+  const res = await fetch(url, { method: 'GET', headers });
 
   if (res.headers.get('Transfer-Encoding') !== 'chunked') {
     throw new Error(`Expected Transfer-Encoding chunked but received ${res.headers.get('Transfer-Encoding')}`);

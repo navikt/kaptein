@@ -16,7 +16,7 @@ const TRACE_FLAGS = '00';
 /** Generates a traceparent ID according to https://www.w3.org/TR/trace-context/#version-format */
 export const generateTraceParent = (): TraceParent => {
   const traceId = getUuid();
-  const spanId = getUuid().substring(0, 16); // parent_id
+  const spanId = generateSpanId(); // parent_id
 
   return {
     traceparent: `${TRACE_VERSION}-${traceId}-${spanId}-${TRACE_FLAGS}`,
@@ -25,9 +25,13 @@ export const generateTraceParent = (): TraceParent => {
   };
 };
 
+export const generateTraceId = (): string => getUuid();
+
+export const generateSpanId = (): string => getUuid().substring(0, 16);
+
 const getUuid = () => crypto.randomUUID().replaceAll('-', '');
 
-const parseTraceParent = (traceparent: string): TraceParent => {
+export const parseTraceParent = (traceparent: string): TraceParent => {
   const [_, traceId, spanId, __] = traceparent.split('-');
 
   return { traceparent, traceId, spanId };

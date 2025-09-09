@@ -1,14 +1,36 @@
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
-import { getResponse } from '@/lib/server/api';
-import { AppName } from '@/lib/server/get-obo-token';
+import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const res = await getResponse(AppName.KABAL_API, '/behandlinger-stream');
+    const textEncoder = new TextEncoder();
 
-    return new Response(res.body, { headers: res.headers, status: res.status, statusText: res.statusText });
+    const eventStream = new ReadableStream({
+      start(controller) {
+        const behandlinger = BEHANDLINGER_DATA_LOADER.getData();
+
+        for (const behandling of behandlinger) {
+          const json = JSON.stringify(behandling);
+          controller.enqueue(textEncoder.encode(`${json}\n`));
+        }
+
+        controller.close();
+      },
+      cancel() {
+        console.debug('Stream cancelled');
+      },
+    });
+
+    return new Response(eventStream, {
+      headers: {
+        'Content-Type': 'application/x-ndjson',
+        'Transfer-Endoding': 'chunked',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      },
+    });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return new Response(error.message, { status: 401 });

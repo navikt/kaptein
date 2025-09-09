@@ -1,5 +1,6 @@
-import { DataLoader } from '@/lib/server/data-loader';
+import { DataLoader, type HasKeyFn } from '@/lib/server/data-loader';
 import { AppName } from '@/lib/server/get-obo-token';
+import type { ParserFn } from '@/lib/server/stream';
 import type { Behandling } from '@/lib/server/types';
 
 const isRecord = (obj: unknown): obj is Record<string, unknown> =>
@@ -17,7 +18,7 @@ const isBehandling = (b: unknown): b is Behandling => {
   return true;
 };
 
-const behandlingParser = (data: string): Behandling => {
+const behandlingParser: ParserFn<Behandling> = (data) => {
   const parsed = JSON.parse(data);
 
   if (!isBehandling(parsed)) {
@@ -27,9 +28,12 @@ const behandlingParser = (data: string): Behandling => {
   return parsed;
 };
 
+const hasKey: HasKeyFn<Behandling> = (item, key) => item.id === key;
+
 export const BEHANDLINGER_DATA_LOADER = new DataLoader<Behandling>(
   AppName.KABAL_API,
   '/behandlinger-stream',
   behandlingParser,
+  hasKey,
   'Behandlinger',
 );

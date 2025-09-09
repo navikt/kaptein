@@ -18,6 +18,8 @@
     "@navikt/ds-react": "7.29.1",
     "@navikt/next-logger": "4.1.5",
     "@navikt/oasis": "3.8.0",
+    "@platformatic/kafka": "1.11.0",
+    "@sinclair/typebox": "0.34.41",
     "date-fns": "4.1.0",
     "echarts": "6.0.0",
     "next": "15.5.2",

@@ -20,13 +20,13 @@ export async function GET(request: Request) {
           encoder.encode(
             format({
               count: BEHANDLINGER_DATA_LOADER.getCount(),
-              total: BEHANDLINGER_DATA_LOADER.getTotal(),
-              progress: BEHANDLINGER_DATA_LOADER.getProgress(),
+              total: BEHANDLINGER_DATA_LOADER.getInitalTotal(),
+              progress: BEHANDLINGER_DATA_LOADER.getInitProgress(),
             }),
           ),
         );
 
-        const removeListener = BEHANDLINGER_DATA_LOADER.addProgressListener((count, total, progress) => {
+        const removeListener = BEHANDLINGER_DATA_LOADER.addInitProgressListener((count, total, progress) => {
           const message = format({ count, total, progress });
           controller.enqueue(encoder.encode(message));
 

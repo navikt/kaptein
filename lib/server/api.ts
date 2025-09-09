@@ -2,8 +2,9 @@ import { headers } from 'next/headers';
 import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
-import { generateTraceParent, getFromKabal } from '@/lib/server/fetch';
+import { getFromKabal } from '@/lib/server/fetch';
 import { AppName } from '@/lib/server/get-obo-token';
+import { generateTraceParent } from '@/lib/server/traceparent';
 import type {
   BehandlingResponse,
   IKodeverkSimpleValue,
@@ -21,7 +22,7 @@ const KABAL_API = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-api/api/kaptein'
 const KABAL_INNSTILLINGER = isLocal ? `${DEV_DOMAIN}/api` : 'http://kabal-innstillinger';
 const KLAGE_KODEVERK = isLocal ? `${DEV_DOMAIN}/api/kodeverk` : 'http://klage-kodeverk-api/kodeverk';
 
-const getUrl = (appName: AppName) => {
+export const getUrl = (appName: AppName) => {
   switch (appName) {
     case AppName.KABAL_API:
       return KABAL_API;

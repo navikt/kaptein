@@ -7,7 +7,12 @@ enum LogLevel {
   ERROR = 'error',
 }
 
-type LoggerFn = (message: string, traceId: string, spanId: string, eventData?: Record<string, string | number>) => void;
+type JsonValue = string | number | bigint | boolean | null | JsonObject | JsonValue[];
+interface JsonObject {
+  [key: string]: JsonValue;
+}
+
+type LoggerFn = (message: string, traceId: string, spanId: string, eventData?: JsonObject) => void;
 
 export const getLogger = (module: string) => ({
   debug: getLogLine(LogLevel.DEBUG, module),
