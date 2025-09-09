@@ -1,6 +1,6 @@
 'use client';
 
-import { isAfter } from 'date-fns';
+import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
@@ -50,14 +50,14 @@ const useColor = (data: { name: string }[]) => {
 
 const TODAY = new Date();
 
-export const VarsletFristIKabal = ({ behandlinger }: Props) => {
+export const FristIKabal = ({ behandlinger }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Record<ExceededFrist, number>>(
       (acc, curr) => {
         const key =
           curr.frist === null
             ? ExceededFrist.NULL
-            : isAfter(new Date(curr.frist), TODAY)
+            : isBefore(new Date(curr.frist), TODAY)
               ? ExceededFrist.EXCEEDED
               : ExceededFrist.NOT_EXCEEDED;
 

@@ -2,27 +2,15 @@
 
 import { useMemo } from 'react';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling, IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
+import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
 interface Props {
   behandlinger: Behandling[];
-  ytelsekodeverk: IYtelse[];
+  relevantYtelser: IKodeverkSimpleValue[];
   klageenheterkodeverk: IKodeverkSimpleValue[];
 }
 
-export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, ytelsekodeverk, klageenheterkodeverk }: Props) => {
-  const relevantYtelser = useMemo(() => {
-    const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
-
-    return ids
-      .map((id) => {
-        const kodeverk = ytelsekodeverk.find((k) => k.id === id);
-
-        return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
-      })
-      .toSorted((a, b) => a.navn.localeCompare(b.navn));
-  }, [behandlinger, ytelsekodeverk]);
-
+export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtelser, klageenheterkodeverk }: Props) => {
   const series = useMemo(
     () =>
       [...klageenheterkodeverk, { id: null, navn: 'Ikke tildelt' }].map((enhet) => ({

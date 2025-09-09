@@ -1,4 +1,3 @@
-import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { Sakstyper } from '@/components/filters/sakstyper';
@@ -16,7 +15,6 @@ export const Filters = async () => {
 
   return (
     <FilterWrapper>
-      <DateRange />
       <Klageenheter klageenheter={klageenheter} />
       <Sakstyper sakstyper={sakstyper} />
       <Utfall utfall={utfall} />

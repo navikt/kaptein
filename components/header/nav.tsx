@@ -17,8 +17,22 @@ export const Nav = () => {
   const pathname = usePathname();
   const params = useSearchParams();
 
-  const defaultParams = useMemo(() => {
+  const aktiveParams = useMemo(() => {
     const searchParams = new URLSearchParams(params.toString());
+
+    searchParams.delete(QueryParam.FROM);
+    searchParams.delete(QueryParam.TO);
+    searchParams.delete(QueryParam.REGISTRERINGSHJEMLER);
+
+    return searchParams.toString();
+  }, [params]);
+
+  const ferdigstilteParams = useMemo(() => {
+    const searchParams = new URLSearchParams(params.toString());
+
+    searchParams.delete(QueryParam.TILDELING);
+    searchParams.delete(QueryParam.KLAGEENHETER);
+    searchParams.delete(QueryParam.INNSENDINGSHJEMLER);
 
     searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
     searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);
@@ -26,20 +40,12 @@ export const Nav = () => {
     return searchParams.toString();
   }, [params]);
 
-  const ferdigstilteParams = useMemo(() => {
-    const searchParams = new URLSearchParams(defaultParams);
-    searchParams.delete(QueryParam.TILDELING);
-    searchParams.delete(QueryParam.KLAGEENHETER);
-
-    return searchParams.toString();
-  }, [defaultParams]);
-
   return (
     <>
       <InternalHeader.Button
         as={Link}
         className={pathname === '/aktive' ? ACTIVE_CLASS : ''}
-        href={`/aktive?${defaultParams}`}
+        href={`/aktive?${aktiveParams}`}
       >
         Aktive saker
       </InternalHeader.Button>

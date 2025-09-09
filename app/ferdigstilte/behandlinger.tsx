@@ -1,13 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
+import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { useData } from '@/components/behandlinger/use-data';
+import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
 import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
-import { VarsletFristIKabal } from '@/components/behandlinger/varslet-frist-i-kabal';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
@@ -24,6 +25,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
     () => behandlinger.filter((b) => b.avsluttetAvSaksbehandlerDate !== null),
     [behandlinger],
   );
+  const relevantYtelser = useRelevantYtelser(behandlinger, ytelseKodeverk);
 
   const { withTildelteFilter: data } = useData(ferdigstilte);
 
@@ -33,7 +35,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
         <SakerPerYtelse
           behandlinger={data}
           total={behandlinger.length}
-          ytelser={ytelseKodeverk}
+          relevantYtelser={relevantYtelser}
           sakstyper={sakstyper}
         />
       </Card>
@@ -53,7 +55,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       <Card>
         <TildelteSakerPerYtelseOgKlageenhet
           behandlinger={data}
-          ytelsekodeverk={ytelseKodeverk}
+          relevantYtelser={relevantYtelser}
           klageenheterkodeverk={klageenheterKodeverk}
         />
       </Card>
@@ -63,7 +65,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card>
-        <VarsletFristIKabal behandlinger={data} />
+        <FristIKabal behandlinger={data} />
       </Card>
     </ChartsWrapper>
   );

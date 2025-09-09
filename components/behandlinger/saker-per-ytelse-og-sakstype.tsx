@@ -3,28 +3,16 @@
 import { useMemo } from 'react';
 import { EChart } from '@/lib/echarts/echarts';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
-import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
 interface Props {
   total: number;
   behandlinger: Behandling[];
-  ytelser: IYtelse[];
+  relevantYtelser: IKodeverkSimpleValue[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
-export const SakerPerYtelse = ({ behandlinger, ytelser, sakstyper }: Props) => {
-  const relevantYtelser = useMemo(() => {
-    const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
-
-    return ids
-      .map((id) => {
-        const kodeverk = ytelser.find((k) => k.id === id);
-
-        return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
-      })
-      .toSorted((a, b) => a.navn.localeCompare(b.navn));
-  }, [behandlinger, ytelser]);
-
+export const SakerPerYtelse = ({ behandlinger, relevantYtelser, sakstyper }: Props) => {
   const series = useMemo(
     () =>
       sakstyper.map((type) => ({

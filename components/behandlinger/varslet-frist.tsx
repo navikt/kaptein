@@ -1,6 +1,6 @@
 'use client';
 
-import { isAfter } from 'date-fns';
+import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
@@ -57,7 +57,7 @@ export const VarsletFrist = ({ behandlinger }: Props) => {
         const key =
           curr.varsletFrist === null
             ? ExceededFrist.NULL
-            : isAfter(new Date(curr.varsletFrist), TODAY)
+            : isBefore(new Date(curr.varsletFrist), TODAY)
               ? ExceededFrist.EXCEEDED
               : ExceededFrist.NOT_EXCEEDED;
 
