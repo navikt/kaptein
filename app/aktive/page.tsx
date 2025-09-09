@@ -1,6 +1,6 @@
+import { Loader } from '@navikt/ds-react';
 import { Suspense } from 'react';
 import { Behandlinger } from '@/app/aktive/behandlinger';
-import { BehandlingerProgress } from '@/components/behandlinger/progress';
 import { getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
 import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
 
@@ -24,7 +24,7 @@ async function BehandlingerData() {
 
 export default async function Page() {
   return (
-    <Suspense fallback={<BehandlingerProgress />}>
+    <Suspense fallback={<Loader />}>
       <BehandlingerData />
     </Suspense>
   );

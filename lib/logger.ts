@@ -14,19 +14,20 @@ interface JsonObject {
 
 type LoggerFn = (message: string, traceId: string, spanId: string, eventData?: JsonObject) => void;
 
-export const getLogger = (module: string) => ({
-  debug: getLogLine(LogLevel.DEBUG, module),
-  info: getLogLine(LogLevel.INFO, module),
-  warn: getLogLine(LogLevel.WARN, module),
-  error: getLogLine(LogLevel.ERROR, module),
+export const getLogger = (module: string, defaultEventData?: JsonObject) => ({
+  debug: getLogLine(LogLevel.DEBUG, module, defaultEventData),
+  info: getLogLine(LogLevel.INFO, module, defaultEventData),
+  warn: getLogLine(LogLevel.WARN, module, defaultEventData),
+  error: getLogLine(LogLevel.ERROR, module, defaultEventData),
 });
 
-type GetLogLineFn = (level: LogLevel, module: string) => LoggerFn;
+type GetLogLineFn = (level: LogLevel, module: string, defaultEventData?: JsonObject) => LoggerFn;
 
-const getLogLine: GetLogLineFn = (level, module) => (message, traceId, spanId, eventData) =>
+const getLogLine: GetLogLineFn = (level, module, defaultEventData) => (message, traceId, spanId, eventData) =>
   // biome-ignore lint/suspicious/noConsole: Console needed
   console[level](
     JSON.stringify({
+      ...defaultEventData,
       ...eventData,
       level,
       module,
