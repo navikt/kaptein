@@ -16,7 +16,8 @@ import { QueryParam } from '@/lib/types/query-param';
 export const useData = (behandlinger: Behandling[]) => {
   const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
   const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
-  const [hjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [innsendingshjemlerFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [sakstyperFilter] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
   const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
   const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
@@ -26,7 +27,8 @@ export const useData = (behandlinger: Behandling[]) => {
 
   const ytelser = ytelseFilter ?? [];
   const klageenheter = klageenheterFilter ?? [];
-  const hjemler = hjemlerFilter ?? [];
+  const registreringshjemler = registreringshjemlerFilter ?? [];
+  const innsendingshjemler = innsendingshjemlerFilter ?? [];
   const sakstyper = sakstyperFilter ?? [];
   const utfall = utfallFilter ?? [];
   const tildeling = tildelingFilter ?? TildelingFilter.ALL;
@@ -72,22 +74,30 @@ export const useData = (behandlinger: Behandling[]) => {
         ? filteredForYtelser
         : filteredForYtelser.filter((b) => klageenheter.includes(b.fraNAVEnhet));
 
-    const filteredForHjemler =
-      hjemler.length === 0
+    const filteredForInnsendingshjemler =
+      innsendingshjemler.length === 0
         ? filteredForKlageenheter
-        : filteredForKlageenheter.filter((b) => hjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)));
+        : filteredForKlageenheter.filter((b) => innsendingshjemler.some((h) => b.hjemmelIdList.includes(h)));
+
+    const filteredForRegistreringshjemler =
+      registreringshjemler.length === 0
+        ? filteredForInnsendingshjemler
+        : filteredForInnsendingshjemler.filter((b) =>
+            registreringshjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)),
+          );
 
     const filteredForTildelte =
       tildeling === TildelingFilter.ALL
-        ? filteredForHjemler
-        : filteredForHjemler.filter((b) => b.isTildelt === (tildeling === TildelingFilter.TILDELTE));
+        ? filteredForInnsendingshjemler
+        : filteredForInnsendingshjemler.filter((b) => b.isTildelt === (tildeling === TildelingFilter.TILDELTE));
 
-    return { withoutTildelteFilter: filteredForHjemler, withTildelteFilter: filteredForTildelte };
+    return { withoutTildelteFilter: filteredForRegistreringshjemler, withTildelteFilter: filteredForTildelte };
   }, [
     behandlinger,
     ytelser,
     klageenheter,
-    hjemler,
+    registreringshjemler,
+    innsendingshjemler,
     tildeling,
     sakstyper,
     fromFilter,

@@ -8,13 +8,12 @@ import type { IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
 import { QueryParam } from '@/lib/types/query-param';
 
-interface HjemlerProps {
-  ytelserkodeverk: IYtelse[];
+interface Props {
+  relevantYtelserkoderverk: IYtelse[];
   lovkildeToRegistreringshjemler: IKodeverkSimpleValue[];
 }
 
-export const Registreringshjemler = ({ ytelserkodeverk, lovkildeToRegistreringshjemler }: HjemlerProps) => {
-  const [selectedYtelser] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
+export const Registreringshjemler = ({ relevantYtelserkoderverk, lovkildeToRegistreringshjemler }: Props) => {
   const [selectedHjemler, setSelectedHjemler] = useQueryState(
     QueryParam.REGISTRERINGSHJEMLER,
     parseAsArrayOf(parseAsString),
@@ -23,15 +22,10 @@ export const Registreringshjemler = ({ ytelserkodeverk, lovkildeToRegistreringsh
   const [value, setValue] = useState('');
 
   const options = useMemo(() => {
-    const ytelseList =
-      selectedYtelser === null || selectedYtelser.length === 0
-        ? ytelserkodeverk
-        : ytelserkodeverk.filter((y) => selectedYtelser.includes(y.id));
-
     const hjemler: Map<string, Map<string, string>> = new Map();
 
     // Create map with unique entries
-    for (const ytelse of ytelseList) {
+    for (const ytelse of relevantYtelserkoderverk) {
       for (const { registreringshjemler, lovkilde } of ytelse.lovKildeToRegistreringshjemler) {
         for (const hjemmel of registreringshjemler) {
           const existing = hjemler.get(lovkilde.id);
@@ -60,7 +54,7 @@ export const Registreringshjemler = ({ ytelserkodeverk, lovkildeToRegistreringsh
           .toSorted(([, a], [, b]) => sortWithOrdinals(a, b))
           .map(([value, label]) => ({ label, value })),
       }));
-  }, [ytelserkodeverk, selectedYtelser, lovkildeToRegistreringshjemler]);
+  }, [relevantYtelserkoderverk, lovkildeToRegistreringshjemler]);
 
   const selectedOptions = selectedHjemler ?? [];
 
@@ -125,7 +119,7 @@ export const Registreringshjemler = ({ ytelserkodeverk, lovkildeToRegistreringsh
           iconPosition="right"
           className="!justify-between"
         >
-          Hjemler ({selectedOptions.length})
+          Registreringshjemler ({selectedOptions.length})
         </Button>
       </ActionMenu.Trigger>
 
@@ -134,10 +128,10 @@ export const Registreringshjemler = ({ ytelserkodeverk, lovkildeToRegistreringsh
           <TextField
             className="grow"
             placeholder="Filtrer"
-            label="Hjemler"
+            label="Registreringshjemler"
+            hideLabel
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            hideLabel
           />
 
           <Button onClick={() => setSelectedHjemler(all)} size="small" variant="secondary" style={{ marginLeft: 8 }}>
