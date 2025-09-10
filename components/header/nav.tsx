@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
-const ACTIVE_CLASS = '!bg-ax-bg-neutral-moderate-pressed';
+const ACTIVE_CLASS = '!bg-ax-bg-neutral-strong-pressed !text-ax-text-accent-contrast';
 const TODAY = new Date();
 const DEFAULT_TO = format(TODAY, ISO_DATE_FORMAT);
 const DEFAULT_FROM = format(startOfMonth(TODAY), ISO_DATE_FORMAT);

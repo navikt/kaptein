@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { filterData } from '@/app/api/graphs/saker-per-ytelse-og-sakstype/data';
+import { filterData, parseParams } from '@/app/api/graphs/saker-per-ytelse-og-sakstype/data';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
@@ -14,7 +14,7 @@ const log = getLogger('graphs-saker-per-ytelse-og-sakstype');
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const params = request.nextUrl.searchParams;
+  const params = parseParams(request.nextUrl.searchParams);
   const traceId = generateTraceId();
   const spanId = generateSpanId();
 

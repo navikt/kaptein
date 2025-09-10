@@ -1,9 +1,10 @@
-import { isAfter, isBefore, isValid } from 'date-fns';
+import { isAfter, isBefore, isValid, parse } from 'date-fns';
 import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 import type { Behandling } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const filterData = (behandlinger: Behandling[], params: URLSearchParams) => {
+export const parseParams = (params: URLSearchParams) => {
   const ytelseFilter = parseStringArray(params.get(QueryParam.YTELSER));
   const klageenheterFilter = parseStringArray(params.get(QueryParam.KLAGEENHETER));
   const registreringshjemlerFilter = parseStringArray(params.get(QueryParam.REGISTRERINGSHJEMLER));
@@ -14,6 +15,34 @@ export const filterData = (behandlinger: Behandling[], params: URLSearchParams) 
   const toFilter = parseDate(params.get(QueryParam.TO));
   const tilbakekrevingFilter = parseTilbakekrevingFilter(params.get(QueryParam.TILBAKEKREVING));
   const utfallFilter = parseStringArray(params.get(QueryParam.UTFALL));
+
+  return {
+    ytelseFilter,
+    klageenheterFilter,
+    registreringshjemlerFilter,
+    innsendingshjemlerFilter,
+    sakstyperFilter,
+    tildelingFilter,
+    fromFilter,
+    toFilter,
+    tilbakekrevingFilter,
+    utfallFilter,
+  };
+};
+
+export const filterData = (behandlinger: Behandling[], params: ReturnType<typeof parseParams>) => {
+  const {
+    ytelseFilter,
+    klageenheterFilter,
+    registreringshjemlerFilter,
+    innsendingshjemlerFilter,
+    sakstyperFilter,
+    tildelingFilter,
+    fromFilter,
+    toFilter,
+    tilbakekrevingFilter,
+    utfallFilter,
+  } = params;
 
   const ytelser = ytelseFilter ?? [];
   const klageenheter = klageenheterFilter ?? [];
@@ -146,17 +175,15 @@ const parseTilbakekrevingFilter = (value: string | null): TilbakekrevingFilter =
 };
 
 const parseDate = (value: string | null): Date => {
+  const NOW = new Date();
+
   if (value === null) {
-    return new Date();
+    return NOW;
   }
 
-  const date = new Date(value);
+  const date = parse(value, ISO_DATE_FORMAT, NOW);
 
-  if (isValid(date)) {
-    return date;
-  }
-
-  return new Date();
+  return isValid(date) ? date : NOW;
 };
 
 const parseStringArray = (value: string | null): string[] => value?.split(',') ?? [];

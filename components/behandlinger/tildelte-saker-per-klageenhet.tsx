@@ -6,7 +6,6 @@ import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
 interface Props {
-  total: number;
   behandlinger: Behandling[];
   klageenheter: IKodeverkSimpleValue[];
 }

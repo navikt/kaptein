@@ -7,14 +7,13 @@ import { useSakstypeColor } from '@/lib/echarts/use-colors';
 import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
 interface Props {
-  total: number;
   behandlinger: Behandling[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
 const TITLE = 'Saker per sakstype';
 
-export const SakerPerSakstype = ({ behandlinger, sakstyper, total }: Props) => {
+export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<Sakstype, { value: number; name: string }>>((acc, curr) => {
       const existing = acc.get(curr.typeId);
@@ -44,7 +43,7 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper, total }: Props) => {
       option={{
         title: {
           text: TITLE,
-          subtext: `Viser data for ${behandlinger.length} av totalt ${total} saker`,
+          subtext: `Viser data for ${behandlinger.length} saker`,
         },
         tooltip: {
           trigger: 'item',

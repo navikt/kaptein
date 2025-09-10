@@ -1,8 +1,8 @@
 'use client';
 
+import { Alder } from '@/components/behandlinger/alder';
 import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
-import { OverskredetVarsletFrist } from '@/components/behandlinger/overskredet-varslet-frist';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -39,15 +39,11 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card>
-        <SakerPerSakstype behandlinger={data} sakstyper={sakstyper} total={behandlinger.length} />
+        <SakerPerSakstype behandlinger={data} sakstyper={sakstyper} />
       </Card>
 
       <Card span={3}>
-        <TildelteSakerPerKlageenhet
-          behandlinger={data}
-          total={behandlinger.length}
-          klageenheter={klageenheterKodeverk}
-        />
+        <TildelteSakerPerKlageenhet behandlinger={data} klageenheter={klageenheterKodeverk} />
       </Card>
 
       <Card span={3}>
@@ -71,7 +67,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={3}>
-        <OverskredetVarsletFrist behandlinger={data} />
+        <Alder behandlinger={data} />
       </Card>
 
       <Card span={4}>

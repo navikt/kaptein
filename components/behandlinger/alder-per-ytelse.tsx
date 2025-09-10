@@ -60,7 +60,7 @@ export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
 
   return (
     <VStack justify="center" align="center" gap="4" className="h-full">
-      <DayPicker value={maxAge} setValue={setMaxAge} title="Maksimal alder" options={DAY_PICKER_OPTIONS} />
+      <DayPicker value={maxAge} setValue={setMaxAge} title="Alder" options={DAY_PICKER_OPTIONS} />
       <EChart
         height="auto"
         className="grow"
@@ -91,10 +91,6 @@ export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
 };
 
 const DAY_PICKER_OPTIONS = [
-  {
-    numDays: 0,
-    label: '0 dager',
-  },
   {
     numDays: 12 * 7,
     label: '12 uker',

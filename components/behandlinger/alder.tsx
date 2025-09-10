@@ -1,11 +1,10 @@
 'use client';
 
 import { VStack } from '@navikt/ds-react';
-import { addDays, isBefore } from 'date-fns';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { DayPicker } from '@/components/behandlinger/day-picker';
-import { ExceededFrist, useFristPieChartColors } from '@/components/behandlinger/use-frist-color';
+import { Age, useAgePieChartColors } from '@/components/behandlinger/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/server/types';
@@ -15,43 +14,33 @@ interface Props {
   behandlinger: Behandling[];
 }
 
-const TODAY = new Date();
+const TITLE = 'Alder';
 
-const TITLE = 'Overskredet varslet frist';
-
-export const OverskredetVarsletFrist = ({ behandlinger }: Props) => {
-  const [overskredetVarsletFrist, setOverskredetVarsletFrist] = useQueryState(
-    QueryParam.OVERSKREDET_VARSLET_FRIST_DAYS,
-    parseAsInteger,
-  );
+export const Alder = ({ behandlinger }: Props) => {
+  const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
   const data = useMemo(() => {
-    const map = behandlinger.reduce<Record<ExceededFrist, number>>(
+    const map = behandlinger.reduce<Record<Age, number>>(
       (acc, curr) => {
-        const key =
-          curr.varsletFrist === null
-            ? ExceededFrist.NULL
-            : isBefore(new Date(curr.varsletFrist), addDays(TODAY, overskredetVarsletFrist ?? 0))
-              ? ExceededFrist.EXCEEDED
-              : ExceededFrist.NOT_EXCEEDED;
-
-        acc[key] = acc[key] + 1;
-
+        if (curr.ageKA > (maxAge ?? 0)) {
+          acc[Age.OLDER] = acc[Age.OLDER] + 1;
+        } else {
+          acc[Age.YOUNGER] = acc[Age.YOUNGER] + 1;
+        }
         return acc;
       },
       {
-        [ExceededFrist.EXCEEDED]: 0,
-        [ExceededFrist.NOT_EXCEEDED]: 0,
-        [ExceededFrist.NULL]: 0,
+        [Age.OLDER]: 0,
+        [Age.YOUNGER]: 0,
       },
     );
 
     return Object.entries(map)
       .filter(([, value]) => value > 0)
       .map(([name, value]) => ({ name, value }));
-  }, [behandlinger, overskredetVarsletFrist]);
+  }, [behandlinger, maxAge]);
 
-  const color = useFristPieChartColors(data);
+  const color = useAgePieChartColors(data);
 
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;
@@ -59,12 +48,7 @@ export const OverskredetVarsletFrist = ({ behandlinger }: Props) => {
 
   return (
     <VStack justify="center" align="center" gap="4" className="h-full">
-      <DayPicker
-        value={overskredetVarsletFrist}
-        setValue={setOverskredetVarsletFrist}
-        title="Overskredet med mer enn:"
-        options={DAY_PICKER_OPTIONS}
-      />
+      <DayPicker value={maxAge} setValue={setMaxAge} title="Alder" options={DAY_PICKER_OPTIONS} />
       <EChart
         height="auto"
         className="grow"
@@ -104,10 +88,6 @@ export const OverskredetVarsletFrist = ({ behandlinger }: Props) => {
 };
 
 const DAY_PICKER_OPTIONS = [
-  {
-    numDays: 0,
-    label: '0 dager',
-  },
   {
     numDays: 12 * 7,
     label: '12 uker',
