@@ -13,6 +13,7 @@ import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
+import { debugBehandlinger } from '@/components/debug';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
 interface Props {
@@ -27,8 +28,8 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
 
   const { withTildelteFilter: data } = useData(behandlinger);
 
-  console.log('ferdigstilte behandlinger', behandlinger);
-  console.log('ferdigstilte data', data);
+  debugBehandlinger(behandlinger);
+  console.log('Data', data);
 
   return (
     <ChartsWrapper>

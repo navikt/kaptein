@@ -18,6 +18,7 @@ import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
+import { debugBehandlinger } from '@/components/debug';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -35,8 +36,8 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelseKodeverk);
-  console.log('aktive behandlinger', behandlinger);
-  console.log('aktive data', data);
+  debugBehandlinger(behandlinger);
+  console.log('Data', data);
 
   const tildelte = useMemo(() => withoutTildelteFilter.filter((b) => b.isTildelt), [withoutTildelteFilter]);
 
