@@ -22,8 +22,16 @@ spec:
       cpu: 200m
       memory: 512Mi
   liveness:
+    failureThreshold: 10
+    initialDelay: 10
+    periodSeconds: 5
+    timeout: 1
     path: /isAlive
   readiness:
+    failureThreshold: 10
+    initialDelay: 10
+    periodSeconds: 5
+    timeout: 1
     path: /isReady
   kafka:
     pool: {{kafka_pool}}

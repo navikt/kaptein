@@ -13,3 +13,5 @@ export enum QueryParam {
   OVERSKREDET_FRIST_I_KABAL_DAYS = 'ofik',
   ALDER_DAYS = 'age',
 }
+
+export const ALL_QUERY_PARAMS = Object.values(QueryParam);

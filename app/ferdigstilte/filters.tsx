@@ -1,3 +1,4 @@
+import { Reset } from '@/app/ferdigstilte/reset';
 import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Sakstyper } from '@/components/filters/sakstyper';
@@ -14,6 +15,7 @@ export const Filters = async () => {
 
   return (
     <FilterWrapper>
+      <Reset />
       <DateRange />
       <Sakstyper sakstyper={sakstyper} />
       <Utfall utfall={utfall} />
