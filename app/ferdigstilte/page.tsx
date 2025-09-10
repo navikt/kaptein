@@ -5,11 +5,11 @@ import { getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/s
 import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
 
 async function BehandlingerData() {
-  const behandlinger = BEHANDLINGER_DATA_LOADER.getData();
   const sakstyper = await getSakstyperWithoutAnkeITR();
   const ytelser = await getYtelser();
   const klageenheter = await getKlageenheter();
 
+  const behandlinger = BEHANDLINGER_DATA_LOADER.getData();
   const filteredBehandlinger = behandlinger.filter((b) => b.isAvsluttetAvSaksbehandler);
 
   return (
