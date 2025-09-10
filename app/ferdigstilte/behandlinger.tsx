@@ -77,10 +77,6 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       <Card span={4}>
         <AlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
       </Card>
-
-      <Card span={4}>
-        <AlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
-      </Card>
     </ChartsWrapper>
   );
 };
