@@ -1,9 +1,16 @@
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
+import { getLogger } from '@/lib/logger';
 import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
+import { generateSpanId, generateTraceId } from '@/lib/server/traceparent';
+
+const log = getLogger('behandlinger-stream-route');
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const traceId = generateTraceId();
+  const spanId = generateSpanId();
+
   try {
     const textEncoder = new TextEncoder();
 
@@ -19,7 +26,7 @@ export async function GET() {
         controller.close();
       },
       cancel() {
-        console.debug('Stream cancelled');
+        log.debug('Stream cancelled', traceId, spanId);
       },
     });
 

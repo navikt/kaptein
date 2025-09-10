@@ -1,6 +1,7 @@
 'use client';
 
 import type { AmplitudeContextData } from '@/lib/amplitude/types';
+import { browserLog } from '@/lib/browser-log';
 import { grafana } from '@/lib/observability';
 
 export const sendMetricEvent = async (
@@ -11,6 +12,6 @@ export const sendMetricEvent = async (
   try {
     grafana.pushEvent(eventName, domain, context);
   } catch (error) {
-    console.error('Failed to send metric event to Grafana', error);
+    browserLog.error('Failed to send metric event to Grafana', error);
   }
 };

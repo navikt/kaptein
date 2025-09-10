@@ -55,6 +55,7 @@ spec:
         - /*.html
         - /*.txt
         - /*.css
+        - /api/behandlinger-stream
   prometheus:
     enabled: true
     path: /metrics
