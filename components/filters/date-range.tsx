@@ -9,7 +9,7 @@ import { parseAsDate } from '@/app/custom-query-parsers';
 import { QueryParam } from '@/lib/types/query-param';
 
 const TODAY = new Date();
-const START_OF_KABAL = new Date('2022-05-01');
+const START_OF_KABAL = new Date('2021-01-01');
 
 const START_OF_MONTH = startOfMonth(TODAY);
 const START_OF_LAST_TERTIAL = startOfMonth(subMonths(TODAY, 4));

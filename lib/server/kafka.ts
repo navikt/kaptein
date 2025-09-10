@@ -151,9 +151,9 @@ export class KafkaConsumer<T> {
 
       this.#log.debug(`Kafka consumer stream listener started for topic '${this.#topic}'`, traceId, spanId);
 
-      await readyPromise;
+      // await readyPromise;
 
-      this.#log.debug(`Kafka consumer ready for topic '${this.#topic}'`, traceId, spanId);
+      // this.#log.debug(`Kafka consumer ready for topic '${this.#topic}'`, traceId, spanId);
     } catch (error) {
       this.#log.error(`Failed to initialize Kafka consumer for topic '${this.#topic}'`, traceId, spanId, {
         error: error instanceof Error ? error.message : 'Unknown error',

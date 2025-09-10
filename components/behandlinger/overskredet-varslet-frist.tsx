@@ -58,9 +58,11 @@ export const OverskredetVarsletFrist = ({ behandlinger }: Props) => {
   }
 
   return (
-    <VStack justify="center" align="center" gap="4">
+    <VStack justify="center" align="center" gap="4" className="h-full">
       <DayPicker value={overskredetVarsletFrist} setValue={setOverskredetVarsletFrist} />
       <EChart
+        height="auto"
+        className="grow"
         option={{
           title: {
             text: TITLE,

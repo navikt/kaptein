@@ -1,7 +1,7 @@
 'use client';
 
 import { HStack, TextField, ToggleGroup } from '@navikt/ds-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   value: number | null;
@@ -12,6 +12,18 @@ export const DayPicker = ({ value, setValue }: Props) => {
   const isWeeks = value !== null && value % 7 === 0;
   const [toggleGroupValue, setToggleGroupValue] = useState(isWeeks ? String(value / 7) : 'custom');
   const [textFieldValue, setTextFieldValue] = useState((7 * 12).toString());
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const num = Number.parseInt(textFieldValue, 10);
+
+      if (!Number.isNaN(num)) {
+        setValue(num);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [textFieldValue, setValue]);
 
   return (
     <HStack gap="4">
@@ -48,14 +60,7 @@ export const DayPicker = ({ value, setValue }: Props) => {
         className="w-20"
         type="number"
         value={textFieldValue}
-        onChange={({ target }) => {
-          setTextFieldValue(target.value);
-          const num = Number.parseInt(target.value, 10);
-
-          if (!Number.isNaN(num)) {
-            setValue(num);
-          }
-        }}
+        onChange={({ target }) => setTextFieldValue(target.value)}
         disabled={toggleGroupValue !== 'custom'}
         label="Dager"
       />
