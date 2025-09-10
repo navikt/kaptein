@@ -28,7 +28,7 @@ interface State {
 const TITLE = 'Saker per ytelse og sakstype';
 
 export const SakerPerYtelse = () => {
-  const [{ series, labels, count }, setState] = useState<State>({ series: [], labels: [], count: 0 });
+  const [{ series, labels, count }, setState] = useState<State>({ series: [], labels: [], count: -1 });
 
   const params = useSearchParams();
 
@@ -42,7 +42,7 @@ export const SakerPerYtelse = () => {
     };
   }, [params]);
 
-  const isLoading = series.length === 0;
+  const isLoading = count === -1;
 
   if (isLoading) {
     return <div>Laster...</div>;
