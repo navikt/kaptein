@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Alder } from '@/components/behandlinger/alder';
-import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
+import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse/graph';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
@@ -98,7 +98,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
+        <AlderPerYtelse />
       </Card>
     </ChartsWrapper>
   );

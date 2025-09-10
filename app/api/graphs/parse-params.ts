@@ -3,7 +3,7 @@ import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const parseParams = (params: URLSearchParams) => {
+export const parseFilters = (params: URLSearchParams) => {
   const ytelseFilter = parseStringArray(params.get(QueryParam.YTELSER));
   const klageenheterFilter = parseStringArray(params.get(QueryParam.KLAGEENHETER));
   const registreringshjemlerFilter = parseStringArray(params.get(QueryParam.REGISTRERINGSHJEMLER));

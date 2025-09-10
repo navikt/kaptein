@@ -6,7 +6,7 @@ type ServerSentEvent = MessageEvent<string>;
 
 type ListenerFn<T> = (event: T) => void;
 type JsonListenerFn<T> = (data: T, event: ServerSentEvent) => void;
-type EventListenerFn = (event: Event) => void;
+type EventListenerFn = (event: ServerSentEvent) => void;
 type EventListener<E> = [E, EventListenerFn];
 
 export class ServerSentEventManager<E extends string = string> {
@@ -70,14 +70,6 @@ export class ServerSentEventManager<E extends string = string> {
     return;
   }
 
-  private removeAllEventSourceListeners() {
-    if (this.events !== undefined) {
-      for (const [event, listener] of this.listeners) {
-        this.events.removeEventListener(event, listener);
-      }
-    }
-  }
-
   private createEventSource(): EventSource {
     const params = new URLSearchParams(this.queryParams);
 
@@ -111,6 +103,14 @@ export class ServerSentEventManager<E extends string = string> {
     });
 
     return events;
+  }
+
+  private removeAllEventSourceListeners() {
+    if (this.events !== undefined) {
+      for (const [event, listener] of this.listeners) {
+        this.events.removeEventListener(event, listener);
+      }
+    }
   }
 
   public close() {

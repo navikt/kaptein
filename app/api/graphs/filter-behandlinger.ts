@@ -1,9 +1,9 @@
 import { isAfter, isBefore } from 'date-fns';
-import type { parseParams } from '@/app/api/graphs/parse-params';
+import type { parseFilters } from '@/app/api/graphs/parse-params';
 import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
 import type { Behandling } from '@/lib/server/types';
 
-export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnType<typeof parseParams>) => {
+export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnType<typeof parseFilters>) => {
   const {
     ytelseFilter,
     klageenheterFilter,

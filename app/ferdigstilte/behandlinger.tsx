@@ -1,7 +1,7 @@
 'use client';
 
 import { Alder } from '@/components/behandlinger/alder';
-import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
+import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse/graph';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/graph';
@@ -71,7 +71,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
+        <AlderPerYtelse />
       </Card>
     </ChartsWrapper>
   );

@@ -2,7 +2,7 @@ import type { Serie, State } from '@/components/behandlinger/saker-per-ytelse-og
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
-export const getData = (
+export const getSakerPerYtelseOgSakstypeState = (
   behandlinger: Behandling[],
   ytelser: IYtelse[],
   sakstyper: IKodeverkSimpleValue<Sakstype>[],
