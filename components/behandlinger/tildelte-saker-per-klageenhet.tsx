@@ -11,6 +11,8 @@ interface Props {
   klageenheter: IKodeverkSimpleValue[];
 }
 
+const TITLE = 'Tildelte saker per klageenhet';
+
 export const TildelteSakerPerKlageenhet = ({ behandlinger, klageenheter }: Props) => {
   const data = useMemo<{ name: string; value: number }[]>(() => {
     const map = new Map<string | null, { value: number; name: string }>();
@@ -37,15 +39,15 @@ export const TildelteSakerPerKlageenhet = ({ behandlinger, klageenheter }: Props
   const labels = useMemo(() => data.map((d) => d.name), [data]);
   const values = useMemo(() => data.map((d) => d.value), [data]);
 
-  if (data.length === 0) {
-    return <NoData />;
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
   }
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Tildelte Saker per klageenhet',
+          text: TITLE,
           subtext: `Viser data for ${behandlinger.length} tildelte saker`,
         },
         tooltip: {

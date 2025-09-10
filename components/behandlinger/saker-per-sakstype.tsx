@@ -12,6 +12,8 @@ interface Props {
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
+const TITLE = 'Saker per sakstype';
+
 export const SakerPerSakstype = ({ behandlinger, sakstyper, total }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<Sakstype, { value: number; name: string }>>((acc, curr) => {
@@ -33,15 +35,15 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper, total }: Props) => {
 
   const color = useSakstypeColor(behandlinger);
 
-  if (data.length === 0) {
-    return <NoData />;
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
   }
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Saker per sakstype',
+          text: TITLE,
           subtext: `Viser data for ${behandlinger.length} av totalt ${total} saker`,
         },
         tooltip: {

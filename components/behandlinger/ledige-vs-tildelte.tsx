@@ -1,13 +1,15 @@
 'use client';
 
-import { Alert, VStack } from '@navikt/ds-react';
 import { useMemo } from 'react';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/server/types';
 
 interface Props {
   behandlinger: Behandling[];
 }
+
+const TITLE = 'Tildelte/ledige saker';
 
 export const LedigeVsTildelte = ({ behandlinger }: Props) => {
   const data = useMemo(() => {
@@ -28,19 +30,15 @@ export const LedigeVsTildelte = ({ behandlinger }: Props) => {
     return Object.values(Object.fromEntries(map));
   }, [behandlinger]);
 
-  if (data.length === 0) {
-    return (
-      <VStack align="center" justify="center" className="grow">
-        <Alert variant="info">Ingen data</Alert>
-      </VStack>
-    );
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
   }
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Tildelte/ledige saker',
+          text: TITLE,
           left: 'center',
         },
         tooltip: {

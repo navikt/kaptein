@@ -42,9 +42,10 @@ interface Props {
   option: ECBasicOption;
   width?: string;
   height?: string;
+  className?: string;
 }
 
-export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
+export const EChart = ({ option, width = '100%', height = '100%', className }: Props) => {
   const theme = useAppTheme();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<Echarts.ECharts | null>(null);
@@ -107,5 +108,5 @@ export const EChart = ({ option, width = '100%', height = '100%' }: Props) => {
     eChartsRef.current.setTheme(theme);
   }, [theme]);
 
-  return <div style={{ width, height }} ref={ref} />;
+  return <div style={{ width, height }} ref={ref} className={className} />;
 };

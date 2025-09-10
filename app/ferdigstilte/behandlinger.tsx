@@ -2,7 +2,7 @@
 
 import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
-import { OvergåttVarsletFrist } from '@/components/behandlinger/overgått-varslet-frist';
+import { OverskredetVarsletFrist } from '@/components/behandlinger/overskredet-varslet-frist';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -74,7 +74,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card>
-        <OvergåttVarsletFrist behandlinger={data} />
+        <OverskredetVarsletFrist behandlinger={data} />
       </Card>
 
       <Card>

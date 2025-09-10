@@ -3,6 +3,7 @@
 import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
 import { ExceededFrist, getFristColor } from '@/components/behandlinger/use-frist-color';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
@@ -12,6 +13,8 @@ interface Props {
 }
 
 const TODAY = new Date();
+
+const TITLE = 'Varslet frist per ytelse';
 
 const getData = (behandling: Behandling, exceeded: ExceededFrist): number => {
   switch (exceeded) {
@@ -45,6 +48,10 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
     [behandlinger, relevantYtelser],
   );
 
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
+  }
+
   const labels = relevantYtelser.map(
     (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
   );
@@ -53,9 +60,10 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
     <EChart
       option={{
         title: {
-          text: 'Varslet frist per ytelse',
+          text: TITLE,
           subtext: `Viser data for ${behandlinger.length} saker`,
         },
+        legend: {},
         tooltip: {
           trigger: 'axis',
           axisPointer: {

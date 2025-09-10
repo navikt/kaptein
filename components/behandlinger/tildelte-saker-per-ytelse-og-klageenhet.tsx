@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
@@ -9,6 +10,8 @@ interface Props {
   relevantYtelser: IKodeverkSimpleValue[];
   klageenheterkodeverk: IKodeverkSimpleValue[];
 }
+
+const TITLE = 'Tildelte saker per ytelse og klageenhet';
 
 export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtelser, klageenheterkodeverk }: Props) => {
   const series = useMemo(
@@ -31,6 +34,10 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtels
     [behandlinger, relevantYtelser, klageenheterkodeverk],
   );
 
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
+  }
+
   const labels = relevantYtelser.map(
     (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
   );
@@ -39,7 +46,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtels
     <EChart
       option={{
         title: {
-          text: 'Tildelte saker per ytelse og klageenhet',
+          text: TITLE,
           subtext: `Viser data for ${behandlinger.length} tildelte saker`,
         },
         legend: {},

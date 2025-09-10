@@ -17,7 +17,9 @@ interface Props {
 
 const TODAY = new Date();
 
-export const OvergåttVarsletFrist = ({ behandlinger }: Props) => {
+const TITLE = 'Overskredet varslet frist';
+
+export const OverskredetVarsletFrist = ({ behandlinger }: Props) => {
   const [overskredetVarsletFrist, setOverskredetVarsletFrist] = useQueryState(
     QueryParam.OVERSKREDET_VARSLET_FRIST_DAYS,
     parseAsInteger,
@@ -51,8 +53,8 @@ export const OvergåttVarsletFrist = ({ behandlinger }: Props) => {
 
   const color = useFristPieChartColors(data);
 
-  if (data.length === 0) {
-    return <NoData />;
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
   }
 
   return (
@@ -61,7 +63,7 @@ export const OvergåttVarsletFrist = ({ behandlinger }: Props) => {
       <EChart
         option={{
           title: {
-            text: 'Varslet frist',
+            text: TITLE,
           },
           tooltip: {
             trigger: 'item',

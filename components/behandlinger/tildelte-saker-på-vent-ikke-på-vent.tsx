@@ -10,6 +10,8 @@ interface Props {
   behandlinger: Behandling[];
 }
 
+const TITLE = 'Tildelte saker på vent / ikke på vent';
+
 export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, total }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
@@ -30,15 +32,15 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, total }: Props) 
     return Object.values(Object.fromEntries(map));
   }, [behandlinger]);
 
-  if (data.length === 0) {
-    return <NoData />;
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
   }
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Tildelte saker på vent / ikke på vent',
+          text: TITLE,
           subtext: `Viser data for ${total} saker`,
         },
         tooltip: {

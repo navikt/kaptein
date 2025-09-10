@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
@@ -11,6 +12,8 @@ interface Props {
   relevantYtelser: IKodeverkSimpleValue[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
+
+const TITLE = 'Saker per ytelse og sakstype';
 
 export const SakerPerYtelse = ({ behandlinger, relevantYtelser, sakstyper }: Props) => {
   const series = useMemo(
@@ -31,6 +34,10 @@ export const SakerPerYtelse = ({ behandlinger, relevantYtelser, sakstyper }: Pro
     [behandlinger, relevantYtelser, sakstyper],
   );
 
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
+  }
+
   const labels = relevantYtelser.map(
     (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
   );
@@ -39,7 +46,7 @@ export const SakerPerYtelse = ({ behandlinger, relevantYtelser, sakstyper }: Pro
     <EChart
       option={{
         title: {
-          text: 'Saker per ytelse og sakstype',
+          text: TITLE,
           subtext: `Viser data for ${behandlinger.length} saker`,
         },
         legend: {},

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { type Behandling, type IKodeverkValue, type IYtelse, PåVentReason } from '@/lib/server/types';
 
@@ -10,6 +11,8 @@ interface Props {
   ytelsekodeverk: IYtelse[];
   påVentReasons: IKodeverkValue[];
 }
+
+const TITLE = 'Behandlinger på vent grupper på ytelse';
 
 export const PåVentPerYtelse = ({ behandlinger, total, ytelsekodeverk, påVentReasons }: Props) => {
   const påVentBehandlinger = useMemo(() => behandlinger.filter((b) => b.sattPaaVent !== null), [behandlinger]);
@@ -46,11 +49,15 @@ export const PåVentPerYtelse = ({ behandlinger, total, ytelsekodeverk, påVentR
     [påVentBehandlinger, påVentReasons, relevantYtelser],
   );
 
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
+  }
+
   return (
     <EChart
       option={{
         title: {
-          text: 'Behandlinger på vent gruppert på ytelse',
+          text: TITLE,
           subtext: `Antall behandlinger på vent: ${påVentBehandlinger.length} av totalt ${total} saker`,
         },
         tooltip: {

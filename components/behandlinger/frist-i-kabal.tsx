@@ -13,6 +13,8 @@ interface Props {
 
 const TODAY = new Date();
 
+const TITLE = 'Frist i Kabal';
+
 export const FristIKabal = ({ behandlinger }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Record<ExceededFrist, number>>(
@@ -42,15 +44,15 @@ export const FristIKabal = ({ behandlinger }: Props) => {
 
   const color = useFristPieChartColors(data);
 
-  if (data.length === 0) {
-    return <NoData />;
+  if (behandlinger.length === 0) {
+    return <NoData title={TITLE} />;
   }
 
   return (
     <EChart
       option={{
         title: {
-          text: 'Frist i Kabal',
+          text: TITLE,
         },
         tooltip: {
           trigger: 'item',
