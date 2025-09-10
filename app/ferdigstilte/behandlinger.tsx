@@ -35,12 +35,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelse
-          behandlinger={data}
-          total={behandlinger.length}
-          relevantYtelser={relevantYtelser}
-          sakstyper={sakstyper}
-        />
+        <SakerPerYtelse />
       </Card>
 
       <Card>

@@ -1,3 +1,5 @@
+import type { NextRequest } from 'next/server';
+import { filterData } from '@/app/api/graphs/saker-per-ytelse-og-sakstype/data';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
@@ -11,7 +13,8 @@ const log = getLogger('graphs-saker-per-ytelse-og-sakstype');
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.searchParams;
   const traceId = generateTraceId();
   const spanId = generateSpanId();
 
@@ -27,12 +30,14 @@ export async function GET() {
     const eventStream = new ReadableStream({
       start(controller) {
         listener = (behandlinger) => {
-          const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
-          const series = getSeries(sakstyper, relevanteYtelser, behandlinger);
+          const { withTildelteFilter } = filterData(behandlinger, params);
+
+          const relevanteYtelser = getRelevantYtelser(withTildelteFilter, ytelser);
+          const series = getSeries(sakstyper, relevanteYtelser, withTildelteFilter);
           const labels = getLabels(relevanteYtelser, series);
 
-          const json = JSON.stringify({ series, labels });
-          controller.enqueue(textEncoder.encode(`data: ${json}\n`));
+          const json = JSON.stringify({ series, labels, count: withTildelteFilter.length });
+          controller.enqueue(textEncoder.encode(`event: graph\ndata: ${json}\n\n`));
         };
 
         listener(initialBehandlinger);
@@ -61,6 +66,10 @@ export async function GET() {
     }
 
     if (error instanceof InternalServerError) {
+      return new Response(error.message, { status: 500 });
+    }
+
+    if (error instanceof Error) {
       return new Response(error.message, { status: 500 });
     }
 

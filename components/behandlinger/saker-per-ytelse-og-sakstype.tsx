@@ -1,53 +1,59 @@
 'use client';
 
-import { useMemo } from 'react';
-import { NoData } from '@/components/no-data/no-data';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { ServerSentEventManager } from '@/lib/client/server-sent-events';
 import { EChart } from '@/lib/echarts/echarts';
-import { getSakstypeColor } from '@/lib/echarts/get-colors';
-import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
-interface Props {
-  total: number;
-  behandlinger: Behandling[];
-  relevantYtelser: IKodeverkSimpleValue[];
-  sakstyper: IKodeverkSimpleValue<Sakstype>[];
+interface Serie {
+  type: string;
+  stack: string;
+  label: {
+    show: boolean;
+  };
+  emphasis: {
+    focus: string;
+  };
+  name: string;
+  color: string;
+  data: (number | null)[];
+}
+
+interface State {
+  series: Serie[];
+  labels: string[];
+  count: number;
 }
 
 const TITLE = 'Saker per ytelse og sakstype';
 
-export const SakerPerYtelse = ({ behandlinger, relevantYtelser, sakstyper }: Props) => {
-  const series = useMemo(
-    () =>
-      sakstyper.map((type) => ({
-        type: 'bar',
-        stack: 'total',
-        label: { show: true },
-        emphasis: { focus: 'series' },
-        name: type.navn,
-        color: getSakstypeColor(type.id),
-        data: relevantYtelser
-          .map(({ id }) =>
-            behandlinger.reduce((acc, curr) => (curr.ytelseId === id && curr.typeId === type.id ? acc + 1 : acc), 0),
-          )
-          .map((value) => (value === 0 ? null : value)),
-      })),
-    [behandlinger, relevantYtelser, sakstyper],
-  );
+export const SakerPerYtelse = () => {
+  const [{ series, labels, count }, setState] = useState<State>({ series: [], labels: [], count: 0 });
 
-  if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+  const params = useSearchParams();
+
+  useEffect(() => {
+    const eventSource = new ServerSentEventManager(`/api/graphs/saker-per-ytelse-og-sakstype?${params.toString()}`);
+
+    eventSource.addJsonEventListener<State>('graph', setState);
+
+    return () => {
+      eventSource.close();
+    };
+  }, [params]);
+
+  const isLoading = series.length === 0;
+
+  if (isLoading) {
+    return <div>Laster...</div>;
   }
-
-  const labels = relevantYtelser.map(
-    (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
-  );
 
   return (
     <EChart
       option={{
         title: {
           text: TITLE,
-          subtext: `Viser data for ${behandlinger.length} saker`,
+          subtext: `Viser data for ${count} saker`,
         },
         legend: {},
         tooltip: {
