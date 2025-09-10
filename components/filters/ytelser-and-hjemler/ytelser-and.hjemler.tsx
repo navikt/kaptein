@@ -1,10 +1,9 @@
 'use client';
 
-import { ChevronRightIcon } from '@navikt/aksel-icons';
-import { HStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
+import { SubFilter } from '@/components/filters/sub-filter';
 import { Innsendingshjemler } from '@/components/filters/ytelser-and-hjemler/innsendingshjemler';
 import { Registreringshjemler } from '@/components/filters/ytelser-and-hjemler/registreringshjemler';
 import type { IKodeverkValue, IYtelse } from '@/lib/server/types';
@@ -30,13 +29,6 @@ const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
   return { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk };
 };
 
-const Tabbed = ({ children }: { children: React.ReactNode }) => (
-  <HStack align="center" className="flex">
-    <ChevronRightIcon fontSize={32} aria-hidden />
-    {children}
-  </HStack>
-);
-
 export const YtelserAndRegistreringshjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedHjemler] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
@@ -53,12 +45,12 @@ export const YtelserAndRegistreringshjemler = ({ ytelser, lovkildeToRegistrering
         options={ytelserOptions}
       />
 
-      <Tabbed>
+      <SubFilter>
         <Registreringshjemler
           relevantYtelserkoderverk={relevantKodeverk}
           lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
         />
-      </Tabbed>
+      </SubFilter>
     </>
   );
 };
@@ -79,9 +71,9 @@ export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }
         options={ytelserOptions}
       />
 
-      <Tabbed>
+      <SubFilter>
         <Innsendingshjemler relevantYtelserkoderverk={relevantKodeverk} />
-      </Tabbed>
+      </SubFilter>
     </>
   );
 };

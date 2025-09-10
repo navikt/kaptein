@@ -6,13 +6,12 @@ import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/server/types';
 
 interface Props {
-  total: number;
   behandlinger: Behandling[];
 }
 
 const TITLE = 'Tildelte saker på vent / ikke på vent';
 
-export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, total }: Props) => {
+export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
       const value = curr.sattPaaVent === null;
@@ -41,7 +40,6 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, total }: Props) 
       option={{
         title: {
           text: TITLE,
-          subtext: `Viser data for ${total} saker`,
         },
         tooltip: {
           trigger: 'item',

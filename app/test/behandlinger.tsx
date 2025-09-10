@@ -1,6 +1,6 @@
 'use client';
 
-import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
+import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/graph';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 

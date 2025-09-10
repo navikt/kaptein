@@ -1,24 +1,21 @@
 import { Reset } from '@/app/test/reset';
 import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
-import { Sakstyper } from '@/components/filters/sakstyper';
+import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { Tilbakekreving } from '@/components/filters/tilbakekreving';
-import { Utfall } from '@/components/filters/utfall';
 import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
-import { getLovkildeToRegistreringshjemler, getSakstyper, getUtfall, getYtelser } from '@/lib/server/api';
+import { getLovkildeToRegistreringshjemler, getSakstyperToUtfall, getYtelser } from '@/lib/server/api';
 
 export const Filters = async () => {
   const ytelser = await getYtelser();
-  const sakstyper = await getSakstyper();
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
-  const utfall = await getUtfall();
+  const sakstyperToUtfall = await getSakstyperToUtfall();
 
   return (
     <FilterWrapper>
       <Reset />
       <DateRange />
-      <Sakstyper sakstyper={sakstyper} />
-      <Utfall utfall={utfall} />
+      <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
       <YtelserAndRegistreringshjemler
         ytelser={ytelser}
         lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}

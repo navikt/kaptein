@@ -5,7 +5,14 @@ import { getLogger } from '@/lib/logger';
 import { getFromKabal } from '@/lib/server/fetch';
 import { AppName } from '@/lib/server/get-obo-token';
 import { generateTraceParent } from '@/lib/server/traceparent';
-import type { IKodeverkSimpleValue, IKodeverkValue, IUserData, IYtelse, Sakstype } from '@/lib/server/types';
+import type {
+  IKodeverkSimpleValue,
+  IKodeverkValue,
+  IUserData,
+  IYtelse,
+  Sakstype,
+  SakstypeToUtfall,
+} from '@/lib/server/types';
 
 const logger = getLogger('api');
 
@@ -77,6 +84,7 @@ export const getKlageenheter = () => getData<IKodeverkSimpleValue[]>(AppName.KLA
 export const getLovkildeToRegistreringshjemler = () =>
   getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/lovkildetoregistreringshjemler');
 export const getSakstyper = () => getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
+export const getSakstyperToUtfall = () => getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
 
 const ANKE_I_TRYGDERETTEN_ID = '3';
 

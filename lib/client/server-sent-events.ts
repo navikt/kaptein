@@ -1,3 +1,4 @@
+import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { browserLog } from '@/lib/browser-log';
 import { isLocal } from '@/lib/environment';
 
@@ -12,12 +13,14 @@ export class ServerSentEventManager<E extends string = string> {
   private events: EventSource;
   private listeners: EventListener<E>[] = [];
   private url: string;
+  private readonly queryParams?: ReadonlyURLSearchParams;
   private lastEventId: string | null = null;
 
   public isConnected = false;
 
-  constructor(url: string, initialEventId: string | null = null) {
+  constructor(url: string, queryParams?: ReadonlyURLSearchParams, initialEventId: string | null = null) {
     this.url = url;
+    this.queryParams = queryParams;
     this.lastEventId = initialEventId;
     this.events = this.createEventSource();
   }
@@ -76,7 +79,7 @@ export class ServerSentEventManager<E extends string = string> {
   }
 
   private createEventSource(): EventSource {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(this.queryParams);
 
     if (this.lastEventId !== null) {
       params.set('lastEventId', this.lastEventId);

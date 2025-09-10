@@ -12,6 +12,7 @@ export const Card = ({ children, span = 2 }: Props) => {
       shadow="dialog"
       background="neutral-soft"
       borderRadius="medium"
+      position="relative"
       style={{ gridRowEnd: `span ${span}` }}
     >
       {children}

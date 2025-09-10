@@ -124,3 +124,9 @@ type Reason =
       reasonId: Exclude<PåVentReason, PåVentReason.ANNET>;
       reason: null;
     };
+
+export interface SakstypeToUtfall extends IKodeverkSimpleValue<Sakstype> {
+  utfall: IKodeverkSimpleValue[];
+}
+
+export const ANKE_I_TRYGDERETTEN_ID = '3';

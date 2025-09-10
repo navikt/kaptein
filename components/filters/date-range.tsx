@@ -2,10 +2,11 @@
 
 import { ClockDashedIcon } from '@navikt/aksel-icons';
 import { Button, DatePicker, HGrid, HStack, useRangeDatepicker, VStack } from '@navikt/ds-react';
-import { endOfMonth, endOfYear, isSameDay, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
+import { endOfMonth, endOfYear, format, isSameDay, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
 import { useQueryState } from 'nuqs';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { parseAsDate } from '@/app/custom-query-parsers';
+import { PRETTY_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
 const TODAY = new Date();
@@ -36,6 +37,15 @@ export const DateRange = () => {
       setTo(range?.to ?? null);
     },
   });
+
+  useEffect(() => {
+    const fromDiff = from !== null && fromInputProps.value !== format(new Date(from), PRETTY_DATE_FORMAT);
+    const toDiff = to !== null && toInputProps.value !== format(new Date(to), PRETTY_DATE_FORMAT);
+
+    if (fromDiff || toDiff) {
+      setSelected({ from: from === null ? START_OF_MONTH : new Date(from), to: to === null ? TODAY : new Date(to) });
+    }
+  }, [from, to, setSelected, fromInputProps.value, toInputProps.value]);
 
   const resetFrom = () => setSelected({ from: START_OF_MONTH, to: to ?? TODAY });
   const resetTo = () => setSelected({ from: from ?? START_OF_MONTH, to: TODAY });

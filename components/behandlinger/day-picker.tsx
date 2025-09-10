@@ -55,6 +55,7 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
 
           if (!Number.isNaN(num)) {
             setValue(num);
+            setTextFieldValue(num.toString());
           }
         }}
       >
