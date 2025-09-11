@@ -69,7 +69,7 @@ export interface Behandling {
   fagsystemId: string;
   feilregistrering: string | null;
   fraNAVEnhet: string;
-  frist: string;
+  frist: string | null;
   hjemmelIdList: string[];
   id: string;
   isAvsluttetAvSaksbehandler: boolean;
