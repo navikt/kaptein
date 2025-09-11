@@ -19,6 +19,7 @@ export const Reset = () => {
 
     searchParams.set(QueryParam.FROM, DEFAULT_FROM);
     searchParams.set(QueryParam.TO, DEFAULT_TO);
+    searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
 
     router.push(`${pathName}?${searchParams.toString()}`);
   };

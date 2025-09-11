@@ -13,6 +13,7 @@ export const Reset = () => {
     const searchParams = new URLSearchParams();
 
     searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
+    searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
 
     router.push(`${pathName}?${searchParams.toString()}`);
   };
