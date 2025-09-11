@@ -1,32 +1,28 @@
 'use client';
 
-import type { State } from '@/components/graphs/frist-i-kabal-per-ytelse/types';
 import { GraphLoading } from '@/components/graphs/loading';
 import { GraphStatus } from '@/components/graphs/status';
+import type { State } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/types';
 import { NoData } from '@/components/no-data/no-data';
 import { useGraphState } from '@/lib/client/use-graph-state';
 import { EChart } from '@/lib/echarts/echarts';
 import { Graph } from '@/lib/graphs';
 
 interface Props {
+  title: string;
   finished?: boolean;
   tildelt?: boolean;
 }
 
-const TITLE = 'Frist i Kabal per ytelse';
-
-export const FristIKabalPerYtelse = ({ finished, tildelt }: Props) => {
+export const TildelteSakerPerYtelseOgKlageenhet = ({ title, finished, tildelt }: Props) => {
   const {
     isInitialized,
     isLoading,
     state: { labels, series },
     count,
   } = useGraphState<State>(
-    Graph.FRIST_I_KABAL_PER_YTELSE,
-    {
-      labels: [],
-      series: [],
-    },
+    Graph.TILDELTE_SAKER_PER_YTELSE_OG_KLAGEENHET,
+    { labels: [], series: [] },
     { finished, tildelt },
   );
 
@@ -35,7 +31,7 @@ export const FristIKabalPerYtelse = ({ finished, tildelt }: Props) => {
   }
 
   if (count === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
@@ -43,9 +39,10 @@ export const FristIKabalPerYtelse = ({ finished, tildelt }: Props) => {
       <EChart
         option={{
           title: {
-            text: TITLE,
-            subtext: `Viser data for ${count} saker`,
+            text: title,
+            subtext: `Viser data for ${count} tildelte saker`,
           },
+          legend: {},
           tooltip: {
             trigger: 'axis',
             axisPointer: {

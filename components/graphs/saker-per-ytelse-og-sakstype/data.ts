@@ -1,20 +1,21 @@
-import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
 import { getRelevantYtelser } from '@/components/graphs/common';
 import type { Serie, State } from '@/components/graphs/saker-per-ytelse-og-sakstype/types';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
-import type { EntryData } from '@/lib/graphs';
+import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
-export const getSakerPerYtelseOgSakstypeState = ({
-  behandlinger,
+export const getSakerPerYtelseOgSakstypeState: GetGraphStateFn<State> = ({
+  unfilteredBehandlinger,
+  filteredBehandlinger,
   ytelser,
   sakstyper,
-}: GetGraphStateParams): EntryData<State> => {
-  const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
-  const series = getSeries(sakstyper, relevanteYtelser, behandlinger);
+}) => {
+  console.log('behandlinger SSE', filteredBehandlinger.length);
+  const relevanteYtelser = getRelevantYtelser(unfilteredBehandlinger, ytelser);
+  const series = getSeries(sakstyper, relevanteYtelser, filteredBehandlinger);
   const labels = getLabels(relevanteYtelser, series);
 
-  return { state: { series, labels }, count: behandlinger.length };
+  return { state: { series, labels }, count: filteredBehandlinger.length };
 };
 
 const getSeries = (

@@ -1,11 +1,10 @@
 import { isBefore } from 'date-fns';
-import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
 import { ExceededFrist } from '@/components/behandlinger/use-frist-color';
 import type { Serie } from '@/components/graphs/frist-i-kabal/types';
-import type { EntryData } from '@/lib/graphs';
+import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling } from '@/lib/server/types';
 
-export const getFristIKabalState = ({ behandlinger }: GetGraphStateParams): EntryData<Serie> => {
+export const getFristIKabalState: GetGraphStateFn<Serie> = ({ filteredBehandlinger: behandlinger }) => {
   const state = getData(behandlinger);
 
   return { state, count: behandlinger.length };

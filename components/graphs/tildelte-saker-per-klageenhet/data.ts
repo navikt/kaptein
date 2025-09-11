@@ -1,14 +1,17 @@
-import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
 import type { Data, State } from '@/components/graphs/tildelte-saker-per-klageenhet/types';
+import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getTildelteSakerPerKlageenhetState = ({ behandlinger, klageenheter }: GetGraphStateParams): State => {
+export const getTildelteSakerPerKlageenhetState: GetGraphStateFn<State> = ({
+  filteredBehandlinger: behandlinger,
+  klageenheter,
+}) => {
   const data = getData(behandlinger, klageenheter);
 
   const labels = data.map((d) => d.name);
   const values = data.map((d) => d.value);
 
-  return { labels, values };
+  return { state: { labels, values }, count: behandlinger.length };
 };
 
 const getData = (behandlinger: Behandling[], klageenheter: IKodeverkSimpleValue[]): Data[] => {
