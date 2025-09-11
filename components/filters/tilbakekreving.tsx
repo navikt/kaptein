@@ -62,8 +62,8 @@ export const HelpForAktive = ({ innsendingshjemlerMap }: HelpForAktiveProps) => 
       <HelpText placement="right">
         <BodyShort>
           Sak satt med minst én av følgende innsendingshjemler regnes som aktiv tilbakekrevingssak i Kaptein:
-          <List>{listItems}</List>
         </BodyShort>
+        <List>{listItems}</List>
       </HelpText>
     </HStack>
   );
