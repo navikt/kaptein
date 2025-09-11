@@ -129,17 +129,17 @@ export const DateRange = () => {
         </Button>
 
         <Button
-          variant={isSisteTertial ? 'primary' : 'secondary'}
-          onClick={() => setSelected({ from: START_OF_LAST_TERTIAL, to: END_OF_LAST_TERTIAL })}
-        >
-          Siste tertial
-        </Button>
-
-        <Button
           variant={isNestSisteTertial ? 'primary' : 'secondary'}
           onClick={() => setSelected({ from: START_OF_LAST_MONTH, to: END_OF_LAST_MONTH })}
         >
           Forrige måned
+        </Button>
+
+        <Button
+          variant={isSisteTertial ? 'primary' : 'secondary'}
+          onClick={() => setSelected({ from: START_OF_LAST_TERTIAL, to: END_OF_LAST_TERTIAL })}
+        >
+          Siste tertial
         </Button>
 
         <Button

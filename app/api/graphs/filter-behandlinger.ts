@@ -63,7 +63,7 @@ export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnTyp
   const filteredForKlageenheter =
     klageenheter.length === 0
       ? filteredForYtelser
-      : filteredForYtelser.filter((b) => klageenheter.includes(b.fraNAVEnhet));
+      : filteredForYtelser.filter(({ tildeltEnhet }) => tildeltEnhet !== null && klageenheter.includes(tildeltEnhet));
 
   const filteredForInnsendingshjemler =
     innsendingshjemler.length === 0

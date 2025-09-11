@@ -53,16 +53,14 @@ const parseTilbakekrevingFilter = (value: string | null): TilbakekrevingFilter =
   return TilbakekrevingFilter.MED;
 };
 
-const parseDate = (value: string | null): Date => {
-  const NOW = new Date();
-
+const parseDate = (value: string | null): Date | null => {
   if (value === null) {
-    return NOW;
+    return null;
   }
 
-  const date = parse(value, ISO_DATE_FORMAT, NOW);
+  const date = parse(value, ISO_DATE_FORMAT, new Date());
 
-  return isValid(date) ? date : NOW;
+  return isValid(date) ? date : null;
 };
 
 const parseStringArray = (value: string | null): string[] =>
