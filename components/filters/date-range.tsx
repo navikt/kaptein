@@ -4,7 +4,7 @@ import { ClockDashedIcon } from '@navikt/aksel-icons';
 import { Button, DatePicker, HGrid, HStack, useRangeDatepicker, VStack } from '@navikt/ds-react';
 import { endOfMonth, endOfYear, format, isSameDay, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
 import { useQueryState } from 'nuqs';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { parseAsDate } from '@/app/custom-query-parsers';
 import { PRETTY_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
@@ -25,9 +25,13 @@ const START_OF_THIS_YEAR = startOfYear(TODAY);
 const START_OF_LAST_YEAR = startOfYear(subYears(TODAY, 1));
 const END_OF_LAST_YEAR = endOfYear(subYears(TODAY, 1));
 
+const PRETTY_START_OF_KABAL = format(START_OF_KABAL, PRETTY_DATE_FORMAT);
+
 export const DateRange = () => {
   const [from, setFrom] = useQueryState(QueryParam.FROM, parseAsDate);
   const [to, setTo] = useQueryState(QueryParam.TO, parseAsDate);
+  const [fromErrors, setFromErrors] = useState<string[]>([]);
+  const [toErrors, setToErrors] = useState<string[]>([]);
 
   const { fromInputProps, toInputProps, datepickerProps, setSelected } = useRangeDatepicker({
     defaultSelected: { from: from === null ? TODAY : new Date(from), to: to === null ? TODAY : new Date(to) },
@@ -38,6 +42,32 @@ export const DateRange = () => {
     onRangeChange: (range) => {
       setFrom(range?.from ?? null);
       setTo(range?.to ?? null);
+    },
+    onValidate: (range) => {
+      const newFromErrors: string[] = [];
+      const newToErrors: string[] = [];
+
+      if (range.from.isValidDate && range.to.isValidDate) {
+        setFromErrors([]);
+        setToErrors([]);
+
+        return;
+      }
+
+      if (range.from.isEmpty) newFromErrors.push('Fra og med dato må være valgt');
+      if (range.from.isInvalid && !range.from.isEmpty) newFromErrors.push('Fra og med dato er ugyldig');
+      if (range.from.isAfter) newFromErrors.push('Fra og med dato kan ikke være etter til og med dato');
+      if (range.from.isBefore) newFromErrors.push(`Fra og med dato kan ikke være før ${PRETTY_START_OF_KABAL}`);
+
+      if (range.to.isEmpty) newToErrors.push('Til og med dato må være valgt');
+      if (range.to.isInvalid && !range.to.isEmpty) newToErrors.push('Til og med dato er ugyldig');
+      if (range.to.isAfter) newToErrors.push('Til og med dato kan ikke være etter i dag');
+      if (range.to.isBefore) newToErrors.push(`Til og med dato kan ikke være før ${PRETTY_START_OF_KABAL}`);
+
+      if (range.to.isBeforeFrom) newToErrors.push('Til og med dato kan ikke være før fra og med dato');
+
+      setFromErrors(newFromErrors);
+      setToErrors(newToErrors);
     },
   });
 
@@ -82,12 +112,29 @@ export const DateRange = () => {
     [from, to],
   );
 
+  const fromError = (
+    <ul>
+      {fromErrors.map((e) => (
+        <li key={e}>{e}</li>
+      ))}
+    </ul>
+  );
+
+  const toError = (
+    <ul>
+      {toErrors.map((e) => (
+        <li key={e}>{e}</li>
+      ))}
+    </ul>
+  );
+
   return (
     <VStack gap="4">
       <DatePicker {...datepickerProps} dropdownCaption>
         <VStack gap="4">
           <DatePicker.Input
             {...fromInputProps}
+            error={fromErrors.length > 0 ? fromError : undefined}
             label={
               <HStack align="center" gap="1">
                 <span>Fra og med</span>
@@ -104,6 +151,7 @@ export const DateRange = () => {
 
           <DatePicker.Input
             {...toInputProps}
+            error={toErrors.length > 0 ? toError : undefined}
             label={
               <HStack align="center" gap="1">
                 <span>Til og med</span>
