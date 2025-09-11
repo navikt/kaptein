@@ -35,7 +35,6 @@ interface Props {
 export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenheterKodeverk }: Props) => {
   const { withTildelteFilter: data, withoutTildelteFilter } = useData(behandlinger);
   const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
-  const showsTildelte = tildelingFilter === TildelingFilter.TILDELTE;
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelseKodeverk);
@@ -60,11 +59,11 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
         </Card>
       ) : null}
 
-      {showsTildelte ? (
+      {showsLedige ? null : (
         <Card>
           <TildelteSakerPåVentIkkePåVent behandlinger={data} />
         </Card>
-      ) : null}
+      )}
 
       {showsLedige ? null : (
         <Card>
