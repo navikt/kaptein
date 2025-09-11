@@ -2,8 +2,6 @@ import { isClient } from '@/lib/environment';
 
 const NOOP = () => undefined;
 
-console.log('isClient:', isClient);
-
 export const browserLog = isClient
   ? {
       error: (...args: unknown[]) => console.error(args),
