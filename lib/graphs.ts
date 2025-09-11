@@ -1,3 +1,5 @@
+import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+
 export enum Graph {
   ALDER_PER_YTELSE = 'alder-per-ytelse',
   SAKER_PER_YTELSE_OG_SAKSTYPE = 'saker-per-ytelse-og-sakstype',
@@ -6,6 +8,8 @@ export enum Graph {
   FRIST_I_KABAL = 'frist-i-kabal',
   TILDELTE_SAKER_PER_KLAGEENHET = 'tildelte-saker-per-klageenhet',
   SAKER_PER_SAKSTYPE = 'saker-per-sakstype',
+  TILDELTE_SAKER_PER_YTELSE_OG_KLAGEENHET = 'tildelte-saker-per-ytelse-og-klageenhet',
+  VARSLET_FRIST = 'varslet-frist',
 }
 
 const GRAPHS = Object.values(Graph);
@@ -18,3 +22,18 @@ export interface EntryData<S> {
   count: number;
   state: S;
 }
+
+export interface GetGraphStateParams {
+  unfilteredBehandlinger: Behandling[];
+  filteredBehandlinger: Behandling[];
+  activeBehandlinger: Behandling[];
+  finishedBehandlinger: Behandling[];
+  ytelser: IYtelse[];
+  sakstyper: IKodeverkSimpleValue<Sakstype>[];
+  klageenheter: IKodeverkSimpleValue[];
+  searchParams: URLSearchParams;
+}
+
+export type GetGraphStateFn<S> = (params: GetGraphStateParams) => EntryData<S>;
+
+export type GetGraphStateJsonFn = (params: GetGraphStateParams) => string;

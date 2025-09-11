@@ -1,15 +1,14 @@
-import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
 import { Age, getAgeColor } from '@/components/behandlinger/use-frist-color';
 import type { Serie, State } from '@/components/graphs/alder-per-ytelse/types';
 import { getRelevantYtelser } from '@/components/graphs/common';
-import type { EntryData } from '@/lib/graphs';
+import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getAlderPerYtelseState = ({
-  behandlinger,
+export const getAlderPerYtelseState: GetGraphStateFn<State> = ({
+  filteredBehandlinger: behandlinger,
   ytelser,
   searchParams,
-}: GetGraphStateParams): EntryData<State> => {
+}) => {
   const maxAge = parseMaxAge(searchParams);
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(relevanteYtelser, behandlinger, maxAge);

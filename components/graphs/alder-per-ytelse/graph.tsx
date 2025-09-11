@@ -27,7 +27,7 @@ export const AlderPerYtelse = ({ finished, tildelt }: Props) => {
     isLoading,
     state: { labels, series },
     count,
-  } = useGraphState<State>(Graph.ALDER_PER_YTELSE, { labels: [], series: [] }, { finished });
+  } = useGraphState<State>(Graph.ALDER_PER_YTELSE, { labels: [], series: [] }, { finished, tildelt });
 
   if (!isInitialized) {
     return <GraphLoading />;

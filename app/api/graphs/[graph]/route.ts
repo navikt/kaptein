@@ -1,17 +1,19 @@
 import { createHash } from 'node:crypto';
 import { notFound } from 'next/navigation';
 import type { NextRequest } from 'next/server';
-import type { GetGraphStateFn } from '@/app/api/graphs/[graph]/data-fn-types';
 import { filterBehandlinger } from '@/app/api/graphs/filter-behandlinger';
 import { parseFilters } from '@/app/api/graphs/parse-params';
 import { getAlderState } from '@/components/graphs/alder/data';
 import { getAlderPerYtelseState } from '@/components/graphs/alder-per-ytelse/data';
 import { getFristIKabalState } from '@/components/graphs/frist-i-kabal/data';
 import { getFristIKabalPerYtelseState } from '@/components/graphs/frist-i-kabal-per-ytelse/data';
+import { getSakerPerSakstypeState } from '@/components/graphs/saker-per-sakstype/data';
 import { getSakerPerYtelseOgSakstypeState } from '@/components/graphs/saker-per-ytelse-og-sakstype/data';
 import { getTildelteSakerPerKlageenhetState } from '@/components/graphs/tildelte-saker-per-klageenhet/data';
+import { getTildelteSakerPerYtelseOgKlageenhetState } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/data';
+import { getVarsletFristState } from '@/components/graphs/varslet-frist/data';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
-import { GRAPH_DATA_EVENT_NAME, Graph, isGraphName } from '@/lib/graphs';
+import { type GetGraphStateJsonFn, GRAPH_DATA_EVENT_NAME, Graph, isGraphName } from '@/lib/graphs';
 import { getLogger } from '@/lib/logger';
 import { getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
 import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
@@ -42,6 +44,10 @@ export async function GET(request: NextRequest, { params }: Context) {
   const traceId = generateTraceId();
   const spanId = generateSpanId();
 
+  if (graphName === Graph.SAKER_PER_YTELSE_OG_SAKSTYPE) {
+    console.log('Graph.SAKER_PER_YTELSE_OG_SAKSTYPE filters', filters);
+  }
+
   const getGraphState = GRAPH_DATA_LOADERS[graphName];
 
   try {
@@ -58,10 +64,13 @@ export async function GET(request: NextRequest, { params }: Context) {
     const eventStream = new ReadableStream({
       start(controller) {
         listener = (behandlinger) => {
-          const filteredBehandlinger = filterBehandlinger(behandlinger, filters);
+          const filteredBehandlinger = filterBehandlinger(behandlinger, filters, traceId);
 
           const json = getGraphState({
-            behandlinger: filteredBehandlinger,
+            unfilteredBehandlinger: behandlinger,
+            filteredBehandlinger: filteredBehandlinger,
+            activeBehandlinger: filteredBehandlinger.filter((b) => b.isTildelt),
+            finishedBehandlinger: filteredBehandlinger.filter((b) => b.isAvsluttetAvSaksbehandler),
             ytelser,
             sakstyper,
             klageenheter,
@@ -110,7 +119,7 @@ export async function GET(request: NextRequest, { params }: Context) {
   }
 }
 
-const GRAPH_DATA_LOADERS: Record<Graph, GetGraphStateFn> = {
+const GRAPH_DATA_LOADERS: Record<Graph, GetGraphStateJsonFn> = {
   [Graph.SAKER_PER_YTELSE_OG_SAKSTYPE]: (...args) => JSON.stringify(getSakerPerYtelseOgSakstypeState(...args)),
 
   [Graph.ALDER_PER_YTELSE]: (...args) => JSON.stringify(getAlderPerYtelseState(...args)),
@@ -122,6 +131,13 @@ const GRAPH_DATA_LOADERS: Record<Graph, GetGraphStateFn> = {
   [Graph.FRIST_I_KABAL]: (...args) => JSON.stringify(getFristIKabalState(...args)),
 
   [Graph.TILDELTE_SAKER_PER_KLAGEENHET]: (...args) => JSON.stringify(getTildelteSakerPerKlageenhetState(...args)),
+
+  [Graph.SAKER_PER_SAKSTYPE]: (...args) => JSON.stringify(getSakerPerSakstypeState(...args)),
+
+  [Graph.TILDELTE_SAKER_PER_YTELSE_OG_KLAGEENHET]: (...args) =>
+    JSON.stringify(getTildelteSakerPerYtelseOgKlageenhetState(...args)),
+
+  [Graph.VARSLET_FRIST]: (...args) => JSON.stringify(getVarsletFristState(...args)),
 };
 
 const hash = (input: string, length = 8): string =>
