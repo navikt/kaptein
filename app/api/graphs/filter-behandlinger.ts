@@ -2,13 +2,21 @@ import { isAfter, isBefore, parse } from 'date-fns';
 import type { parseFilters } from '@/app/api/graphs/parse-params';
 import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
 import { ISO_DATE_FORMAT } from '@/lib/date';
+import { getLogger } from '@/lib/logger';
+import { generateSpanId } from '@/lib/server/traceparent';
 import type { Behandling } from '@/lib/server/types';
 import { TILBAKEKREVINGINNSENDINGSHJEMLER } from '@/lib/types/tilbakekrevingshjemler';
 
-export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnType<typeof parseFilters>) => {
+const log = getLogger('filter-behandlinger');
+
+export const filterBehandlinger = (
+  behandlinger: Behandling[],
+  params: ReturnType<typeof parseFilters>,
+  traceId: string,
+) => {
+  const start = performance.now();
+
   const {
-    finished,
-    tildelt,
     ytelseFilter,
     klageenheterFilter,
     registreringshjemlerFilter,
@@ -19,25 +27,24 @@ export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnTyp
     toFilter,
     tilbakekrevingFilter,
     utfallFilter,
-    ignoreTildeltFilter,
   } = params;
 
-  const filteredForFeilregistrert = behandlinger.filter((b) => b.feilregistrering === null);
+  const filteredForFeilregistrertAndAnkeITR = behandlinger.filter(
+    (b) => b.feilregistrering === null && b.typeId !== ANKE_I_TRYGDERETTEN_ID,
+  );
 
-  const filteredForFinished =
-    finished === null
-      ? filteredForFeilregistrert
-      : filteredForFeilregistrert.filter((b) => b.isAvsluttetAvSaksbehandler === finished);
+  // const filteredForFinished =
+  //   finished === null
+  //     ? filteredForFeilregistrertAndAnkeITR
+  //     : filteredForFeilregistrertAndAnkeITR.filter((b) => b.isAvsluttetAvSaksbehandler === finished);
 
-  const filteredForTildelt =
-    tildelt === null ? filteredForFinished : filteredForFinished.filter((b) => b.isTildelt === tildelt);
-
-  const filteredForAnkeITR = filteredForTildelt.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
+  // const filteredForTildelt =
+  //   tildelt === null ? filteredForFinished : filteredForFinished.filter((b) => b.isTildelt === tildelt);
 
   const filteredForUtfall =
     utfallFilter.length === 0
-      ? filteredForAnkeITR
-      : filteredForAnkeITR.filter((b) => utfallFilter.includes(b.resultat.utfallId));
+      ? filteredForFeilregistrertAndAnkeITR
+      : filteredForFeilregistrertAndAnkeITR.filter((b) => utfallFilter.includes(b.resultat.utfallId));
 
   const filteredForTilbakekreving =
     tilbakekrevingFilter === TilbakekrevingFilter.MED
@@ -89,11 +96,20 @@ export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnTyp
           registreringshjemlerFilter.some((h) => b.resultat.hjemmelIdSet.includes(h)),
         );
 
-  if (ignoreTildeltFilter || tildelingFilter === TildelingFilter.ALL) {
-    return filteredForRegistreringshjemler;
-  }
+  const requireTildelt = tildelingFilter === TildelingFilter.TILDELTE;
 
-  return filteredForInnsendingshjemler.filter((b) => b.isTildelt === (tildelingFilter === TildelingFilter.TILDELTE));
+  const filteredForTildeling =
+    tildelingFilter === TildelingFilter.ALL
+      ? filteredForRegistreringshjemler
+      : filteredForRegistreringshjemler.filter((b) => b.isTildelt === requireTildelt);
+
+  log.debug(
+    `Filtered ${behandlinger.length} to ${filteredForTildeling.length} behandlinger in ${Math.round(performance.now() - start)} ms`,
+    traceId,
+    generateSpanId(),
+  );
+
+  return filteredForTildeling;
 };
 
 const ANKE_I_TRYGDERETTEN_ID = '3';

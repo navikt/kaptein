@@ -7,20 +7,23 @@ import { TildelingFilter } from '@/app/query-types';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
-import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
+import { SakerPerSakstype as OldSakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
-import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
+import { TildelteSakerPerYtelseOgKlageenhet as OldTildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
 import { useData } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
-import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
+import { VarsletFrist as OldVarsletFrist } from '@/components/behandlinger/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { debugBehandlinger } from '@/components/debug';
 import { Alder } from '@/components/graphs/alder/graph';
 import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
+import { SakerPerSakstype } from '@/components/graphs/saker-per-sakstype/graph';
 import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
+import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/graph';
+import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
 import { browserLog } from '@/lib/browser-log';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
@@ -50,7 +53,12 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card>
-        <SakerPerSakstype behandlinger={data} sakstyper={sakstyper} />
+        <SakerPerSakstype tildelt finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card>
+        <OldSakerPerSakstype behandlinger={data} sakstyper={sakstyper} />
       </Card>
 
       {showsAlle ? (
@@ -79,15 +87,31 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
         <Card span={3}>
           <TildelteSakerPerYtelseOgKlageenhet
             title="Tildelte saker per ytelse og klageenhet"
-            behandlinger={tildelte}
-            relevantYtelser={relevantYtelser}
+            tildelt
+            finished={false}
+          />
+        </Card>
+      )}
+
+      {/* TODO: Remove */}
+      {showsLedige ? null : (
+        <Card span={3}>
+          <OldTildelteSakerPerYtelseOgKlageenhet
+            title="Tildelte saker per ytelse og klageenhet"
+            behandlinger={data}
             klageenheterkodeverk={klageenheterKodeverk}
+            relevantYtelser={relevantYtelser}
           />
         </Card>
       )}
 
       <Card>
-        <VarsletFrist behandlinger={data} />
+        <VarsletFrist tildelt finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card>
+        <OldVarsletFrist behandlinger={data} />
       </Card>
 
       <Card>

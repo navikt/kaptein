@@ -1,10 +1,11 @@
-import type { State, ThemeColors } from '@/components/graphs/saker-per-sakstype/types';
-import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
+import type { State } from '@/components/graphs/saker-per-sakstype/types';
+import { DARK } from '@/lib/echarts/dark';
+import { LIGHT } from '@/lib/echarts/light';
+import { SAKSTYPE_COLORS } from '@/lib/echarts/sakstype-colors';
+import type { GetGraphStateFn } from '@/lib/graphs';
+import type { Behandling, Sakstype } from '@/lib/server/types';
 
-export const getSakerPerSakstypeState = (
-  behandlinger: Behandling[],
-  sakstyper: IKodeverkSimpleValue<Sakstype>[],
-): State => {
+export const getSakerPerSakstypeState: GetGraphStateFn<State> = ({ filteredBehandlinger: behandlinger, sakstyper }) => {
   const map = behandlinger.reduce<Map<Sakstype, { value: number; name: string }>>((acc, curr) => {
     const existing = acc.get(curr.typeId);
 
@@ -19,22 +20,23 @@ export const getSakerPerSakstypeState = (
     return acc;
   }, new Map());
 
-  return { data: Object.values(Object.fromEntries(map)), colors: getSakstypeColors(behandlinger) };
+  return {
+    state: { data: Object.values(Object.fromEntries(map)), ...getSakstypeColors(behandlinger) },
+    count: behandlinger.length,
+  };
 };
 
-import { AppTheme } from '@/lib/app-theme';
-import { DARK } from '@/lib/echarts/dark';
-import { LIGHT } from '@/lib/echarts/light';
-import { SAKSTYPE_COLORS } from '@/lib/echarts/sakstype-colors';
+interface Colors {
+  darkColors: string[];
+  lightColors: string[];
+}
 
 // Due to a bug in pie chart when hovering (emphasis) we have to hard code the colors instead of using tokens
-const getSakstypeColors = (behandlinger: Behandling[]): ThemeColors[] => {
+const getSakstypeColors = (behandlinger: Behandling[]): Colors => {
   const relevantSakstyper = Array.from(new Set(behandlinger.map((b) => b.typeId)));
 
-  return relevantSakstyper
-    .map((s) => SAKSTYPE_COLORS[s])
-    .map<ThemeColors>((t) => ({
-      [AppTheme.LIGHT]: LIGHT[t],
-      [AppTheme.DARK]: DARK[t],
-    }));
+  const darkColors = relevantSakstyper.map((s) => SAKSTYPE_COLORS[s]).map((t) => DARK[t]);
+  const lightColors = relevantSakstyper.map((s) => SAKSTYPE_COLORS[s]).map((t) => LIGHT[t]);
+
+  return { darkColors, lightColors };
 };

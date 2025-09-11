@@ -16,7 +16,6 @@ export const parseFilters = (params: URLSearchParams) => {
   const toFilter = parseDate(params.get(QueryParam.TO));
   const tilbakekrevingFilter = parseTilbakekrevingFilter(params.get(QueryParam.TILBAKEKREVING));
   const utfallFilter = parseStringArray(params.get(QueryParam.UTFALL));
-  const ignoreTildeltFilter = params.has('ignoreTildeltFilter');
 
   return {
     finished,
@@ -31,7 +30,6 @@ export const parseFilters = (params: URLSearchParams) => {
     toFilter,
     tilbakekrevingFilter,
     utfallFilter,
-    ignoreTildeltFilter,
   };
 };
 

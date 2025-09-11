@@ -1,12 +1,14 @@
 import { isBefore } from 'date-fns';
-import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
 import { ExceededFrist, getFristColor } from '@/components/behandlinger/use-frist-color';
 import { getRelevantYtelser } from '@/components/graphs/common';
 import type { Serie, State } from '@/components/graphs/frist-i-kabal-per-ytelse/types';
-import type { EntryData } from '@/lib/graphs';
+import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getFristIKabalPerYtelseState = ({ behandlinger, ytelser }: GetGraphStateParams): EntryData<State> => {
+export const getFristIKabalPerYtelseState: GetGraphStateFn<State> = ({
+  filteredBehandlinger: behandlinger,
+  ytelser,
+}) => {
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(relevanteYtelser, behandlinger);
   const labels = getLabels(relevanteYtelser, series);
