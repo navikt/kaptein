@@ -5,6 +5,7 @@ import { format, startOfMonth } from 'date-fns';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
+import { TildelingFilter } from '@/app/query-types';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -24,6 +25,8 @@ export const Nav = () => {
     searchParams.delete(QueryParam.TO);
     searchParams.delete(QueryParam.REGISTRERINGSHJEMLER);
 
+    searchParams.get(QueryParam.TILDELING) ?? searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
+
     return searchParams.toString();
   }, [params]);
 
@@ -36,6 +39,7 @@ export const Nav = () => {
 
     searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
     searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);
+    searchParams.get(QueryParam.TILDELING) ?? searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
 
     return searchParams.toString();
   }, [params]);
