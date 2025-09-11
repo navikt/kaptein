@@ -4,7 +4,8 @@ import { ISO_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const parseFilters = (params: URLSearchParams) => {
-  const finished = params.has('finished');
+  const finished = parseBoolean(params.get('finished'));
+  const tildelt = parseBoolean(params.get('tildelt'));
   const ytelseFilter = parseStringArray(params.get(QueryParam.YTELSER));
   const klageenheterFilter = parseStringArray(params.get(QueryParam.KLAGEENHETER));
   const registreringshjemlerFilter = parseStringArray(params.get(QueryParam.REGISTRERINGSHJEMLER));
@@ -19,6 +20,7 @@ export const parseFilters = (params: URLSearchParams) => {
 
   return {
     finished,
+    tildelt,
     ytelseFilter,
     klageenheterFilter,
     registreringshjemlerFilter,
@@ -69,3 +71,5 @@ const parseDate = (value: string | null): Date | null => {
 
 const parseStringArray = (value: string | null): string[] =>
   value === null || value.length === 0 ? [] : value.split(',');
+
+const parseBoolean = (value: string | null): boolean | null => (value === null ? null : value === 'true');

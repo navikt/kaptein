@@ -15,14 +15,15 @@ import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   finished?: boolean;
+  tildelt?: boolean;
 }
 
 const TITLE = 'Alder';
 
-export const Alder = ({ finished }: Props) => {
+export const Alder = ({ finished, tildelt }: Props) => {
   const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
-  const { isInitialized, isLoading, state, count } = useGraphState<Serie>(Graph.ALDER, [], { finished });
+  const { isInitialized, isLoading, state, count } = useGraphState<Serie>(Graph.ALDER, [], { finished, tildelt });
 
   const color = useAgePieChartColors(state);
 

@@ -10,17 +10,18 @@ import { Graph } from '@/lib/graphs';
 
 interface Props {
   finished?: boolean;
+  tildelt?: boolean;
 }
 
 const TITLE = 'Saker per ytelse og sakstype';
 
-export const SakerPerYtelse = ({ finished }: Props) => {
+export const SakerPerYtelseOgSakstype = ({ finished, tildelt }: Props) => {
   const {
     isInitialized,
     isLoading,
     state: { series, labels },
     count,
-  } = useGraphState<State>(Graph.SAKER_PER_YTELSE_OG_SAKSTYPE, { series: [], labels: [] }, { finished });
+  } = useGraphState<State>(Graph.SAKER_PER_YTELSE_OG_SAKSTYPE, { series: [], labels: [] }, { finished, tildelt });
 
   if (!isInitialized) {
     return <GraphLoading />;

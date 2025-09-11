@@ -14,11 +14,12 @@ import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   finished?: boolean;
+  tildelt?: boolean;
 }
 
 const TITLE = 'Alder per ytelse';
 
-export const AlderPerYtelse = ({ finished }: Props) => {
+export const AlderPerYtelse = ({ finished, tildelt }: Props) => {
   const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
   const {

@@ -10,11 +10,12 @@ import { Graph } from '@/lib/graphs';
 
 interface Props {
   finished?: boolean;
+  tildelt?: boolean;
 }
 
 const TITLE = 'Frist i Kabal per ytelse';
 
-export const FristIKabalPerYtelse = ({ finished }: Props) => {
+export const FristIKabalPerYtelse = ({ finished, tildelt }: Props) => {
   const {
     isInitialized,
     isLoading,

@@ -3,7 +3,6 @@
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { useData } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
@@ -14,7 +13,8 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { debugBehandlinger } from '@/components/debug';
 import { Alder } from '@/components/graphs/alder/graph';
 import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
-import { SakerPerYtelse } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
+import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
+import { TildelteSakerPerKlageenhet } from '@/components/graphs/tildelte-saker-per-klageenhet/graph';
 import { browserLog } from '@/lib/browser-log';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
@@ -36,7 +36,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelse finished />
+        <SakerPerYtelseOgSakstype finished />
       </Card>
 
       <Card>
@@ -44,11 +44,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={3}>
-        <TildelteSakerPerKlageenhet
-          behandlinger={data}
-          klageenheter={klageenheterKodeverk}
-          title="Saker per klageenhet"
-        />
+        <TildelteSakerPerKlageenhet title="Saker per klageenhet" finished />
       </Card>
 
       <Card span={3}>

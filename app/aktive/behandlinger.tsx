@@ -7,7 +7,6 @@ import { TildelingFilter } from '@/app/query-types';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
-import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/old-saker-per-ytelse-og-sakstype';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
@@ -21,7 +20,7 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { debugBehandlinger } from '@/components/debug';
 import { Alder } from '@/components/graphs/alder/graph';
 import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
-import { SakerPerYtelse } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
+import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
 import { browserLog } from '@/lib/browser-log';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
@@ -47,12 +46,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelse />
-      </Card>
-
-      {/* TODO: Remove this when <SakerPerYtelse /> shows correct data */}
-      <Card span={3}>
-        <SakerPerYtelseOgSakstype behandlinger={data} relevantYtelser={relevantYtelser} sakstyper={sakstyper} />
+        <SakerPerYtelseOgSakstype tildelt finished={false} />
       </Card>
 
       <Card>

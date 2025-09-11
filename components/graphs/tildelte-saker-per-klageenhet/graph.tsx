@@ -11,15 +11,16 @@ import { Graph } from '@/lib/graphs';
 interface Props {
   title: string;
   finished?: boolean;
+  tildelt?: boolean;
 }
 
-export const TildelteSakerPerKlageenhet = ({ title, finished }: Props) => {
+export const TildelteSakerPerKlageenhet = ({ title, finished, tildelt }: Props) => {
   const {
     isInitialized,
     isLoading,
     state: { labels, values },
     count,
-  } = useGraphState<State>(Graph.TILDELTE_SAKER_PER_KLAGEENHET, { labels: [], values: [] }, { finished });
+  } = useGraphState<State>(Graph.TILDELTE_SAKER_PER_KLAGEENHET, { labels: [], values: [] }, { finished, tildelt });
 
   if (!isInitialized) {
     return <GraphLoading />;

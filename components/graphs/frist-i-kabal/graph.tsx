@@ -11,12 +11,16 @@ import { Graph } from '@/lib/graphs';
 
 interface Props {
   finished?: boolean;
+  tildelt?: boolean;
 }
 
 const TITLE = 'Frist i Kabal';
 
-export const FristIKabal = ({ finished }: Props) => {
-  const { isInitialized, isLoading, state, count } = useGraphState<Serie>(Graph.FRIST_I_KABAL, [], { finished });
+export const FristIKabal = ({ finished, tildelt }: Props) => {
+  const { isInitialized, isLoading, state, count } = useGraphState<Serie>(Graph.FRIST_I_KABAL, [], {
+    finished,
+    tildelt,
+  });
 
   const color = useFristPieChartColors(state);
 

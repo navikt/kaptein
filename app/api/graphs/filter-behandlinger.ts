@@ -8,6 +8,7 @@ import { TILBAKEKREVINGINNSENDINGSHJEMLER } from '@/lib/types/tilbakekrevingshje
 export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnType<typeof parseFilters>) => {
   const {
     finished,
+    tildelt,
     ytelseFilter,
     klageenheterFilter,
     registreringshjemlerFilter,
@@ -21,11 +22,17 @@ export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnTyp
     ignoreTildeltFilter,
   } = params;
 
-  const filteredForFeilregistrertAndFinished = behandlinger.filter(
-    (b) => b.feilregistrering === null && b.isAvsluttetAvSaksbehandler === finished,
-  );
+  const filteredForFeilregistrert = behandlinger.filter((b) => b.feilregistrering === null);
 
-  const filteredForAnkeITR = filteredForFeilregistrertAndFinished.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
+  const filteredForFinished =
+    finished === null
+      ? filteredForFeilregistrert
+      : filteredForFeilregistrert.filter((b) => b.isAvsluttetAvSaksbehandler === finished);
+
+  const filteredForTildelt =
+    tildelt === null ? filteredForFinished : filteredForFinished.filter((b) => b.isTildelt === tildelt);
+
+  const filteredForAnkeITR = filteredForTildelt.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
 
   const filteredForUtfall =
     utfallFilter.length === 0

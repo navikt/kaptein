@@ -5,6 +5,7 @@ export enum Graph {
   FRIST_I_KABAL_PER_YTELSE = 'frist-i-kabal-per-ytelse',
   FRIST_I_KABAL = 'frist-i-kabal',
   TILDELTE_SAKER_PER_KLAGEENHET = 'tildelte-saker-per-klageenhet',
+  SAKER_PER_SAKSTYPE = 'saker-per-sakstype',
 }
 
 const GRAPHS = Object.values(Graph);
