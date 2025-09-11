@@ -31,7 +31,8 @@ export const useData = (behandlinger: Behandling[]) => {
   const tilbakekreving = tilbakekrevingFilter ?? TilbakekrevingFilter.MED;
 
   return useMemo(() => {
-    const filteredForAnkeITR = behandlinger.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
+    const filteredForFeilregistrert = behandlinger.filter((b) => b.feilregistrering === null);
+    const filteredForAnkeITR = filteredForFeilregistrert.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
 
     const filteredForUtfall =
       utfall.length === 0 ? filteredForAnkeITR : filteredForAnkeITR.filter((b) => utfall.includes(b.resultat.utfallId));
