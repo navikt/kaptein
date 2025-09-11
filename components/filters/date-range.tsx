@@ -18,8 +18,6 @@ const END_OF_LAST_MONTH = endOfMonth(LAST_MONTH);
 const START_OF_MONTH = startOfMonth(TODAY);
 const START_OF_LAST_TERTIAL = startOfMonth(subMonths(TODAY, 4));
 const END_OF_LAST_TERTIAL = endOfMonth(subMonths(TODAY, 1));
-const START_OF_NEST_SISTE_TERTIAL = startOfMonth(subMonths(TODAY, 8));
-const END_OF_NEST_SISTE_TERTIAL = endOfMonth(subMonths(TODAY, 5));
 const START_OF_SISTE_12_MND = subMonths(TODAY, 12);
 const START_OF_THIS_YEAR = startOfYear(TODAY);
 const START_OF_LAST_YEAR = startOfYear(subYears(TODAY, 1));
@@ -91,12 +89,8 @@ export const DateRange = () => {
     () => from !== null && to !== null && isSameDay(from, START_OF_LAST_TERTIAL) && isSameDay(to, END_OF_LAST_TERTIAL),
     [from, to],
   );
-  const isNestSisteTertial = useMemo(
-    () =>
-      from !== null &&
-      to !== null &&
-      isSameDay(from, START_OF_NEST_SISTE_TERTIAL) &&
-      isSameDay(to, END_OF_NEST_SISTE_TERTIAL),
+  const isForrigeMåned = useMemo(
+    () => from !== null && to !== null && isSameDay(from, START_OF_LAST_MONTH) && isSameDay(to, END_OF_LAST_MONTH),
     [from, to],
   );
   const isSiste12Mnd = useMemo(
@@ -177,7 +171,7 @@ export const DateRange = () => {
         </Button>
 
         <Button
-          variant={isNestSisteTertial ? 'primary' : 'secondary'}
+          variant={isForrigeMåned ? 'primary' : 'secondary'}
           onClick={() => setSelected({ from: START_OF_LAST_MONTH, to: END_OF_LAST_MONTH })}
         >
           Forrige måned
