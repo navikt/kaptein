@@ -2,7 +2,7 @@ import { Reset } from '@/app/test/reset';
 import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
-import { Tilbakekreving } from '@/components/filters/tilbakekreving';
+import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import { getLovkildeToRegistreringshjemler, getSakstyperToUtfall, getYtelser } from '@/lib/server/api';
 
@@ -20,7 +20,7 @@ export const Filters = async () => {
         ytelser={ytelser}
         lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
       />
-      <Tilbakekreving />
+      <Tilbakekreving help={<HelpForFerdigstilte />} />
     </FilterWrapper>
   );
 };

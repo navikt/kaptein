@@ -6,14 +6,18 @@ import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
 interface Props {
+  title: string;
   behandlinger: Behandling[];
   relevantYtelser: IKodeverkSimpleValue[];
   klageenheterkodeverk: IKodeverkSimpleValue[];
 }
 
-const TITLE = 'Tildelte saker per ytelse og klageenhet';
-
-export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtelser, klageenheterkodeverk }: Props) => {
+export const TildelteSakerPerYtelseOgKlageenhet = ({
+  behandlinger,
+  relevantYtelser,
+  klageenheterkodeverk,
+  title,
+}: Props) => {
   const series = useMemo(
     () =>
       [...klageenheterkodeverk].map((enhet) => ({
@@ -35,7 +39,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtels
   );
 
   if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   const labels = relevantYtelser.map(
@@ -46,7 +50,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtels
     <EChart
       option={{
         title: {
-          text: TITLE,
+          text: title,
           subtext: `Viser data for ${behandlinger.length} tildelte saker`,
         },
         legend: {},

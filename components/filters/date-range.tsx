@@ -12,6 +12,9 @@ import { QueryParam } from '@/lib/types/query-param';
 const TODAY = new Date();
 const START_OF_KABAL = new Date('2021-01-01');
 
+const LAST_MONTH = subMonths(TODAY, 1);
+const START_OF_LAST_MONTH = startOfMonth(LAST_MONTH);
+const END_OF_LAST_MONTH = endOfMonth(LAST_MONTH);
 const START_OF_MONTH = startOfMonth(TODAY);
 const START_OF_LAST_TERTIAL = startOfMonth(subMonths(TODAY, 4));
 const END_OF_LAST_TERTIAL = endOfMonth(subMonths(TODAY, 1));
@@ -134,9 +137,9 @@ export const DateRange = () => {
 
         <Button
           variant={isNestSisteTertial ? 'primary' : 'secondary'}
-          onClick={() => setSelected({ from: START_OF_NEST_SISTE_TERTIAL, to: END_OF_NEST_SISTE_TERTIAL })}
+          onClick={() => setSelected({ from: START_OF_LAST_MONTH, to: END_OF_LAST_MONTH })}
         >
-          Nest siste tertial
+          Forrige måned
         </Button>
 
         <Button

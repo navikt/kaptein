@@ -44,11 +44,16 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={3}>
-        <TildelteSakerPerKlageenhet behandlinger={data} klageenheter={klageenheterKodeverk} />
+        <TildelteSakerPerKlageenhet
+          behandlinger={data}
+          klageenheter={klageenheterKodeverk}
+          title="Saker per klageenhet"
+        />
       </Card>
 
       <Card span={3}>
         <TildelteSakerPerYtelseOgKlageenhet
+          title="Saker per ytelse og klageenhet"
           behandlinger={data}
           relevantYtelser={relevantYtelser}
           klageenheterkodeverk={klageenheterKodeverk}
