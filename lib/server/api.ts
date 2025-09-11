@@ -85,6 +85,7 @@ export const getLovkildeToRegistreringshjemler = () =>
   getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/lovkildetoregistreringshjemler');
 export const getSakstyper = () => getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
 export const getSakstyperToUtfall = () => getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
+export const getInnsendingshjemlerMap = () => getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/hjemlermap');
 
 const ANKE_I_TRYGDERETTEN_ID = '3';
 

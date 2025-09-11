@@ -2,33 +2,25 @@
 
 import { BodyShort, HelpText, HStack, Label, List, ToggleGroup } from '@navikt/ds-react';
 import { ListItem } from '@navikt/ds-react/List';
-import { usePathname } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { isTilbakekrevingFilter, parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
 import { QueryParam } from '@/lib/types/query-param';
+import { TILBAKEKREVINGINNSENDINGSHJEMLER } from '@/lib/types/tilbakekrevingshjemler';
 
-export const Tilbakekreving = () => {
+interface Props {
+  help: React.ReactNode;
+}
+
+export const Tilbakekreving = ({ help }: Props) => {
   const [tilbakekreving, setTilbakekreving] = useQueryState(QueryParam.TILBAKEKREVING, parseAsTilbakekrevingFilter);
-  const pathname = usePathname();
-
-  const label = useMemo(() => {
-    switch (pathname) {
-      case '/ferdigstilte':
-        return <HelpForFerdigstilte />;
-      case '/aktive':
-        return <HelpForAktive />;
-      default:
-        return 'Tilbakekreving';
-    }
-  }, [pathname]);
 
   return (
     <ToggleGroup
       value={tilbakekreving ?? TilbakekrevingFilter.MED}
       onChange={(v) => setTilbakekreving(isTilbakekrevingFilter(v) ? v : TilbakekrevingFilter.MED)}
-      label={label}
+      label={help}
     >
       <ToggleGroup.Item value={TilbakekrevingFilter.MED}>Med tilbakekreving</ToggleGroup.Item>
       <ToggleGroup.Item value={TilbakekrevingFilter.UTEN}>Uten tilbakekreving</ToggleGroup.Item>
@@ -37,7 +29,7 @@ export const Tilbakekreving = () => {
   );
 };
 
-const HelpForFerdigstilte = () => (
+export const HelpForFerdigstilte = () => (
   <HStack gap="2">
     Tilbakekreving
     <HelpText placement="right">
@@ -51,23 +43,28 @@ const HelpForFerdigstilte = () => (
   </HStack>
 );
 
-const HelpForAktive = () => (
-  <HStack gap="2">
-    Tilbakekreving
-    <HelpText placement="right">
-      <BodyShort>
-        Sak satt med minst én av følgende innsendingshjemler regnes som aktiv tilbakekrevingssak i Kaptein:
-        <List>
-          <ListItem>folketrygdloven 22-15</ListItem>
-          <ListItem>folketrygdloven 22-15 dødsbo</ListItem>
-          <ListItem>alle andre varianter av folketrygdloven 22-15</ListItem>
-          <ListItem>folketrygdloven 22-17a</ListItem>
-          <ListItem>folketrygdloven 4-28</ListItem>
-          <ListItem>barnetrygdloven § 13</ListItem>
-          <ListItem>kontantstøtteloven § 11</ListItem>
-          <ListItem>lov om supplerende stønad § 13</ListItem>
-        </List>
-      </BodyShort>
-    </HelpText>
-  </HStack>
-);
+interface HelpForAktiveProps {
+  innsendingshjemlerMap: Record<string, string>;
+}
+
+export const HelpForAktive = ({ innsendingshjemlerMap }: HelpForAktiveProps) => {
+  const listItems = useMemo(
+    () =>
+      TILBAKEKREVINGINNSENDINGSHJEMLER.map((id) => ({ id, label: innsendingshjemlerMap[id] ?? id }))
+        .toSorted((a, b) => a.label.localeCompare(b.label))
+        .map(({ id, label }) => <ListItem key={id}>{label}</ListItem>),
+    [innsendingshjemlerMap],
+  );
+
+  return (
+    <HStack gap="2">
+      Tilbakekreving
+      <HelpText placement="right">
+        <BodyShort>
+          Sak satt med minst én av følgende innsendingshjemler regnes som aktiv tilbakekrevingssak i Kaptein:
+          <List>{listItems}</List>
+        </BodyShort>
+      </HelpText>
+    </HStack>
+  );
+};

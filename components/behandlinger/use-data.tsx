@@ -7,6 +7,7 @@ import { parseAsDate, parseAsLedigeFilter, parseAsTilbakekrevingFilter } from '@
 import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
 import type { Behandling } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
+import { TILBAKEKREVINGINNSENDINGSHJEMLER } from '@/lib/types/tilbakekrevingshjemler';
 
 export const useData = (behandlinger: Behandling[]) => {
   const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
@@ -113,29 +114,12 @@ const filterForTilbakekreving = (behandling: Behandling, filter: TilbakekrevingF
   // Filter on innsendingshjemler for active behandling
 
   if (filter === TilbakekrevingFilter.KUN) {
-    return behandling.hjemmelIdList.some((h) => TILBAKEKREVINGHJEMLER.includes(h));
+    return behandling.hjemmelIdList.some((h) => TILBAKEKREVINGINNSENDINGSHJEMLER.includes(h));
   }
 
   if (filter === TilbakekrevingFilter.UTEN) {
-    return !behandling.hjemmelIdList.some((h) => TILBAKEKREVINGHJEMLER.includes(h));
+    return !behandling.hjemmelIdList.some((h) => TILBAKEKREVINGINNSENDINGSHJEMLER.includes(h));
   }
 
   return true;
 };
-
-const TILBAKEKREVINGHJEMLER = [
-  'FTRL_22_15_TILBAKEKREVING',
-  'FTRL_22_15_TILBAKEKREVING_DOEDSBO',
-  '1000.022.015',
-  'FTRL_22_15_1_1',
-  'FTRL_22_15_1_2',
-  'FTRL_22_15_2',
-  'FTRL_22_15_4',
-  'FTRL_22_15_5',
-  'FTRL_22_15_6',
-  'FTRL_22_17A',
-  'FTRL_4_28',
-  '596',
-  '614',
-  '706',
-];
