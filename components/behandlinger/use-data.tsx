@@ -68,7 +68,7 @@ export const useData = (behandlinger: Behandling[]) => {
     const filteredForKlageenheter =
       klageenheter.length === 0
         ? filteredForYtelser
-        : filteredForYtelser.filter((b) => klageenheter.includes(b.fraNAVEnhet));
+        : filteredForYtelser.filter((b) => b.tildeltEnhet !== null && klageenheter.includes(b.tildeltEnhet));
 
     const filteredForInnsendingshjemler =
       innsendingshjemler.length === 0
