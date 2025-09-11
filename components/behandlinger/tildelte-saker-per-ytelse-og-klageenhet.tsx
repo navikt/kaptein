@@ -16,7 +16,7 @@ const TITLE = 'Tildelte saker per ytelse og klageenhet';
 export const TildelteSakerPerYtelseOgKlageenhet = ({ behandlinger, relevantYtelser, klageenheterkodeverk }: Props) => {
   const series = useMemo(
     () =>
-      [...klageenheterkodeverk, { id: null, navn: 'Ikke tildelt' }].map((enhet) => ({
+      [...klageenheterkodeverk].map((enhet) => ({
         type: 'bar',
         stack: 'total',
         label: { show: true },
