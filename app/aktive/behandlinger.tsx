@@ -9,6 +9,7 @@ import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse/graph
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/old-saker-per-ytelse-og-sakstype';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/graph';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -47,6 +48,11 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
     <ChartsWrapper>
       <Card span={3}>
         <SakerPerYtelse />
+      </Card>
+
+      {/* TODO: Remove this when <SakerPerYtelse /> shows correct data */}
+      <Card span={3}>
+        <SakerPerYtelseOgSakstype behandlinger={data} relevantYtelser={relevantYtelser} sakstyper={sakstyper} />
       </Card>
 
       <Card>
