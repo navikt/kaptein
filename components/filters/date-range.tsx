@@ -124,42 +124,21 @@ export const DateRange = () => {
 
   return (
     <VStack gap="4">
-      <DatePicker {...datepickerProps} dropdownCaption>
-        <VStack gap="4">
+      <DatePicker {...datepickerProps} dropdownCaption wrapperClassName="!w-full">
+        <HGrid columns={2} align="start" gap="2" className="!auto-cols-max">
           <DatePicker.Input
             {...fromInputProps}
+            className="w-full"
             error={fromErrors.length > 0 ? fromError : undefined}
-            label={
-              <HStack align="center" gap="1">
-                <span>Fra og med</span>
-                <Button
-                  variant="tertiary"
-                  className="shrink"
-                  size="small"
-                  onClick={resetFrom}
-                  icon={<ClockDashedIcon aria-hidden />}
-                />
-              </HStack>
-            }
+            label={<LabelWithReset label="Fra og med" resetLabel="Tilbakestill fra og med" onClick={resetFrom} />}
           />
 
           <DatePicker.Input
             {...toInputProps}
             error={toErrors.length > 0 ? toError : undefined}
-            label={
-              <HStack align="center" gap="1">
-                <span>Til og med</span>
-                <Button
-                  variant="tertiary"
-                  className="shrink"
-                  size="small"
-                  onClick={resetTo}
-                  icon={<ClockDashedIcon aria-hidden />}
-                />
-              </HStack>
-            }
+            label={<LabelWithReset label="Til og med" resetLabel="Tilbakestill til og med" onClick={resetTo} />}
           />
-        </VStack>
+        </HGrid>
       </DatePicker>
 
       <HGrid columns={2} gap="2">
@@ -208,3 +187,17 @@ export const DateRange = () => {
     </VStack>
   );
 };
+
+const LabelWithReset = ({ onClick, label, resetLabel }: { onClick: () => void; label: string; resetLabel: string }) => (
+  <HStack align="center" gap="1">
+    <span>{label}</span>
+    <Button
+      variant="tertiary"
+      className="shrink"
+      size="small"
+      onClick={onClick}
+      icon={<ClockDashedIcon aria-hidden />}
+      title={resetLabel}
+    />
+  </HStack>
+);

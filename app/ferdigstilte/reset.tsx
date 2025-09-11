@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowUndoIcon } from '@navikt/aksel-icons';
 import { Button } from '@navikt/ds-react';
 import { format, startOfMonth } from 'date-fns';
 import { usePathname, useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ export const Reset = () => {
   };
 
   return (
-    <Button variant="secondary" onClick={handleReset}>
+    <Button variant="secondary" onClick={handleReset} icon={<ArrowUndoIcon aria-hidden />}>
       Nullstill filtre
     </Button>
   );

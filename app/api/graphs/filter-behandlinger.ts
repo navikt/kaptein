@@ -1,10 +1,13 @@
-import { isAfter, isBefore } from 'date-fns';
+import { isAfter, isBefore, parse } from 'date-fns';
 import type { parseFilters } from '@/app/api/graphs/parse-params';
 import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 import type { Behandling } from '@/lib/server/types';
+import { TILBAKEKREVINGINNSENDINGSHJEMLER } from '@/lib/types/tilbakekrevingshjemler';
 
 export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnType<typeof parseFilters>) => {
   const {
+    finished,
     ytelseFilter,
     klageenheterFilter,
     registreringshjemlerFilter,
@@ -15,34 +18,32 @@ export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnTyp
     toFilter,
     tilbakekrevingFilter,
     utfallFilter,
+    ignoreTildeltFilter,
   } = params;
 
-  const ytelser = ytelseFilter ?? [];
-  const klageenheter = klageenheterFilter ?? [];
-  const registreringshjemler = registreringshjemlerFilter ?? [];
-  const innsendingshjemler = innsendingshjemlerFilter ?? [];
-  const sakstyper = sakstyperFilter ?? [];
-  const utfall = utfallFilter ?? [];
-  const tildeling = tildelingFilter ?? TildelingFilter.ALL;
-  const tilbakekreving = tilbakekrevingFilter ?? TilbakekrevingFilter.MED;
+  const filteredForFeilregistrertAndFinished = behandlinger.filter(
+    (b) => b.feilregistrering === null && b.isAvsluttetAvSaksbehandler === finished,
+  );
 
-  const filteredForAnkeITR = behandlinger.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
+  const filteredForAnkeITR = filteredForFeilregistrertAndFinished.filter((b) => b.typeId !== ANKE_I_TRYGDERETTEN_ID);
 
   const filteredForUtfall =
-    utfall.length === 0 ? filteredForAnkeITR : filteredForAnkeITR.filter((b) => utfall.includes(b.resultat.utfallId));
+    utfallFilter.length === 0
+      ? filteredForAnkeITR
+      : filteredForAnkeITR.filter((b) => utfallFilter.includes(b.resultat.utfallId));
 
   const filteredForTilbakekreving =
-    tilbakekreving === TilbakekrevingFilter.MED
+    tilbakekrevingFilter === TilbakekrevingFilter.MED
       ? filteredForUtfall
-      : filteredForUtfall.filter((b) => filterForTilbakekreving(b, tilbakekreving));
+      : filteredForUtfall.filter((b) => filterForTilbakekreving(b, tilbakekrevingFilter));
 
   const filteredForFrom =
     fromFilter === null
       ? filteredForTilbakekreving
       : filteredForTilbakekreving.filter((b) =>
           b.avsluttetAvSaksbehandlerDate === null
-            ? !isBefore(new Date(b.created), fromFilter)
-            : !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter),
+            ? !isBefore(parseISODate(b.created), fromFilter)
+            : !isBefore(parseISODate(b.avsluttetAvSaksbehandlerDate), fromFilter),
         );
 
   const filteredForTo =
@@ -50,39 +51,42 @@ export const filterBehandlinger = (behandlinger: Behandling[], params: ReturnTyp
       ? filteredForFrom
       : filteredForFrom.filter((b) =>
           b.avsluttetAvSaksbehandlerDate === null
-            ? !isAfter(new Date(b.created), toFilter)
-            : !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter),
+            ? !isAfter(parseISODate(b.created), toFilter)
+            : !isAfter(parseISODate(b.avsluttetAvSaksbehandlerDate), toFilter),
         );
 
   const filteredForSakstyper =
-    sakstyper.length === 0 ? filteredForTo : filteredForTo.filter((b) => sakstyper.includes(b.typeId));
+    sakstyperFilter.length === 0 ? filteredForTo : filteredForTo.filter((b) => sakstyperFilter.includes(b.typeId));
 
   const filteredForYtelser =
-    ytelser.length === 0 ? filteredForSakstyper : filteredForSakstyper.filter((b) => ytelser.includes(b.ytelseId));
+    ytelseFilter.length === 0
+      ? filteredForSakstyper
+      : filteredForSakstyper.filter((b) => ytelseFilter.includes(b.ytelseId));
 
   const filteredForKlageenheter =
-    klageenheter.length === 0
+    klageenheterFilter.length === 0
       ? filteredForYtelser
-      : filteredForYtelser.filter(({ tildeltEnhet }) => tildeltEnhet !== null && klageenheter.includes(tildeltEnhet));
-
-  const filteredForInnsendingshjemler =
-    innsendingshjemler.length === 0
-      ? filteredForKlageenheter
-      : filteredForKlageenheter.filter((b) => innsendingshjemler.some((h) => b.hjemmelIdList.includes(h)));
-
-  const filteredForRegistreringshjemler =
-    registreringshjemler.length === 0
-      ? filteredForInnsendingshjemler
-      : filteredForInnsendingshjemler.filter((b) =>
-          registreringshjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)),
+      : filteredForYtelser.filter(
+          ({ tildeltEnhet }) => tildeltEnhet !== null && klageenheterFilter.includes(tildeltEnhet),
         );
 
-  const filteredForTildelte =
-    tildeling === TildelingFilter.ALL
-      ? filteredForInnsendingshjemler
-      : filteredForInnsendingshjemler.filter((b) => b.isTildelt === (tildeling === TildelingFilter.TILDELTE));
+  const filteredForInnsendingshjemler =
+    innsendingshjemlerFilter.length === 0
+      ? filteredForKlageenheter
+      : filteredForKlageenheter.filter((b) => innsendingshjemlerFilter.some((h) => b.hjemmelIdList.includes(h)));
 
-  return { withoutTildelteFilter: filteredForRegistreringshjemler, withTildelteFilter: filteredForTildelte };
+  const filteredForRegistreringshjemler =
+    registreringshjemlerFilter.length === 0
+      ? filteredForInnsendingshjemler
+      : filteredForInnsendingshjemler.filter((b) =>
+          registreringshjemlerFilter.some((h) => b.resultat.hjemmelIdSet.includes(h)),
+        );
+
+  if (ignoreTildeltFilter || tildelingFilter === TildelingFilter.ALL) {
+    return filteredForRegistreringshjemler;
+  }
+
+  return filteredForInnsendingshjemler.filter((b) => b.isTildelt === (tildelingFilter === TildelingFilter.TILDELTE));
 };
 
 const ANKE_I_TRYGDERETTEN_ID = '3';
@@ -96,29 +100,14 @@ const filterForTilbakekreving = (behandling: Behandling, filter: TilbakekrevingF
   // Filter on innsendingshjemler for active behandling
 
   if (filter === TilbakekrevingFilter.KUN) {
-    return behandling.hjemmelIdList.some((h) => TILBAKEKREVINGHJEMLER.includes(h));
+    return behandling.hjemmelIdList.some((h) => TILBAKEKREVINGINNSENDINGSHJEMLER.includes(h));
   }
 
   if (filter === TilbakekrevingFilter.UTEN) {
-    return !behandling.hjemmelIdList.some((h) => TILBAKEKREVINGHJEMLER.includes(h));
+    return !behandling.hjemmelIdList.some((h) => TILBAKEKREVINGINNSENDINGSHJEMLER.includes(h));
   }
 
   return true;
 };
 
-const TILBAKEKREVINGHJEMLER = [
-  'FTRL_22_15_TILBAKEKREVING',
-  'FTRL_22_15_TILBAKEKREVING_DOEDSBO',
-  '1000.022.015',
-  'FTRL_22_15_1_1',
-  'FTRL_22_15_1_2',
-  'FTRL_22_15_2',
-  'FTRL_22_15_4',
-  'FTRL_22_15_5',
-  'FTRL_22_15_6',
-  'FTRL_22_17A',
-  'FTRL_4_28',
-  '596',
-  '614',
-  '706',
-];
+const parseISODate = (date: string) => parse(date, ISO_DATE_FORMAT, new Date());

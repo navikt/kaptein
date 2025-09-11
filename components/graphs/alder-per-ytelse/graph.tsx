@@ -2,8 +2,8 @@
 
 import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
-import type { State } from '@/components/behandlinger/alder-per-ytelse/types';
 import { DayPicker } from '@/components/behandlinger/day-picker';
+import type { State } from '@/components/graphs/alder-per-ytelse/types';
 import { GraphLoading } from '@/components/graphs/loading';
 import { GraphStatus } from '@/components/graphs/status';
 import { NoData } from '@/components/no-data/no-data';
@@ -12,16 +12,21 @@ import { EChart } from '@/lib/echarts/echarts';
 import { Graph } from '@/lib/graphs';
 import { QueryParam } from '@/lib/types/query-param';
 
+interface Props {
+  finished?: boolean;
+}
+
 const TITLE = 'Alder per ytelse';
 
-export const AlderPerYtelse = () => {
+export const AlderPerYtelse = ({ finished }: Props) => {
   const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
   const {
     isInitialized,
     isLoading,
-    state: { labels, series, count },
-  } = useGraphState<State>(Graph.ALDER_PER_YTELSE, { labels: [], series: [], count: 0 });
+    state: { labels, series },
+    count,
+  } = useGraphState<State>(Graph.ALDER_PER_YTELSE, { labels: [], series: [] }, { finished });
 
   if (!isInitialized) {
     return <GraphLoading />;

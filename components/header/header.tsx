@@ -52,7 +52,5 @@ const UserDropdown = () => (
         Logg ut
       </ActionMenu.Item>
     </ActionMenu.Group>
-
-    <ActionMenu.Divider />
   </ActionMenu.Content>
 );

@@ -1,12 +1,8 @@
 'use client';
 
-import { Alder } from '@/components/behandlinger/alder';
-import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse/graph';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
-import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/old-saker-per-ytelse-og-sakstype';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/graph';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { useData } from '@/components/behandlinger/use-data';
@@ -16,6 +12,9 @@ import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-p
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { debugBehandlinger } from '@/components/debug';
+import { Alder } from '@/components/graphs/alder/graph';
+import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
+import { SakerPerYtelse } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
 import { browserLog } from '@/lib/browser-log';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
@@ -37,12 +36,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelse />
-
-      {/* TODO: Remove this when <SakerPerYtelse /> shows correct data */}
-      <Card span={3}>
-        <SakerPerYtelseOgSakstype behandlinger={data} relevantYtelser={relevantYtelser} sakstyper={sakstyper} />
-      </Card>
+        <SakerPerYtelse finished />
       </Card>
 
       <Card>
@@ -83,7 +77,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={3}>
-        <Alder behandlinger={data} />
+        <Alder />
       </Card>
 
       <Card span={4}>

@@ -1,18 +1,23 @@
 import { createHash } from 'node:crypto';
 import { notFound } from 'next/navigation';
 import type { NextRequest } from 'next/server';
+import type { GetGraphStateFn } from '@/app/api/graphs/[graph]/data-fn-types';
 import { filterBehandlinger } from '@/app/api/graphs/filter-behandlinger';
 import { parseFilters } from '@/app/api/graphs/parse-params';
-import { getAlderPerYtelseState } from '@/components/behandlinger/alder-per-ytelse/data';
-import { getSakerPerYtelseOgSakstypeState } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/data';
+import { getAlderState } from '@/components/graphs/alder/data';
+import { getAlderPerYtelseState } from '@/components/graphs/alder-per-ytelse/data';
+import { getFristIKabalState } from '@/components/graphs/frist-i-kabal/data';
+import { getFristIKabalPerYtelseState } from '@/components/graphs/frist-i-kabal-per-ytelse/data';
+import { getSakerPerYtelseOgSakstypeState } from '@/components/graphs/saker-per-ytelse-og-sakstype/data';
+import { getTildelteSakerPerKlageenhetState } from '@/components/graphs/tildelte-saker-per-klageenhet/data';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { GRAPH_DATA_EVENT_NAME, Graph, isGraphName } from '@/lib/graphs';
 import { getLogger } from '@/lib/logger';
-import { getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
+import { getKlageenheter, getSakstyperWithoutAnkeITR, getYtelser } from '@/lib/server/api';
 import { BEHANDLINGER_DATA_LOADER } from '@/lib/server/behandlinger';
 import type { DataListener } from '@/lib/server/data-loader';
 import { generateSpanId, generateTraceId } from '@/lib/server/traceparent';
-import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type { Behandling } from '@/lib/server/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,21 +31,24 @@ interface Context {
 
 export async function GET(request: NextRequest, { params }: Context) {
   const graphName = (await params).graph;
+
+  if (!isGraphName(graphName)) {
+    return notFound();
+  }
+
   const log = getLogger(`graphs-${graphName}`);
   const { searchParams } = request.nextUrl;
   const filters = parseFilters(searchParams);
   const traceId = generateTraceId();
   const spanId = generateSpanId();
 
-  if (!isGraphName(graphName)) {
-    return notFound();
-  }
-
-  const getData = GRAPH_DATA_LOADERS[graphName];
+  const getGraphState = GRAPH_DATA_LOADERS[graphName];
 
   try {
     const ytelser = await getYtelser();
     const sakstyper = await getSakstyperWithoutAnkeITR();
+    const klageenheter = await getKlageenheter();
+
     const initialBehandlinger = BEHANDLINGER_DATA_LOADER.getData();
 
     const textEncoder = new TextEncoder();
@@ -50,9 +58,16 @@ export async function GET(request: NextRequest, { params }: Context) {
     const eventStream = new ReadableStream({
       start(controller) {
         listener = (behandlinger) => {
-          const { withTildelteFilter } = filterBehandlinger(behandlinger, filters);
+          const filteredBehandlinger = filterBehandlinger(behandlinger, filters);
 
-          const json = getData(withTildelteFilter, ytelser, sakstyper, searchParams);
+          const json = getGraphState({
+            behandlinger: filteredBehandlinger,
+            ytelser,
+            sakstyper,
+            klageenheter,
+            searchParams,
+          });
+
           controller.enqueue(
             textEncoder.encode(`event: ${GRAPH_DATA_EVENT_NAME}\nid: ${hash(json)}\ndata: ${json}\n\n`),
           );
@@ -95,20 +110,18 @@ export async function GET(request: NextRequest, { params }: Context) {
   }
 }
 
-const GRAPH_DATA_LOADERS: Record<
-  Graph,
-  (
-    behandlinger: Behandling[],
-    ytelser: IYtelse[],
-    sakstyper: IKodeverkSimpleValue<Sakstype>[],
-    searchParams: URLSearchParams,
-  ) => string
-> = {
-  [Graph.SAKER_PER_YTELSE_OG_SAKSTYPE]: (behandlinger, ytelser, sakstyper) =>
-    JSON.stringify(getSakerPerYtelseOgSakstypeState(behandlinger, ytelser, sakstyper)),
+const GRAPH_DATA_LOADERS: Record<Graph, GetGraphStateFn> = {
+  [Graph.SAKER_PER_YTELSE_OG_SAKSTYPE]: (...args) => JSON.stringify(getSakerPerYtelseOgSakstypeState(...args)),
 
-  [Graph.ALDER_PER_YTELSE]: (behandlinger, ytelser, _sakstyper, searchParams) =>
-    JSON.stringify(getAlderPerYtelseState(behandlinger, ytelser, searchParams)),
+  [Graph.ALDER_PER_YTELSE]: (...args) => JSON.stringify(getAlderPerYtelseState(...args)),
+
+  [Graph.ALDER]: (...args) => JSON.stringify(getAlderState(...args)),
+
+  [Graph.FRIST_I_KABAL_PER_YTELSE]: (...args) => JSON.stringify(getFristIKabalPerYtelseState(...args)),
+
+  [Graph.FRIST_I_KABAL]: (...args) => JSON.stringify(getFristIKabalState(...args)),
+
+  [Graph.TILDELTE_SAKER_PER_KLAGEENHET]: (...args) => JSON.stringify(getTildelteSakerPerKlageenhetState(...args)),
 };
 
 const hash = (input: string, length = 8): string =>

@@ -1,29 +1,20 @@
-import type { Serie, State } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/types';
+import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
+import { getRelevantYtelser } from '@/components/graphs/common';
+import type { Serie, State } from '@/components/graphs/saker-per-ytelse-og-sakstype/types';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
-import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type { EntryData } from '@/lib/graphs';
+import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
-export const getSakerPerYtelseOgSakstypeState = (
-  behandlinger: Behandling[],
-  ytelser: IYtelse[],
-  sakstyper: IKodeverkSimpleValue<Sakstype>[],
-): State => {
+export const getSakerPerYtelseOgSakstypeState = ({
+  behandlinger,
+  ytelser,
+  sakstyper,
+}: GetGraphStateParams): EntryData<State> => {
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(sakstyper, relevanteYtelser, behandlinger);
   const labels = getLabels(relevanteYtelser, series);
 
-  return { series, labels, count: behandlinger.length };
-};
-
-const getRelevantYtelser = (behandlinger: Behandling[], ytelser: IYtelse[]): IKodeverkSimpleValue[] => {
-  const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
-
-  return ids
-    .map((id) => {
-      const kodeverk = ytelser.find((k) => k.id === id);
-
-      return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
-    })
-    .toSorted((a, b) => a.navn.localeCompare(b.navn));
+  return { state: { series, labels }, count: behandlinger.length };
 };
 
 const getSeries = (
@@ -31,7 +22,7 @@ const getSeries = (
   relevantYtelser: IKodeverkSimpleValue[],
   behandlinger: Behandling[],
 ) =>
-  sakstyper.map<Serie>((type) => ({
+  sakstyper.map((type) => ({
     type: 'bar',
     stack: 'total',
     label: { show: true },

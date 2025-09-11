@@ -1,20 +1,33 @@
 'use client';
 
-import type { State } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/types';
+import type { State } from '@/components/graphs/frist-i-kabal-per-ytelse/types';
 import { GraphLoading } from '@/components/graphs/loading';
 import { GraphStatus } from '@/components/graphs/status';
 import { NoData } from '@/components/no-data/no-data';
 import { useGraphState } from '@/lib/client/use-graph-state';
 import { EChart } from '@/lib/echarts/echarts';
+import { Graph } from '@/lib/graphs';
 
-const TITLE = 'Saker per ytelse og sakstype';
+interface Props {
+  finished?: boolean;
+}
 
-export const SakerPerYtelse = () => {
+const TITLE = 'Frist i Kabal per ytelse';
+
+export const FristIKabalPerYtelse = ({ finished }: Props) => {
   const {
     isInitialized,
     isLoading,
-    state: { series, labels, count },
-  } = useGraphState<State>('saker-per-ytelse-og-sakstype', { series: [], labels: [], count: 0 });
+    state: { labels, series },
+    count,
+  } = useGraphState<State>(
+    Graph.FRIST_I_KABAL_PER_YTELSE,
+    {
+      labels: [],
+      series: [],
+    },
+    { finished },
+  );
 
   if (!isInitialized) {
     return <GraphLoading />;
@@ -32,7 +45,6 @@ export const SakerPerYtelse = () => {
             text: TITLE,
             subtext: `Viser data for ${count} saker`,
           },
-          legend: {},
           tooltip: {
             trigger: 'axis',
             axisPointer: {

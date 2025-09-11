@@ -1,3 +1,5 @@
+import type { Age } from '@/components/behandlinger/use-frist-color';
+
 export interface Serie {
   type: string;
   stack: string;
@@ -7,7 +9,7 @@ export interface Serie {
   emphasis: {
     focus: string;
   };
-  name: string;
+  name: Age;
   color: string;
   data: (number | null)[];
 }
@@ -15,5 +17,4 @@ export interface Serie {
 export interface State {
   series: Serie[];
   labels: string[];
-  count: number;
 }

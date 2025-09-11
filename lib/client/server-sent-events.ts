@@ -1,4 +1,3 @@
-import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { browserLog } from '@/lib/browser-log';
 import { isLocal } from '@/lib/environment';
 
@@ -13,12 +12,12 @@ export class ServerSentEventManager<E extends string = string> {
   private events: EventSource;
   private listeners: EventListener<E>[] = [];
   private url: string;
-  private readonly queryParams?: ReadonlyURLSearchParams;
+  private readonly queryParams?: URLSearchParams;
   private lastEventId: string | null = null;
 
   public isConnected = false;
 
-  constructor(url: string, queryParams?: ReadonlyURLSearchParams, initialEventId: string | null = null) {
+  constructor(url: string, queryParams?: URLSearchParams, initialEventId: string | null = null) {
     this.url = url;
     this.queryParams = queryParams;
     this.lastEventId = initialEventId;

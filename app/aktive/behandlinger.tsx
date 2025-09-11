@@ -4,14 +4,11 @@ import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
-import { Alder } from '@/components/behandlinger/alder';
-import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse/graph';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/old-saker-per-ytelse-og-sakstype';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { SakerPerYtelse } from '@/components/behandlinger/saker-per-ytelse-og-sakstype/graph';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
@@ -22,6 +19,9 @@ import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-p
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { debugBehandlinger } from '@/components/debug';
+import { Alder } from '@/components/graphs/alder/graph';
+import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
+import { SakerPerYtelse } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
 import { browserLog } from '@/lib/browser-log';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
@@ -109,7 +109,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card span={3}>
-        <Alder behandlinger={data} />
+        <Alder />
       </Card>
 
       <Card span={4}>
