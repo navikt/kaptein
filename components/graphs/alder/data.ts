@@ -1,9 +1,8 @@
-import type { GetGraphStateParams } from '@/app/api/graphs/[graph]/data-fn-types';
 import { Age } from '@/components/behandlinger/use-frist-color';
 import type { Serie } from '@/components/graphs/alder/types';
-import type { EntryData } from '@/lib/graphs';
+import type { GetGraphStateFn } from '@/lib/graphs';
 
-export const getAlderState = ({ behandlinger, searchParams }: GetGraphStateParams): EntryData<Serie> => {
+export const getAlderState: GetGraphStateFn<Serie> = ({ filteredBehandlinger: behandlinger, searchParams }) => {
   const maxAge = parseMaxAge(searchParams);
 
   const map = behandlinger.reduce<Record<Age, number>>(

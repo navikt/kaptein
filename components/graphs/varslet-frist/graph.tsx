@@ -1,10 +1,10 @@
 'use client';
 
+import { useFristPieChartColors } from '@/components/behandlinger/use-frist-color';
 import { GraphLoading } from '@/components/graphs/loading';
-import type { State } from '@/components/graphs/saker-per-sakstype/types';
 import { GraphStatus } from '@/components/graphs/status';
+import type { State } from '@/components/graphs/varslet-frist/type';
 import { NoData } from '@/components/no-data/no-data';
-import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { useGraphState } from '@/lib/client/use-graph-state';
 import { EChart } from '@/lib/echarts/echarts';
 import { Graph } from '@/lib/graphs';
@@ -14,27 +14,19 @@ interface Props {
   tildelt?: boolean;
 }
 
-const TITLE = 'Saker per sakstype';
+const TITLE = 'Varslet frist';
 
-export const SakerPerSakstype = ({ finished, tildelt }: Props) => {
-  const theme = useAppTheme();
+export const VarsletFrist = ({ finished, tildelt }: Props) => {
+  const { isInitialized, isLoading, state, count } = useGraphState<State>(Graph.VARSLET_FRIST, [], {
+    finished,
+    tildelt,
+  });
 
-  const {
-    isInitialized,
-    isLoading,
-    state: { data, darkColors, lightColors },
-    count,
-  } = useGraphState<State>(
-    Graph.SAKER_PER_SAKSTYPE,
-    { data: [], darkColors: [], lightColors: [] },
-    { finished, tildelt },
-  );
+  const color = useFristPieChartColors(state);
 
   if (!isInitialized) {
     return <GraphLoading />;
   }
-
-  const color = theme === AppTheme.DARK ? darkColors : lightColors;
 
   if (count === 0) {
     return <NoData title={TITLE} />;
@@ -46,7 +38,6 @@ export const SakerPerSakstype = ({ finished, tildelt }: Props) => {
         option={{
           title: {
             text: TITLE,
-            subtext: `Viser data for ${count} saker`,
           },
           tooltip: {
             trigger: 'item',
@@ -60,7 +51,7 @@ export const SakerPerSakstype = ({ finished, tildelt }: Props) => {
               color,
               type: 'pie',
               radius: '50%',
-              data,
+              data: state,
               label: {
                 formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
               },
