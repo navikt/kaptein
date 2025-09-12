@@ -10,6 +10,7 @@ export enum QueryParam {
   TILBAKEKREVING = 'tbk',
   UTFALL = 'u',
   ALDER_MAX_DAYS = 'ma',
+  ALDER_PER_YTELSE_MAX_DAYS = 'apyma',
 }
 
 export const ALL_QUERY_PARAMS = Object.values(QueryParam);

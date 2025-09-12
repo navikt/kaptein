@@ -15,9 +15,10 @@ interface Props {
   options: Option[];
 }
 
+const CUSTOM = 'custom';
+
 export const DayPicker = ({ value, setValue, title, options }: Props) => {
-  const isWeeks = value !== null && value % 7 === 0;
-  const [toggleGroupValue, setToggleGroupValue] = useState(isWeeks ? String(value / 7) : 'custom');
+  const [toggleGroupValue, setToggleGroupValue] = useState<string | undefined>(value?.toString() ?? undefined);
   const [textFieldValue, setTextFieldValue] = useState((7 * 12).toString());
 
   useEffect(() => {
@@ -27,10 +28,16 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
       if (!Number.isNaN(num)) {
         setValue(num);
       }
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [textFieldValue, setValue]);
+
+  useEffect(() => {
+    if (toggleGroupValue !== CUSTOM && value != null && value.toString() !== textFieldValue) {
+      setTextFieldValue(value.toString());
+    }
+  }, [value, textFieldValue, toggleGroupValue]);
 
   return (
     <HStack gap="4">
@@ -41,7 +48,7 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
         onChange={(v) => {
           setToggleGroupValue(v);
 
-          if (v === 'custom') {
+          if (v === CUSTOM) {
             const num = Number.parseInt(textFieldValue, 10);
 
             if (!Number.isNaN(num)) {
@@ -72,7 +79,7 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
         type="number"
         value={textFieldValue}
         onChange={({ target }) => setTextFieldValue(target.value)}
-        disabled={toggleGroupValue !== 'custom'}
+        disabled={toggleGroupValue !== CUSTOM}
         label="Dager"
       />
     </HStack>

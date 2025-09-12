@@ -4,7 +4,7 @@ import { InternalHeader } from '@navikt/ds-react/InternalHeader';
 import { format, startOfMonth } from 'date-fns';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { TildelingFilter } from '@/app/query-types';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
@@ -18,6 +18,13 @@ export const Nav = () => {
   const pathname = usePathname();
   const params = useSearchParams();
 
+  const setDefaultParams = useCallback((searchParams: URLSearchParams) => {
+    searchParams.get(QueryParam.TILDELING) ?? searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
+    searchParams.get(QueryParam.ALDER_MAX_DAYS) ?? searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
+    searchParams.get(QueryParam.ALDER_PER_YTELSE_MAX_DAYS) ??
+      searchParams.set(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
+  }, []);
+
   const aktiveParams = useMemo(() => {
     const searchParams = new URLSearchParams(params.toString());
 
@@ -25,11 +32,10 @@ export const Nav = () => {
     searchParams.delete(QueryParam.TO);
     searchParams.delete(QueryParam.REGISTRERINGSHJEMLER);
 
-    searchParams.get(QueryParam.TILDELING) ?? searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
-    searchParams.get(QueryParam.ALDER_MAX_DAYS) ?? searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
+    setDefaultParams(searchParams);
 
     return searchParams.toString();
-  }, [params]);
+  }, [params, setDefaultParams]);
 
   const ferdigstilteParams = useMemo(() => {
     const searchParams = new URLSearchParams(params.toString());
@@ -40,11 +46,11 @@ export const Nav = () => {
 
     searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
     searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);
-    searchParams.get(QueryParam.TILDELING) ?? searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
-    searchParams.get(QueryParam.ALDER_MAX_DAYS) ?? searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
+
+    setDefaultParams(searchParams);
 
     return searchParams.toString();
-  }, [params]);
+  }, [params, setDefaultParams]);
 
   return (
     <>
