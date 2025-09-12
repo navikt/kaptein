@@ -100,12 +100,15 @@ export const EChart = ({ option, width = '100%', height = '100%', className }: P
   }, [option, theme]);
 
   // Update theme when it changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: setOption(option) is a workaround for a bug in ECharts
   useEffect(() => {
     if (eChartsRef.current === null) {
       return;
     }
 
     eChartsRef.current.setTheme(theme);
+    // Without this eChart would show data from previous filtering after changing theme
+    eChartsRef.current.setOption(option);
   }, [theme]);
 
   return <div style={{ width, height }} ref={ref} className={className} />;
