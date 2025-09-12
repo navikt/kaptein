@@ -5,7 +5,7 @@ import { SAKSTYPE_COLORS } from '@/lib/echarts/sakstype-colors';
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, Sakstype } from '@/lib/server/types';
 
-export const getSakerPerSakstypeState: GetGraphStateFn<State> = ({ filteredBehandlinger: behandlinger, sakstyper }) => {
+export const getSakerPerSakstypeState: GetGraphStateFn<State> = ({ behandlinger, sakstyper }) => {
   const map = behandlinger.reduce<Map<Sakstype, { value: number; name: string }>>((acc, curr) => {
     const existing = acc.get(curr.typeId);
 

@@ -27,7 +27,7 @@ export const LedigeVsTildelte = ({ behandlinger }: Props) => {
       return acc;
     }, new Map());
 
-    return Object.values(Object.fromEntries(map));
+    return [...map.values()];
   }, [behandlinger]);
 
   if (behandlinger.length === 0) {
@@ -39,6 +39,7 @@ export const LedigeVsTildelte = ({ behandlinger }: Props) => {
       option={{
         title: {
           text: TITLE,
+          subtext: `Viser data for ${behandlinger.length} saker`,
           left: 'center',
         },
         tooltip: {

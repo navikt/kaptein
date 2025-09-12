@@ -20,7 +20,7 @@ interface Props {
 const TITLE = 'Alder per ytelse';
 
 export const AlderPerYtelse = ({ finished, tildelt }: Props) => {
-  const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
+  const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, parseAsInteger);
 
   const {
     isInitialized,

@@ -4,7 +4,7 @@ import type { Serie } from '@/components/graphs/frist-i-kabal/types';
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling } from '@/lib/server/types';
 
-export const getFristIKabalState: GetGraphStateFn<Serie> = ({ filteredBehandlinger: behandlinger }) => {
+export const getFristIKabalState: GetGraphStateFn<Serie> = ({ behandlinger }) => {
   const state = getData(behandlinger);
 
   return { state, count: behandlinger.length };

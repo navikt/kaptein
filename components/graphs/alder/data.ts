@@ -1,13 +1,14 @@
 import { Age } from '@/components/behandlinger/use-frist-color';
-import type { Serie } from '@/components/graphs/alder/types';
+import type { State } from '@/components/graphs/alder/types';
 import type { GetGraphStateFn } from '@/lib/graphs';
+import { QueryParam } from '@/lib/types/query-param';
 
-export const getAlderState: GetGraphStateFn<Serie> = ({ filteredBehandlinger: behandlinger, searchParams }) => {
+export const getAlderState: GetGraphStateFn<State> = ({ behandlinger, searchParams }) => {
   const maxAge = parseMaxAge(searchParams);
 
   const map = behandlinger.reduce<Record<Age, number>>(
     (acc, curr) => {
-      if (curr.ageKA > (maxAge ?? 0)) {
+      if (curr.ageKA > maxAge) {
         acc[Age.OLDER] = acc[Age.OLDER] + 1;
       } else {
         acc[Age.YOUNGER] = acc[Age.YOUNGER] + 1;
@@ -27,14 +28,14 @@ export const getAlderState: GetGraphStateFn<Serie> = ({ filteredBehandlinger: be
   return { count: behandlinger.length, state };
 };
 
-const parseMaxAge = (searchParams: URLSearchParams): number | null => {
-  const maxAge = searchParams.get('ma');
+const parseMaxAge = (searchParams: URLSearchParams): number => {
+  const maxAge = searchParams.get(QueryParam.ALDER_MAX_DAYS);
 
   if (maxAge === null) {
-    return null;
+    return 0;
   }
 
   const parsed = Number.parseInt(maxAge, 10);
 
-  return Number.isNaN(parsed) ? null : parsed;
+  return Number.isNaN(parsed) ? 0 : parsed;
 };

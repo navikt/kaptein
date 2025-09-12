@@ -7,11 +7,14 @@ import { getAlderState } from '@/components/graphs/alder/data';
 import { getAlderPerYtelseState } from '@/components/graphs/alder-per-ytelse/data';
 import { getFristIKabalState } from '@/components/graphs/frist-i-kabal/data';
 import { getFristIKabalPerYtelseState } from '@/components/graphs/frist-i-kabal-per-ytelse/data';
+import { getFristPerYtelseState } from '@/components/graphs/frist-per-ytelse/data';
+import { getLedigeVsTildelteState } from '@/components/graphs/ledige-vs-tildelte/data';
 import { getSakerPerSakstypeState } from '@/components/graphs/saker-per-sakstype/data';
 import { getSakerPerYtelseOgSakstypeState } from '@/components/graphs/saker-per-ytelse-og-sakstype/data';
 import { getTildelteSakerPerKlageenhetState } from '@/components/graphs/tildelte-saker-per-klageenhet/data';
 import { getTildelteSakerPerYtelseOgKlageenhetState } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/data';
 import { getVarsletFristState } from '@/components/graphs/varslet-frist/data';
+import { getVarsletFristPerYtelseState } from '@/components/graphs/varslet-frist-per-ytelse/data';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { type GetGraphStateJsonFn, GRAPH_DATA_EVENT_NAME, Graph, isGraphName } from '@/lib/graphs';
 import { getLogger } from '@/lib/logger';
@@ -44,10 +47,6 @@ export async function GET(request: NextRequest, { params }: Context) {
   const traceId = generateTraceId();
   const spanId = generateSpanId();
 
-  if (graphName === Graph.SAKER_PER_YTELSE_OG_SAKSTYPE) {
-    console.log('Graph.SAKER_PER_YTELSE_OG_SAKSTYPE filters', filters);
-  }
-
   const getGraphState = GRAPH_DATA_LOADERS[graphName];
 
   try {
@@ -67,9 +66,7 @@ export async function GET(request: NextRequest, { params }: Context) {
           const filteredBehandlinger = filterBehandlinger(behandlinger, filters, traceId);
 
           const json = getGraphState({
-            filteredBehandlinger: filteredBehandlinger,
-            activeBehandlinger: filteredBehandlinger.filter((b) => b.isTildelt),
-            finishedBehandlinger: filteredBehandlinger.filter((b) => b.isAvsluttetAvSaksbehandler),
+            behandlinger: filteredBehandlinger,
             ytelser,
             sakstyper,
             klageenheter,
@@ -137,6 +134,12 @@ const GRAPH_DATA_LOADERS: Record<Graph, GetGraphStateJsonFn> = {
     JSON.stringify(getTildelteSakerPerYtelseOgKlageenhetState(...args)),
 
   [Graph.VARSLET_FRIST]: (...args) => JSON.stringify(getVarsletFristState(...args)),
+
+  [Graph.VARSLET_FRIST_PER_YTELSE]: (...args) => JSON.stringify(getVarsletFristPerYtelseState(...args)),
+
+  [Graph.FRIST_PER_YTELSE]: (...args) => JSON.stringify(getFristPerYtelseState(...args)),
+
+  [Graph.LEDIGE_VS_TILDELTE]: (...args) => JSON.stringify(getLedigeVsTildelteState(...args)),
 };
 
 const hash = (input: string, length = 8): string =>

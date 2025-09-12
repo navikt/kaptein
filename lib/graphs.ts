@@ -10,6 +10,9 @@ export enum Graph {
   SAKER_PER_SAKSTYPE = 'saker-per-sakstype',
   TILDELTE_SAKER_PER_YTELSE_OG_KLAGEENHET = 'tildelte-saker-per-ytelse-og-klageenhet',
   VARSLET_FRIST = 'varslet-frist',
+  VARSLET_FRIST_PER_YTELSE = 'varslet-frist-per-ytelse',
+  FRIST_PER_YTELSE = 'frist-per-ytelse',
+  LEDIGE_VS_TILDELTE = 'ledige-vs-tildelte',
 }
 
 const GRAPHS = Object.values(Graph);
@@ -24,9 +27,7 @@ export interface EntryData<S> {
 }
 
 export interface GetGraphStateParams {
-  filteredBehandlinger: Behandling[];
-  activeBehandlinger: Behandling[];
-  finishedBehandlinger: Behandling[];
+  behandlinger: Behandling[];
   ytelser: IYtelse[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
   klageenheter: IKodeverkSimpleValue[];

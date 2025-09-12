@@ -17,6 +17,8 @@ export const filterBehandlinger = (
   const start = performance.now();
 
   const {
+    finished,
+    tildelt,
     ytelseFilter,
     klageenheterFilter,
     registreringshjemlerFilter,
@@ -33,18 +35,18 @@ export const filterBehandlinger = (
     (b) => b.feilregistrering === null && b.typeId !== ANKE_I_TRYGDERETTEN_ID,
   );
 
-  // const filteredForFinished =
-  //   finished === null
-  //     ? filteredForFeilregistrertAndAnkeITR
-  //     : filteredForFeilregistrertAndAnkeITR.filter((b) => b.isAvsluttetAvSaksbehandler === finished);
+  const filteredForFinished =
+    finished === null
+      ? filteredForFeilregistrertAndAnkeITR
+      : filteredForFeilregistrertAndAnkeITR.filter((b) => b.isAvsluttetAvSaksbehandler === finished);
 
-  // const filteredForTildelt =
-  //   tildelt === null ? filteredForFinished : filteredForFinished.filter((b) => b.isTildelt === tildelt);
+  const filteredForTildelt =
+    tildelt === null ? filteredForFinished : filteredForFinished.filter((b) => b.isTildelt === tildelt);
 
   const filteredForUtfall =
     utfallFilter.length === 0
-      ? filteredForFeilregistrertAndAnkeITR
-      : filteredForFeilregistrertAndAnkeITR.filter((b) => utfallFilter.includes(b.resultat.utfallId));
+      ? filteredForTildelt
+      : filteredForTildelt.filter((b) => utfallFilter.includes(b.resultat.utfallId));
 
   const filteredForTilbakekreving =
     tilbakekrevingFilter === TilbakekrevingFilter.MED

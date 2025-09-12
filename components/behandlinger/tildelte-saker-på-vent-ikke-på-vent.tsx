@@ -40,6 +40,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
       option={{
         title: {
           text: TITLE,
+          subtext: `Viser data for ${behandlinger.length} saker`,
         },
         tooltip: {
           trigger: 'item',

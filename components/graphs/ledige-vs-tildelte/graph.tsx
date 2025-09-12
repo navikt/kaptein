@@ -1,7 +1,6 @@
 'use client';
 
-import { useFristPieChartColors } from '@/components/behandlinger/use-frist-color';
-import type { Serie } from '@/components/graphs/frist-i-kabal/types';
+import type { State } from '@/components/graphs/ledige-vs-tildelte/types';
 import { GraphLoading } from '@/components/graphs/loading';
 import { GraphStatus } from '@/components/graphs/status';
 import { NoData } from '@/components/no-data/no-data';
@@ -10,19 +9,17 @@ import { EChart } from '@/lib/echarts/echarts';
 import { Graph } from '@/lib/graphs';
 
 interface Props {
-  finished?: boolean;
   tildelt?: boolean;
+  finished?: boolean;
 }
 
-const TITLE = 'Frist i Kabal';
+const TITLE = 'Tildelte/ledige saker';
 
-export const FristIKabal = ({ finished, tildelt }: Props) => {
-  const { isInitialized, isLoading, state, count } = useGraphState<Serie>(Graph.FRIST_I_KABAL, [], {
-    finished,
+export const LedigeVsTildelte = ({ tildelt, finished }: Props) => {
+  const { isInitialized, isLoading, state, count } = useGraphState<State>(Graph.LEDIGE_VS_TILDELTE, [], {
     tildelt,
+    finished,
   });
-
-  const color = useFristPieChartColors(state);
 
   if (!isInitialized) {
     return <GraphLoading />;
@@ -39,6 +36,7 @@ export const FristIKabal = ({ finished, tildelt }: Props) => {
           title: {
             text: TITLE,
             subtext: `Viser data for ${count} saker`,
+            left: 'center',
           },
           tooltip: {
             trigger: 'item',
@@ -49,7 +47,6 @@ export const FristIKabal = ({ finished, tildelt }: Props) => {
           },
           series: [
             {
-              color,
               type: 'pie',
               radius: '50%',
               data: state,

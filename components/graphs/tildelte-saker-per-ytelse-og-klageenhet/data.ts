@@ -1,22 +1,25 @@
 import { getRelevantYtelser } from '@/components/graphs/common';
 import type { Serie, State } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/types';
-import type { GetGraphStateFn, GetGraphStateParams } from '@/lib/graphs';
-import type { IKodeverkSimpleValue } from '@/lib/server/types';
+import type { GetGraphStateFn } from '@/lib/graphs';
+import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getTildelteSakerPerYtelseOgKlageenhetState: GetGraphStateFn<State> = (args) => {
-  const { filteredBehandlinger: behandlinger, ytelser } = args;
-
+export const getTildelteSakerPerYtelseOgKlageenhetState: GetGraphStateFn<State> = ({
+  behandlinger,
+  ytelser,
+  klageenheter,
+}) => {
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
 
-  const series = getSeries(relevanteYtelser, args);
+  const series = getSeries(relevanteYtelser, behandlinger, klageenheter);
   const labels = getLabels(relevanteYtelser, series);
 
-  return { state: { series, labels }, count: args.filteredBehandlinger.length };
+  return { state: { series, labels }, count: behandlinger.length };
 };
 
 const getSeries = (
   relevanteYtelser: IKodeverkSimpleValue[],
-  { filteredBehandlinger: behandlinger, klageenheter }: GetGraphStateParams,
+  behandlinger: Behandling[],
+  klageenheter: IKodeverkSimpleValue<string>[],
 ) =>
   [...klageenheter].map((enhet) => ({
     type: 'bar',

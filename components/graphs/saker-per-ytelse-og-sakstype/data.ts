@@ -4,17 +4,12 @@ import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
-export const getSakerPerYtelseOgSakstypeState: GetGraphStateFn<State> = ({
-  filteredBehandlinger,
-  finishedBehandlinger,
-  ytelser,
-  sakstyper,
-}) => {
-  const relevanteYtelser = getRelevantYtelser(finishedBehandlinger, ytelser);
-  const series = getSeries(sakstyper, relevanteYtelser, filteredBehandlinger);
+export const getSakerPerYtelseOgSakstypeState: GetGraphStateFn<State> = ({ behandlinger, ytelser, sakstyper }) => {
+  const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
+  const series = getSeries(sakstyper, relevanteYtelser, behandlinger);
   const labels = getLabels(relevanteYtelser, series);
 
-  return { state: { series, labels }, count: filteredBehandlinger.length };
+  return { state: { series, labels }, count: behandlinger.length };
 };
 
 const getSeries = (

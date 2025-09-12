@@ -38,6 +38,7 @@ export const VarsletFrist = ({ finished, tildelt }: Props) => {
         option={{
           title: {
             text: TITLE,
+            subtext: `Viser data for ${count} saker`,
           },
           tooltip: {
             trigger: 'item',

@@ -27,7 +27,7 @@ const getData = (behandling: Behandling, age: Age, maxAge: number): number => {
 };
 
 export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
-  const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
+  const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, parseAsInteger);
 
   const series = useMemo(
     () =>

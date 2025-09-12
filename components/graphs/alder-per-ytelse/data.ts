@@ -3,12 +3,9 @@ import type { Serie, State } from '@/components/graphs/alder-per-ytelse/types';
 import { getRelevantYtelser } from '@/components/graphs/common';
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
+import { QueryParam } from '@/lib/types/query-param';
 
-export const getAlderPerYtelseState: GetGraphStateFn<State> = ({
-  filteredBehandlinger: behandlinger,
-  ytelser,
-  searchParams,
-}) => {
+export const getAlderPerYtelseState: GetGraphStateFn<State> = ({ behandlinger, ytelser, searchParams }) => {
   const maxAge = parseMaxAge(searchParams);
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(relevanteYtelser, behandlinger, maxAge);
@@ -18,7 +15,7 @@ export const getAlderPerYtelseState: GetGraphStateFn<State> = ({
 };
 
 const parseMaxAge = (searchParams: URLSearchParams): number | null => {
-  const maxAge = searchParams.get('ma');
+  const maxAge = searchParams.get(QueryParam.ALDER_PER_YTELSE_MAX_DAYS);
 
   if (maxAge === null) {
     return null;

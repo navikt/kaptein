@@ -3,4 +3,4 @@ interface SerieEntry {
   value: number;
 }
 
-export type Serie = SerieEntry[];
+export type State = SerieEntry[];

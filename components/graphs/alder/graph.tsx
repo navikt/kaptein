@@ -4,7 +4,7 @@ import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { DayPicker } from '@/components/behandlinger/day-picker';
 import { useAgePieChartColors } from '@/components/behandlinger/use-frist-color';
-import type { Serie } from '@/components/graphs/alder/types';
+import type { State } from '@/components/graphs/alder/types';
 import { GraphLoading } from '@/components/graphs/loading';
 import { GraphStatus } from '@/components/graphs/status';
 import { NoData } from '@/components/no-data/no-data';
@@ -23,7 +23,7 @@ const TITLE = 'Alder';
 export const Alder = ({ finished, tildelt }: Props) => {
   const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
-  const { isInitialized, isLoading, state, count } = useGraphState<Serie>(Graph.ALDER, [], { finished, tildelt });
+  const { isInitialized, isLoading, state, count } = useGraphState<State>(Graph.ALDER, [], { finished, tildelt });
 
   const color = useAgePieChartColors(state);
 
@@ -45,6 +45,7 @@ export const Alder = ({ finished, tildelt }: Props) => {
           option={{
             title: {
               text: TITLE,
+              subtext: `Viser data for ${count} saker`,
             },
             tooltip: {
               trigger: 'item',

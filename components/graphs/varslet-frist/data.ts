@@ -3,7 +3,7 @@ import { ExceededFrist } from '@/components/behandlinger/use-frist-color';
 import type { State } from '@/components/graphs/varslet-frist/type';
 import type { GetGraphStateFn } from '@/lib/graphs';
 
-export const getVarsletFristState: GetGraphStateFn<State> = ({ filteredBehandlinger: behandlinger }) => {
+export const getVarsletFristState: GetGraphStateFn<State> = ({ behandlinger }) => {
   const TODAY = new Date();
 
   const map = behandlinger.reduce<Record<ExceededFrist, number>>(

@@ -38,7 +38,10 @@ export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, saksty
   }
 
   const labels = relevantYtelser.map(
-    (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
+    (y, i) =>
+      `${y.navn} (${series
+        .filter(({ data }) => data.some((d) => d !== null))
+        .reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
   );
 
   return (
