@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Reset } from '@/app/ferdigstilte/reset';
 import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
@@ -5,22 +6,40 @@ import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import { getLovkildeToRegistreringshjemler, getSakstyperToUtfall, getYtelser } from '@/lib/server/api';
+import type { IKodeverkValue, IYtelse, SakstypeToUtfall } from '@/lib/server/types';
 
-export const Filters = async () => {
+export const Filters = async () => (
+  <Suspense fallback={<RenderFilters />}>
+    <AsyncFilters />
+  </Suspense>
+);
+
+const AsyncFilters = async () => {
   const ytelser = await getYtelser();
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
   const sakstyperToUtfall = await getSakstyperToUtfall();
 
   return (
-    <FilterWrapper>
-      <Reset />
-      <DateRange />
-      <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
-      <YtelserAndRegistreringshjemler
-        ytelser={ytelser}
-        lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
-      />
-      <Tilbakekreving help={<HelpForFerdigstilte />} />
-    </FilterWrapper>
+    <RenderFilters
+      ytelser={ytelser}
+      lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
+      sakstyperToUtfall={sakstyperToUtfall}
+    />
   );
 };
+
+interface Props {
+  ytelser?: IYtelse[];
+  lovkildeToRegistreringshjemler?: IKodeverkValue<string>[];
+  sakstyperToUtfall?: SakstypeToUtfall[];
+}
+
+const RenderFilters = ({ ytelser = [], lovkildeToRegistreringshjemler = [], sakstyperToUtfall = [] }: Props) => (
+  <FilterWrapper>
+    <Reset />
+    <DateRange />
+    <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
+    <YtelserAndRegistreringshjemler ytelser={ytelser} lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler} />
+    <Tilbakekreving help={<HelpForFerdigstilte />} />
+  </FilterWrapper>
+);
