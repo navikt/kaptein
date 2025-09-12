@@ -13,6 +13,7 @@ import { getSakerPerSakstypeState } from '@/components/graphs/saker-per-sakstype
 import { getSakerPerYtelseOgSakstypeState } from '@/components/graphs/saker-per-ytelse-og-sakstype/data';
 import { getTildelteSakerPerKlageenhetState } from '@/components/graphs/tildelte-saker-per-klageenhet/data';
 import { getTildelteSakerPerYtelseOgKlageenhetState } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/data';
+import { getTildelteSakerPåVentIkkePåVentState } from '@/components/graphs/tildelte-saker-på-vent-ikke-på-vent/data';
 import { getVarsletFristState } from '@/components/graphs/varslet-frist/data';
 import { getVarsletFristPerYtelseState } from '@/components/graphs/varslet-frist-per-ytelse/data';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
@@ -140,6 +141,9 @@ const GRAPH_DATA_LOADERS: Record<Graph, GetGraphStateJsonFn> = {
   [Graph.FRIST_PER_YTELSE]: (...args) => JSON.stringify(getFristPerYtelseState(...args)),
 
   [Graph.LEDIGE_VS_TILDELTE]: (...args) => JSON.stringify(getLedigeVsTildelteState(...args)),
+
+  [Graph.TILDELTE_SAKER_PÅ_VENT_IKKE_PÅ_VENT]: (...args) =>
+    JSON.stringify(getTildelteSakerPåVentIkkePåVentState(...args)),
 };
 
 const hash = (input: string, length = 8): string =>

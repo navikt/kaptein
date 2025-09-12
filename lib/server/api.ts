@@ -64,15 +64,11 @@ export const getResponse = async (appName: AppName, path: string): Promise<Respo
 };
 
 export const getData = async <T>(appName: AppName, path: string): Promise<T> => {
-  try {
-    const res = await getResponse(appName, path);
+  const res = await getResponse(appName, path);
 
-    const data: T = await res.json();
+  const data: T = await res.json();
 
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  return data;
 };
 
 export const getUser = () => getData<IUserData>(AppName.KABAL_INNSTILLINGER, '/me/brukerdata');

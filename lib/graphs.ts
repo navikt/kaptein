@@ -13,6 +13,7 @@ export enum Graph {
   VARSLET_FRIST_PER_YTELSE = 'varslet-frist-per-ytelse',
   FRIST_PER_YTELSE = 'frist-per-ytelse',
   LEDIGE_VS_TILDELTE = 'ledige-vs-tildelte',
+  TILDELTE_SAKER_PÅ_VENT_IKKE_PÅ_VENT = 'tildelte-saker-på-vent-ikke-på-vent',
 }
 
 const GRAPHS = Object.values(Graph);

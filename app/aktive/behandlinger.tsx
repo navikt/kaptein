@@ -4,25 +4,34 @@ import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
-import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
-import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
-import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { Alder as OldAlder } from '@/components/behandlinger/alder';
+import { AlderPerYtelse as OldAlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
+import { FristIKabal as OldFristIKabal } from '@/components/behandlinger/frist-i-kabal';
+import { FristPerYtelse as OldFristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
+import { LedigeVsTildelte as OldLedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { SakerPerYtelseOgSakstype as OldSakerPerYtelseOgSakstype } from '@/components/behandlinger/old-saker-per-ytelse-og-sakstype';
 import { SakerPerSakstype as OldSakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
+import { TildelteSakerPerKlageenhet as OldTildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet as OldTildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
-import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
+import { TildelteSakerPåVentIkkePåVent as OldTildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
 import { useData } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
 import { VarsletFrist as OldVarsletFrist } from '@/components/behandlinger/varslet-frist';
-import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
+import { VarsletFristPerYtelse as OldVarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { Alder } from '@/components/graphs/alder/graph';
 import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
+import { FristIKabal } from '@/components/graphs/frist-i-kabal/graph';
+import { FristPerYtelse } from '@/components/graphs/frist-per-ytelse/graph';
+import { LedigeVsTildelte } from '@/components/graphs/ledige-vs-tildelte/graph';
 import { SakerPerSakstype } from '@/components/graphs/saker-per-sakstype/graph';
 import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
+import { TildelteSakerPerKlageenhet } from '@/components/graphs/tildelte-saker-per-klageenhet/graph';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/graph';
+import { TildelteSakerPåVentIkkePåVent } from '@/components/graphs/tildelte-saker-på-vent-ikke-på-vent/graph';
 import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
+import { VarsletFristPerYtelse } from '@/components/graphs/varslet-frist-per-ytelse/graph';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -45,11 +54,16 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelseOgSakstype tildelt finished={false} />
+        <SakerPerYtelseOgSakstype finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card span={3}>
+        <OldSakerPerYtelseOgSakstype behandlinger={data} relevantYtelser={relevantYtelser} sakstyper={sakstyper} />
       </Card>
 
       <Card>
-        <SakerPerSakstype tildelt finished={false} />
+        <SakerPerSakstype finished={false} />
       </Card>
 
       {/* TODO: Remove */}
@@ -59,19 +73,40 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
 
       {showsAlle ? (
         <Card>
-          <LedigeVsTildelte behandlinger={data} />
+          <LedigeVsTildelte finished={false} />
+        </Card>
+      ) : null}
+
+      {/* TODO: Remove */}
+      {showsAlle ? (
+        <Card>
+          <OldLedigeVsTildelte behandlinger={data} />
         </Card>
       ) : null}
 
       {showsLedige ? null : (
         <Card>
-          <TildelteSakerPåVentIkkePåVent behandlinger={data} />
+          <TildelteSakerPåVentIkkePåVent finished={false} />
+        </Card>
+      )}
+
+      {/* TODO: Remove */}
+      {showsLedige ? null : (
+        <Card>
+          <OldTildelteSakerPåVentIkkePåVent behandlinger={data} />
         </Card>
       )}
 
       {showsLedige ? null : (
         <Card>
-          <TildelteSakerPerKlageenhet
+          <TildelteSakerPerKlageenhet finished={false} tildelt title="Tildelte saker per klageenhet" />
+        </Card>
+      )}
+
+      {/* TODO: Remove */}
+      {showsLedige ? null : (
+        <Card>
+          <OldTildelteSakerPerKlageenhet
             behandlinger={tildelte}
             klageenheter={klageenheterKodeverk}
             title="Tildelte saker per klageenhet"
@@ -94,7 +129,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
         <Card span={3}>
           <OldTildelteSakerPerYtelseOgKlageenhet
             title="Tildelte saker per ytelse og klageenhet"
-            behandlinger={data}
+            behandlinger={tildelte}
             klageenheterkodeverk={klageenheterKodeverk}
             relevantYtelser={relevantYtelser}
           />
@@ -102,7 +137,7 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       )}
 
       <Card>
-        <VarsletFrist tildelt finished={false} />
+        <VarsletFrist finished={false} />
       </Card>
 
       {/* TODO: Remove */}
@@ -111,23 +146,48 @@ export const Behandlinger = ({ behandlinger, sakstyper, ytelseKodeverk, klageenh
       </Card>
 
       <Card>
-        <FristIKabal behandlinger={data} />
+        <FristIKabal finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card>
+        <OldFristIKabal behandlinger={data} />
       </Card>
 
       <Card span={3}>
-        <VarsletFristPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
+        <VarsletFristPerYtelse finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card span={3}>
+        <OldVarsletFristPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={3}>
-        <FristPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
+        <FristPerYtelse finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card span={3}>
+        <OldFristPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={3}>
-        <Alder />
+        <Alder finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card span={3}>
+        <OldAlder behandlinger={data} />
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse />
+        <AlderPerYtelse finished={false} />
+      </Card>
+
+      {/* TODO: Remove */}
+      <Card span={4}>
+        <OldAlderPerYtelse behandlinger={data} relevantYtelser={relevantYtelser} />
       </Card>
     </ChartsWrapper>
   );
