@@ -14,7 +14,6 @@ import { VarsletFrist as OldVarsletFrist } from '@/components/behandlinger/varsl
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { debugBehandlinger } from '@/components/debug';
 import { Alder } from '@/components/graphs/alder/graph';
 import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
 import { SakerPerSakstype } from '@/components/graphs/saker-per-sakstype/graph';
@@ -22,7 +21,6 @@ import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-o
 import { TildelteSakerPerKlageenhet } from '@/components/graphs/tildelte-saker-per-klageenhet/graph';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/graph';
 import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
-import { browserLog } from '@/lib/browser-log';
 import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
 interface Props {
@@ -37,9 +35,6 @@ export const Behandlinger = ({ behandlinger, ytelseKodeverk, klageenheterKodever
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelseKodeverk);
 
   const { withTildelteFilter: data } = useData(behandlinger);
-
-  debugBehandlinger(behandlinger);
-  browserLog.debug('Data', data);
 
   return (
     <ChartsWrapper>
