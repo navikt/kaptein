@@ -12,8 +12,12 @@ import { TildelteSakerPerKlageenhet } from '@/components/graphs/tildelte-saker-p
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/graph';
 import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
 import { VarsletFristPerYtelse } from '@/components/graphs/varslet-frist-per-ytelse/graph';
+import { getCachedBehandlinger, getCachedYtelser } from '@/lib/cache';
 
 export const Behandlinger = () => {
+  getCachedYtelser();
+  getCachedBehandlinger();
+
   return (
     <ChartsWrapper>
       <Card span={3}>
