@@ -17,9 +17,12 @@ import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte
 import { TildelteSakerPåVentIkkePåVent } from '@/components/graphs/tildelte-saker-på-vent-ikke-på-vent/graph';
 import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
 import { VarsletFristPerYtelse } from '@/components/graphs/varslet-frist-per-ytelse/graph';
+import { getCachedBehandlinger, getCachedYtelser } from '@/lib/cache';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const Behandlinger = () => {
+  getCachedYtelser();
+  getCachedBehandlinger();
   const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
