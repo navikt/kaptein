@@ -10,6 +10,7 @@
         "@navikt/aksel-icons": "7.30.0",
         "@navikt/ds-css": "7.30.0",
         "@navikt/ds-react": "7.30.0",
+        "@navikt/next-api-proxy": "4.1.4",
         "@navikt/next-logger": "4.1.5",
         "@navikt/oasis": "3.8.0",
         "@platformatic/kafka": "1.11.0",
@@ -218,6 +219,8 @@
     "@navikt/ds-tailwind": ["@navikt/ds-tailwind@7.30.0", "https://npm.pkg.github.com/download/@navikt/ds-tailwind/7.30.0/45c893ba720c7714dae09e1eaee82bcb80d43fb4", {}, "sha512-Bp8NIN1J4wt5Xfumm8MNdJLDQuu6Z8XDGnu+R1QSZvgaNo0vvN2D49byqFmkYr6VAr7RPCBk9XqDnIup8qGSUA=="],
 
     "@navikt/ds-tokens": ["@navikt/ds-tokens@7.30.0", "https://npm.pkg.github.com/download/@navikt/ds-tokens/7.30.0/c00e201ceaac27b28367703dbeb77fab7b956413", {}, "sha512-zOez+NAEniTKJ6qIWRjF+FZkAysjKvlm4b9QFpq4CUUHsXWyoCm1UQ7ubBYT+KiB18pD2jrOEdLc70Tv3GlYBA=="],
+
+    "@navikt/next-api-proxy": ["@navikt/next-api-proxy@4.1.4", "https://npm.pkg.github.com/download/@navikt/next-api-proxy/4.1.4/781f2144baaceb4ff9e9bea9d50d443ed52d2f99", { "peerDependencies": { "next": "14 || 15" } }, "sha512-3tylOzh0G/Ru8jDy7mz9GW52pSEUkOUWq6tXe+YTf6M4Wq/c/FtFhU0gzlZlcI09kgpMA31Re6JyXu2K0Cx00g=="],
 
     "@navikt/next-logger": ["@navikt/next-logger@4.1.5", "https://npm.pkg.github.com/download/@navikt/next-logger/4.1.5/40d028e0d8ec8a978b6e58f464f255ce7605836c", { "dependencies": { "@navikt/pino-logger": "^4.1.5" }, "optionalDependencies": { "pino-roll": "3" }, "peerDependencies": { "next": "14 || 15", "pino": "8 || 9" } }, "sha512-tdswF2z8FZaiRcbCAH9avcPUQJh93upXGBSkT6Bf/MKVQbzNC8Td1SqrFgxMhYKnCT+XlCVdb+e6P84ktW8gbw=="],
 

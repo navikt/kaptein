@@ -16,6 +16,7 @@
     "@navikt/aksel-icons": "7.30.0",
     "@navikt/ds-css": "7.30.0",
     "@navikt/ds-react": "7.30.0",
+    "@navikt/next-api-proxy": "4.1.4",
     "@navikt/next-logger": "4.1.5",
     "@navikt/oasis": "3.8.0",
     "@platformatic/kafka": "1.11.0",

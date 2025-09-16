@@ -1,4 +1,4 @@
-import type { Behandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
 export enum Graph {
   ALDER_PER_YTELSE = 'alder-per-ytelse',
@@ -27,14 +27,14 @@ export interface EntryData<S> {
   state: S;
 }
 
-export interface GetGraphStateParams {
-  behandlinger: Behandling[];
+export interface GetGraphStateParams<B> {
+  behandlinger: B[];
   ytelser: IYtelse[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
   klageenheter: IKodeverkSimpleValue[];
   searchParams: URLSearchParams;
 }
 
-export type GetGraphStateFn<S> = (params: GetGraphStateParams) => EntryData<S>;
+export type GetGraphStateFn<S, B> = (params: GetGraphStateParams<B>) => EntryData<S>;
 
-export type GetGraphStateJsonFn = (params: GetGraphStateParams) => string;
+export type GetGraphStateJsonFn<B> = (params: GetGraphStateParams<B>) => string;

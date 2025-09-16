@@ -1,7 +1,8 @@
 import type { State } from '@/components/graphs/tildelte-saker-på-vent-ikke-på-vent/types';
 import type { GetGraphStateFn } from '@/lib/graphs';
+import type { TildeltBehandling } from '@/lib/server/types';
 
-export const getTildelteSakerPåVentIkkePåVentState: GetGraphStateFn<State> = ({ behandlinger }) => {
+export const getTildelteSakerPåVentIkkePåVentState: GetGraphStateFn<State, TildeltBehandling> = ({ behandlinger }) => {
   const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
     const value = curr.sattPaaVent === null;
     const existing = acc.get(value);
