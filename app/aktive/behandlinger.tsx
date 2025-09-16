@@ -27,15 +27,19 @@ import type {
   IKodeverkSimpleValue,
   IKodeverkValue,
   IYtelse,
+  KapteinApiResponse,
   LedigBehandling,
   Sakstype,
   TildeltBehandling,
 } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
+type LedigeResponse = KapteinApiResponse<LedigBehandling>;
+type TildelteResponse = KapteinApiResponse<TildeltBehandling>;
+
 interface Props {
-  ledige: LedigBehandling[];
-  tildelte: TildeltBehandling[];
+  ledige: LedigeResponse;
+  tildelte: TildelteResponse;
 }
 
 interface KodeverkProps {
@@ -46,8 +50,8 @@ interface KodeverkProps {
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
-  const ledige = useClientFetch<LedigBehandling[]>('/api/behandlinger/ledige');
-  const tildelte = useClientFetch<TildeltBehandling[]>('/api/behandlinger/tildelte');
+  const ledige = useClientFetch<LedigeResponse>('/api/behandlinger/ledige');
+  const tildelte = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
 
   if (ledige === null || tildelte === null) {
     return (
@@ -74,14 +78,14 @@ const BehandlingerData = ({
 
   const behandlinger = useMemo(() => {
     if (tildelingFilter === TildelingFilter.LEDIGE) {
-      return ledige;
+      return ledige.behandlinger;
     }
 
     if (tildelingFilter === TildelingFilter.TILDELTE) {
-      return tildelte;
+      return tildelte.behandlinger;
     }
 
-    return [...ledige, ...tildelte];
+    return [...ledige.behandlinger, ...tildelte.behandlinger];
   }, [tildelingFilter, ledige, tildelte]);
 
   const filteredBehandlinger = useAktive(behandlinger);

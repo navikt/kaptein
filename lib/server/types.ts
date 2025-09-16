@@ -98,6 +98,11 @@ export interface FerdigstiltBehandling extends BaseBehandling {
 
 export type Behandling = AktivBehandling | FerdigstiltBehandling;
 
+export interface KapteinApiResponse<T> {
+  behandlinger: T[];
+  total: number;
+}
+
 // export interface Behandling {
 //   ageKA: number;
 //   avsluttetAvSaksbehandlerDate: string | null;

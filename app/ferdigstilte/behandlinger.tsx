@@ -16,11 +16,15 @@ import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-p
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
-import type { FerdigstiltBehandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type {
+  FerdigstiltBehandling,
+  IKodeverkSimpleValue,
+  IYtelse,
+  KapteinApiResponse,
+  Sakstype,
+} from '@/lib/server/types';
 
-interface Props {
-  ferdigstilte: FerdigstiltBehandling[];
-}
+type Response = KapteinApiResponse<FerdigstiltBehandling>;
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -29,9 +33,9 @@ interface KodeverkProps {
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
-  const ferdigstilte = useClientFetch<FerdigstiltBehandling[]>('/api/behandlinger/ferdigstilte');
+  const response = useClientFetch<Response>('/api/behandlinger/ferdigstilte');
 
-  if (ferdigstilte === null) {
+  if (response === null) {
     return (
       <VStack align="center" justify="center" className="w-full">
         <Loader size="3xlarge" />
@@ -39,11 +43,11 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     );
   }
 
-  return <BehandlingerData ferdigstilte={ferdigstilte} {...kodeverk} />;
+  return <BehandlingerData {...response} {...kodeverk} />;
 };
 
-const BehandlingerData = ({ ferdigstilte, sakstyper, ytelser, klageenheter }: Props & KodeverkProps) => {
-  const filteredBehandlinger = useFerdigstilte(ferdigstilte);
+const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Response & KodeverkProps) => {
+  const filteredBehandlinger = useFerdigstilte(behandlinger);
   const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
 
   return (

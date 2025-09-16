@@ -1,121 +1,184 @@
 import http, { type IncomingMessage, type OutgoingHttpHeaders } from 'node:http';
 import https from 'node:https';
-import { isLocal } from '@/lib/environment';
+import type { NextRequest } from 'next/server';
+import { isDeployed, isLocal } from '@/lib/environment';
+import { getLogger } from '@/lib/logger';
+import { AppName, getOboToken } from '@/lib/server/get-obo-token';
+import { generateTraceParent, parseTraceParent } from '@/lib/server/traceparent';
+
+const log = getLogger('behandlinger-proxy');
 
 export const dynamic = 'force-dynamic';
 
-const KAPTEIN_URL = new URL('https://kaptein-api.intern.dev.nav.no/behandlinger');
-
-// TODO: Use this.
-const USE_THIS = isLocal
-  ? new URL('https://kaptein.intern.dev.nav.no/api/behandlinger')
+const KAPTEIN_URL = isLocal
+  ? new URL('https://kaptein-api.intern.dev.nav.no/behandlinger')
   : new URL('http://kaptein-api/behandlinger');
 
-export async function GET(request: Request, ctx: RouteContext<'/api/behandlinger/[status]'>): Promise<Response> {
+const request = isLocal ? https.request : http.request;
+
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger/[status]'>): Promise<Response> {
+  const incomingTraceparent = req.headers.get('traceparent');
+
+  const { traceparent, traceId, spanId } =
+    incomingTraceparent === null ? generateTraceParent() : parseTraceParent(incomingTraceparent);
+
   const { status } = await ctx.params;
 
-  if (!isStatus(status)) {
-    return new Response('Not found', { status: 404 });
-  }
-
-  // const token = await getOboToken(AppName.KAPTEIN_API, request.headers);
-
-  const requestHeaders: OutgoingHttpHeaders = {
-    ...Object.fromEntries([...request.headers.entries()]),
-    // authorization: `Bearer ${token}`,
-    accept: 'application/json',
-    host: KAPTEIN_URL.host,
-  };
-
   const url = new URL(KAPTEIN_URL);
+
   url.pathname += `/${status}`;
 
-  const res = await customFetch(url, requestHeaders);
+  const requestHeaders: OutgoingHttpHeaders = {
+    connection: 'keep-alive',
+    'cache-control': 'no-cache',
+    pragma: 'no-cache',
+    'user-agent': req.headers.get('user-agent') ?? 'kaptein-proxy',
+    'accept-encoding': req.headers.get('accept-encoding') ?? 'gzip, deflate, br',
+    accept: 'application/json',
+    host: url.host,
+    traceparent,
+  };
 
-  const headers = new Headers();
-
-  for (const [key, value] of Object.entries(res.headers)) {
-    if (value === undefined) {
-      continue;
-    }
-    if (Array.isArray(value)) {
-      headers.set(key, value.join(','));
-    } else {
-      headers.set(key, value);
-    }
+  if (isDeployed) {
+    const token = await getOboToken(AppName.KAPTEIN_API, req.headers);
+    requestHeaders.authorization = `Bearer ${token}`;
+    requestHeaders.cookie = req.headers.get('cookie') ?? undefined;
   }
 
-  return new Response(
-    new ReadableStream({
-      async start(controller) {
-        res.once('readable', async () => {
-          console.debug('Response is readable');
+  try {
+    const res = await proxyRequest(url, requestHeaders, req.signal);
 
-          while (true) {
-            const { done, value } = await res.read();
+    const headers = new Headers();
 
-            if (done) {
-              console.debug('Stream is done');
-              break;
-            }
+    for (const [key, value] of Object.entries(res.headers)) {
+      if (value === undefined) {
+        continue;
+      }
 
-            console.debug(`Enqueuing ${value?.length} bytes`);
-            controller.enqueue(value);
-          }
-        });
+      if (Array.isArray(value)) {
+        headers.set(key, value.join(','));
+      } else {
+        headers.set(key, value);
+      }
+    }
 
-        res.once('end', () => {
-          console.debug('Response ended');
-          controller.close();
-        });
-        res.once('error', (err) => {
-          console.error('Response error', err);
-          controller.error(err);
-        });
-        res.once('close', () => {
-          console.warn('Response closed');
-          controller.error(new Error('Connection closed'));
-        });
+    let bytes = 0;
+
+    return new Response(
+      new ReadableStream({
+        async start(controller) {
+          res.on('data', (chunk) => {
+            bytes += chunk.length;
+            controller.enqueue(chunk);
+          });
+
+          res.once('end', () => {
+            log.debug(
+              `Proxied ${formatBytes(bytes)} from ${req.method} ${url.href} (${res.headers['content-type']} - ${res.headers['content-encoding']})`,
+              traceId,
+              spanId,
+            );
+            controller.close();
+          });
+
+          res.once('error', (error) => {
+            log.error(`Response error: ${error.message}`, traceId, spanId, { error: error.message });
+            controller.error(error);
+          });
+
+          res.resume(); // Ensure the stream is not paused.
+        },
+      }),
+      {
+        status: res.statusCode,
+        headers,
+        statusText: res.statusMessage,
       },
-    }),
-    {
-      status: res.statusCode,
-      headers,
-      statusText: res.statusMessage,
-    },
-  );
+    );
+  } catch (error) {
+    if (error instanceof TimeoutError) {
+      log.warn(
+        `Timeout after ${error.duration} ms (limit: ${error.timeout} ms) for ${req.method} ${url.href}`,
+        traceId,
+        spanId,
+      );
+      return new Response(JSON.stringify({ message: 'Upstream request timed out' }), { status: 504 });
+    }
+
+    if (error instanceof AbortError) {
+      log.warn(`Request aborted by client for ${req.method} ${url.href}`, traceId, spanId);
+      return new Response(JSON.stringify({ message: 'Request aborted by client' }), { status: 499 });
+    }
+
+    if (error instanceof Error) {
+      log.error(`Proxy error: ${error.message}`, traceId, spanId, { error: error.message });
+      return new Response(JSON.stringify({ message: 'Upstream request failed', details: error.message }), {
+        status: 502,
+      });
+    }
+
+    log.error('Proxy error: Unknown error', traceId, spanId, { error: 'Unknown error' });
+    return new Response(JSON.stringify({ message: 'Upstream request failed', details: 'Unknown error' }), {
+      status: 502,
+    });
+  }
 }
 
-const customFetch = async (url: URL, headers: OutgoingHttpHeaders) => {
-  console.debug(`Fetching ${url.href}`, headers);
-
+const proxyRequest = async (
+  url: URL,
+  headers: OutgoingHttpHeaders,
+  abortSignal: AbortSignal,
+  timeout = 500,
+): Promise<IncomingMessage> => {
   const start = performance.now();
 
   return new Promise<IncomingMessage>((resolve, reject) => {
-    const fn = url.protocol === 'http:' ? http.request : https.request;
+    const req = request(url, { method: 'GET', headers, timeout }, resolve);
 
-    const req = fn(KAPTEIN_URL, { method: 'GET', headers, timeout: 500 }, resolve);
+    abortSignal.addEventListener('abort', () => {
+      req.destroy();
+      reject(new AbortError('Request aborted by client'));
+    });
 
     req.once('timeout', () => {
       req.destroy();
-      reject(new Error(`Request timed out after ${Math.round(performance.now() - start)} ms`));
+      const duration = Math.round(performance.now() - start);
+      reject(new TimeoutError(`Request timed out after ${duration} ms`, duration, timeout));
     });
 
-    req.once('error', (err) => {
-      console.error(`Error fetching ${url.href} after ${Math.round(performance.now() - start)} ms`, err);
-      reject(err);
-    });
+    req.once('error', reject);
 
     req.end();
   });
 };
 
-enum Status {
-  LEDIGE = 'ledige',
-  TILDELTE = 'tildelte',
-  FERDIGSTILTE = 'ferdigstilte',
+class TimeoutError extends Error {
+  constructor(
+    message: string,
+    public duration: number,
+    public timeout: number,
+  ) {
+    super(message);
+    this.name = 'TimeoutError';
+  }
 }
 
-const STATUS_LIST = Object.values(Status);
+class AbortError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AbortError';
+  }
+}
 
-const isStatus = (status: string): status is Status => STATUS_LIST.includes(status as Status);
+const k = 1000;
+const sizes = ['bytes', 'kB', 'MB', 'GB', 'TB'];
+
+const formatBytes = (bytes: number): string => {
+  if (bytes === 0) {
+    return '0 bytes';
+  }
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${(bytes / k ** i).toFixed(2)} ${sizes[i]}`;
+};
