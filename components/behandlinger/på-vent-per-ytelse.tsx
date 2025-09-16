@@ -3,31 +3,18 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import { type Behandling, type IKodeverkValue, type IYtelse, PåVentReason } from '@/lib/server/types';
+import { type AktivBehandling, type IKodeverkSimpleValue, type IKodeverkValue, PåVentReason } from '@/lib/server/types';
 
 interface Props {
-  total: number;
-  behandlinger: Behandling[];
-  ytelsekodeverk: IYtelse[];
+  behandlinger: AktivBehandling[];
+  relevantYtelser: IKodeverkSimpleValue[];
   påVentReasons: IKodeverkValue[];
 }
 
 const TITLE = 'Behandlinger på vent grupper på ytelse';
 
-export const PåVentPerYtelse = ({ behandlinger, total, ytelsekodeverk, påVentReasons }: Props) => {
+export const PåVentPerYtelse = ({ behandlinger, relevantYtelser, påVentReasons }: Props) => {
   const påVentBehandlinger = useMemo(() => behandlinger.filter((b) => b.sattPaaVent !== null), [behandlinger]);
-
-  const relevantYtelser = useMemo(() => {
-    const ids = Array.from(new Set(påVentBehandlinger.map((b) => b.ytelseId)));
-
-    return ids
-      .map((id) => {
-        const kodeverk = ytelsekodeverk.find((k) => k.id === id);
-
-        return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
-      })
-      .toSorted((a, b) => a.navn.localeCompare(b.navn));
-  }, [påVentBehandlinger, ytelsekodeverk]);
 
   const series = useMemo(
     () =>
@@ -58,7 +45,7 @@ export const PåVentPerYtelse = ({ behandlinger, total, ytelsekodeverk, påVentR
       option={{
         title: {
           text: TITLE,
-          subtext: `Antall behandlinger på vent: ${påVentBehandlinger.length} av totalt ${total} saker`,
+          subtext: `Antall behandlinger på vent: ${påVentBehandlinger.length}`,
         },
         tooltip: {
           trigger: 'axis',

@@ -1,54 +1,133 @@
 'use client';
 
+import { Loader, VStack } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
+import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
+import { Alder } from '@/components/behandlinger/alder';
+import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
+import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
+import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
+import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
+import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
+import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
+import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
+import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
+import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
+import { useAktive } from '@/components/behandlinger/use-data';
+import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
+import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
+import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { Alder } from '@/components/graphs/alder/graph';
-import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
-import { FristIKabal } from '@/components/graphs/frist-i-kabal/graph';
-import { FristPerYtelse } from '@/components/graphs/frist-per-ytelse/graph';
-import { LedigeVsTildelte } from '@/components/graphs/ledige-vs-tildelte/graph';
-import { SakerPerSakstype } from '@/components/graphs/saker-per-sakstype/graph';
-import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
-import { TildelteSakerPerKlageenhet } from '@/components/graphs/tildelte-saker-per-klageenhet/graph';
-import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/graph';
-import { TildelteSakerPåVentIkkePåVent } from '@/components/graphs/tildelte-saker-på-vent-ikke-på-vent/graph';
-import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
-import { VarsletFristPerYtelse } from '@/components/graphs/varslet-frist-per-ytelse/graph';
+import { useClientFetch } from '@/lib/client/use-client-fetch';
+import type {
+  IKodeverkSimpleValue,
+  IKodeverkValue,
+  IYtelse,
+  LedigBehandling,
+  Sakstype,
+  TildeltBehandling,
+} from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const Behandlinger = () => {
+interface Props {
+  ledige: LedigBehandling[];
+  tildelte: TildeltBehandling[];
+}
+
+interface KodeverkProps {
+  ytelser: IYtelse[];
+  sakstyper: IKodeverkSimpleValue<Sakstype>[];
+  klageenheter: IKodeverkSimpleValue[];
+  påVentReasons: IKodeverkValue[];
+}
+
+export const Behandlinger = (kodeverk: KodeverkProps) => {
+  const ledige = useClientFetch<LedigBehandling[]>('/api/behandlinger/ledige');
+  const tildelte = useClientFetch<TildeltBehandling[]>('/api/behandlinger/tildelte');
+
+  if (ledige === null || tildelte === null) {
+    return (
+      <VStack align="center" justify="center" className="w-full">
+        <Loader size="3xlarge" />
+      </VStack>
+    );
+  }
+
+  return <BehandlingerData ledige={ledige} tildelte={tildelte} {...kodeverk} />;
+};
+
+const BehandlingerData = ({
+  ledige,
+  tildelte,
+  sakstyper,
+  ytelser,
+  klageenheter,
+  påVentReasons,
+}: Props & KodeverkProps) => {
   const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
 
+  const behandlinger = useMemo(() => {
+    if (tildelingFilter === TildelingFilter.LEDIGE) {
+      return ledige;
+    }
+
+    if (tildelingFilter === TildelingFilter.TILDELTE) {
+      return tildelte;
+    }
+
+    return [...ledige, ...tildelte];
+  }, [tildelingFilter, ledige, tildelte]);
+
+  const filteredBehandlinger = useAktive(behandlinger);
+  const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
+
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelseOgSakstype finished={false} />
+        <SakerPerYtelseOgSakstype
+          behandlinger={filteredBehandlinger}
+          sakstyper={sakstyper}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card>
-        <SakerPerSakstype finished={false} />
+        <SakerPerSakstype behandlinger={filteredBehandlinger} sakstyper={sakstyper} />
       </Card>
 
       {showsAlle ? (
         <Card>
-          <LedigeVsTildelte finished={false} />
+          <LedigeVsTildelte behandlinger={filteredBehandlinger} />
         </Card>
       ) : null}
 
       {showsLedige ? null : (
         <Card>
-          <TildelteSakerPåVentIkkePåVent finished={false} />
+          <TildelteSakerPåVentIkkePåVent behandlinger={filteredBehandlinger} />
         </Card>
       )}
 
+      <Card span={3}>
+        <PåVentPerYtelse
+          behandlinger={filteredBehandlinger}
+          relevantYtelser={relevantYtelser}
+          påVentReasons={påVentReasons}
+        />
+      </Card>
+
       {showsLedige ? null : (
         <Card>
-          <TildelteSakerPerKlageenhet finished={false} tildelt title="Tildelte saker per klageenhet" />
+          <TildelteSakerPerKlageenhet
+            behandlinger={filteredBehandlinger}
+            klageenheter={klageenheter}
+            title="Tildelte saker per klageenhet"
+          />
         </Card>
       )}
 
@@ -56,34 +135,35 @@ export const Behandlinger = () => {
         <Card span={3}>
           <TildelteSakerPerYtelseOgKlageenhet
             title="Tildelte saker per ytelse og klageenhet"
-            tildelt
-            finished={false}
+            behandlinger={filteredBehandlinger}
+            klageenheter={klageenheter}
+            relevantYtelser={relevantYtelser}
           />
         </Card>
       )}
 
       <Card>
-        <VarsletFrist finished={false} />
+        <VarsletFrist behandlinger={filteredBehandlinger} />
       </Card>
 
       <Card>
-        <FristIKabal finished={false} />
+        <FristIKabal behandlinger={filteredBehandlinger} />
       </Card>
 
       <Card span={3}>
-        <VarsletFristPerYtelse finished={false} />
+        <VarsletFristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={3}>
-        <FristPerYtelse finished={false} />
+        <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={3}>
-        <Alder finished={false} />
+        <Alder behandlinger={filteredBehandlinger} />
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse finished={false} />
+        <AlderPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
     </ChartsWrapper>
   );

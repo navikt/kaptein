@@ -3,7 +3,7 @@ import type { Serie, State } from '@/components/graphs/tildelte-saker-per-ytelse
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getTildelteSakerPerYtelseOgKlageenhetState: GetGraphStateFn<State> = ({
+export const getTildelteSakerPerYtelseOgKlageenhetState: GetGraphStateFn<State, Behandling> = ({
   behandlinger,
   ytelser,
   klageenheter,

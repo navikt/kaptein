@@ -1,59 +1,104 @@
 'use client';
 
+import { Loader, VStack } from '@navikt/ds-react';
+import { Alder } from '@/components/behandlinger/alder';
+import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
+import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
+import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
+import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
+import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
+import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
+import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
+import { useFerdigstilte } from '@/components/behandlinger/use-data';
+import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
+import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
+import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { Alder } from '@/components/graphs/alder/graph';
-import { AlderPerYtelse } from '@/components/graphs/alder-per-ytelse/graph';
-import { FristIKabal } from '@/components/graphs/frist-i-kabal/graph';
-import { FristPerYtelse } from '@/components/graphs/frist-per-ytelse/graph';
-import { SakerPerSakstype } from '@/components/graphs/saker-per-sakstype/graph';
-import { SakerPerYtelseOgSakstype } from '@/components/graphs/saker-per-ytelse-og-sakstype/graph';
-import { TildelteSakerPerKlageenhet } from '@/components/graphs/tildelte-saker-per-klageenhet/graph';
-import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/graphs/tildelte-saker-per-ytelse-og-klageenhet/graph';
-import { VarsletFrist } from '@/components/graphs/varslet-frist/graph';
-import { VarsletFristPerYtelse } from '@/components/graphs/varslet-frist-per-ytelse/graph';
+import { useClientFetch } from '@/lib/client/use-client-fetch';
+import type { FerdigstiltBehandling, IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
 
-export const Behandlinger = () => {
+interface Props {
+  ferdigstilte: FerdigstiltBehandling[];
+}
+
+interface KodeverkProps {
+  ytelser: IYtelse[];
+  sakstyper: IKodeverkSimpleValue<Sakstype>[];
+  klageenheter: IKodeverkSimpleValue[];
+}
+
+export const Behandlinger = (kodeverk: KodeverkProps) => {
+  const ferdigstilte = useClientFetch<FerdigstiltBehandling[]>('/api/behandlinger/ferdigstilte');
+
+  if (ferdigstilte === null) {
+    return (
+      <VStack align="center" justify="center" className="w-full">
+        <Loader size="3xlarge" />
+      </VStack>
+    );
+  }
+
+  return <BehandlingerData ferdigstilte={ferdigstilte} {...kodeverk} />;
+};
+
+const BehandlingerData = ({ ferdigstilte, sakstyper, ytelser, klageenheter }: Props & KodeverkProps) => {
+  const filteredBehandlinger = useFerdigstilte(ferdigstilte);
+  const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
+
   return (
     <ChartsWrapper>
       <Card span={3}>
-        <SakerPerYtelseOgSakstype finished />
+        <SakerPerYtelseOgSakstype
+          behandlinger={filteredBehandlinger}
+          sakstyper={sakstyper}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card>
-        <SakerPerSakstype finished />
+        <SakerPerSakstype behandlinger={filteredBehandlinger} sakstyper={sakstyper} />
       </Card>
 
       <Card span={3}>
-        <TildelteSakerPerKlageenhet title="Saker per klageenhet" finished />
+        <TildelteSakerPerKlageenhet
+          title="Saker per klageenhet"
+          behandlinger={filteredBehandlinger}
+          klageenheter={klageenheter}
+        />
       </Card>
 
       <Card span={3}>
-        <TildelteSakerPerYtelseOgKlageenhet title="Saker per ytelse og klageenhet" finished />
+        <TildelteSakerPerYtelseOgKlageenhet
+          title="Saker per ytelse og klageenhet"
+          behandlinger={filteredBehandlinger}
+          klageenheter={klageenheter}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card>
-        <VarsletFrist finished />
+        <VarsletFrist behandlinger={filteredBehandlinger} />
       </Card>
 
       <Card>
-        <FristIKabal finished />
+        <FristIKabal behandlinger={filteredBehandlinger} />
       </Card>
 
       <Card span={3}>
-        <VarsletFristPerYtelse finished />
+        <VarsletFristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={3}>
-        <FristPerYtelse finished />
+        <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={3}>
-        <Alder finished />
+        <Alder behandlinger={filteredBehandlinger} />
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse finished />
+        <AlderPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
     </ChartsWrapper>
   );

@@ -1,7 +1,8 @@
 import type { State } from '@/components/graphs/ledige-vs-tildelte/types';
 import type { GetGraphStateFn } from '@/lib/graphs';
+import type { AktivBehandling } from '@/lib/server/types';
 
-export const getLedigeVsTildelteState: GetGraphStateFn<State> = ({ behandlinger }) => {
+export const getLedigeVsTildelteState: GetGraphStateFn<State, AktivBehandling> = ({ behandlinger }) => {
   const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
     const existing = acc.get(curr.isTildelt);
 
