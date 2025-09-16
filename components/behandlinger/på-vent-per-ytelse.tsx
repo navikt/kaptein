@@ -3,11 +3,11 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import { type Behandling, type IKodeverkValue, type IYtelse, PåVentReason } from '@/lib/server/types';
+import { type AktivBehandling, type IKodeverkValue, type IYtelse, PåVentReason } from '@/lib/server/types';
 
 interface Props {
   total: number;
-  behandlinger: Behandling[];
+  behandlinger: AktivBehandling[];
   ytelsekodeverk: IYtelse[];
   påVentReasons: IKodeverkValue[];
 }
