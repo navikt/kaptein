@@ -2,7 +2,10 @@ import type { Data, State } from '@/components/graphs/tildelte-saker-per-klageen
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getTildelteSakerPerKlageenhetState: GetGraphStateFn<State> = ({ behandlinger, klageenheter }) => {
+export const getTildelteSakerPerKlageenhetState: GetGraphStateFn<State, Behandling> = ({
+  behandlinger,
+  klageenheter,
+}) => {
   const data = getData(behandlinger, klageenheter);
 
   const labels = data.map((d) => d.name);
