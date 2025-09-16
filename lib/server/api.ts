@@ -83,11 +83,4 @@ export const getSakstyper = () => getData<IKodeverkSimpleValue<Sakstype>[]>(AppN
 export const getSakstyperToUtfall = () => getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
 export const getInnsendingshjemlerMap = () => getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/hjemlermap');
 
-const ANKE_I_TRYGDERETTEN_ID = '3';
-
-export const getSakstyperWithoutAnkeITR = async () => {
-  const data = await getSakstyper();
-
-  return data.filter((s) => s.id !== ANKE_I_TRYGDERETTEN_ID);
-};
 export const getPåVentReasons = () => getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
