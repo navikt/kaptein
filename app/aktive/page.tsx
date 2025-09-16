@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import { Behandlinger } from '@/app/aktive/behandlinger';
 import { getKlageenheter, getPåVentReasons, getSakstyper, getYtelser } from '@/lib/server/api';
+
+export const metadata: Metadata = {
+  title: 'Aktive saker - Kaptein',
+};
 
 export default async function Page() {
   const ytelser = await getYtelser();

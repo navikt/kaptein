@@ -1,8 +1,11 @@
-'use client';
-
 import { BodyShort, BoxNew, Heading, VStack } from '@navikt/ds-react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import logo from './logo.png';
+
+export const metadata: Metadata = {
+  title: 'Kaptein',
+};
 
 export default function KapteinPage() {
   return (
