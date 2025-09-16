@@ -2,8 +2,9 @@ import { isBefore } from 'date-fns';
 import { ExceededFrist } from '@/components/behandlinger/use-frist-color';
 import type { State } from '@/components/graphs/varslet-frist/type';
 import type { GetGraphStateFn } from '@/lib/graphs';
+import type { Behandling } from '@/lib/server/types';
 
-export const getVarsletFristState: GetGraphStateFn<State> = ({ behandlinger }) => {
+export const getVarsletFristState: GetGraphStateFn<State, Behandling> = ({ behandlinger }) => {
   const TODAY = new Date();
 
   const map = behandlinger.reduce<Record<ExceededFrist, number>>(

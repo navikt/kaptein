@@ -5,7 +5,7 @@ import type { Serie, State } from '@/components/graphs/frist-i-kabal-per-ytelse/
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getFristIKabalPerYtelseState: GetGraphStateFn<State> = ({ behandlinger, ytelser }) => {
+export const getFristIKabalPerYtelseState: GetGraphStateFn<State, Behandling> = ({ behandlinger, ytelser }) => {
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(relevanteYtelser, behandlinger);
   const labels = getLabels(relevanteYtelser, series);
