@@ -5,7 +5,7 @@ import type { Serie, State } from '@/components/graphs/frist-per-ytelse/types';
 import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 
-export const getFristPerYtelseState: GetGraphStateFn<State> = ({ behandlinger, ytelser }) => {
+export const getFristPerYtelseState: GetGraphStateFn<State, Behandling> = ({ behandlinger, ytelser }) => {
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(behandlinger, relevanteYtelser);
   const labels = getLabels(relevanteYtelser, series);

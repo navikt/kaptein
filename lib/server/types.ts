@@ -61,48 +61,85 @@ export interface BehandlingResponse {
   total: number;
 }
 
-export interface Behandling {
+interface BaseBehandling {
   ageKA: number;
-  avsluttetAvSaksbehandlerDate: string | null;
   created: string;
-  datoSendtMedunderskriver: string | null;
-  fagsystemId: string;
-  feilregistrering: string | null;
-  fraNAVEnhet: string;
   frist: string | null;
   hjemmelIdList: string[];
   id: string;
-  isAvsluttetAvSaksbehandler: boolean;
-  kjennelseMottatt: string | null;
-  modified: string;
-  mottattKlageinstans: string;
-  mottattVedtaksinstans: string;
-  resultat: {
-    id: string;
-    utfallId: string;
-    extraUtfallIdSet: string[];
-    hjemmelIdSet: string[];
-  };
-  sattPaaVent:
-    | ({
-        from: string;
-        to: string;
-      } & Reason)
-    | null;
-  sendtTilTrygderetten: string | null;
-  temaId: string;
   tilbakekreving: boolean;
   typeId: Sakstype;
   varsletFrist: string | null;
   ytelseId: string;
-  isTildelt: boolean;
-  tildeltEnhet: string | null;
 }
+
+export interface LedigBehandling extends BaseBehandling {
+  isTildelt: false;
+  sattPaaVent: null;
+  tildeltEnhet: null;
+}
+
+export interface TildeltBehandling extends BaseBehandling {
+  isTildelt: true;
+  sattPaaVent: Reason | null;
+  tildeltEnhet: string;
+}
+
+export type AktivBehandling = LedigBehandling | TildeltBehandling;
+
+export interface FerdigstiltBehandling extends BaseBehandling {
+  avsluttetAvSaksbehandlerDate: string;
+  tildeltEnhet: string;
+  resultat: {
+    hjemmelIdSet: string[];
+    utfallId: string;
+  };
+}
+
+export type Behandling = AktivBehandling | FerdigstiltBehandling;
+
+// export interface Behandling {
+//   ageKA: number;
+//   avsluttetAvSaksbehandlerDate: string | null;
+//   created: string;
+//   datoSendtMedunderskriver: string | null;
+//   fagsystemId: string;
+//   feilregistrering: string | null;
+//   fraNAVEnhet: string;
+//   frist: string | null;
+//   hjemmelIdList: string[];
+//   id: string;
+//   isAvsluttetAvSaksbehandler: boolean;
+//   kjennelseMottatt: string | null;
+//   modified: string;
+//   mottattKlageinstans: string;
+//   mottattVedtaksinstans: string;
+//   resultat: {
+//     id: string;
+//     utfallId: string;
+//     extraUtfallIdSet: string[];
+//     hjemmelIdSet: string[];
+//   };
+//   sattPaaVent:
+//     | ({
+//         from: string;
+//         to: string;
+//       } & Reason)
+//     | null;
+//   sendtTilTrygderetten: string | null;
+//   temaId: string;
+//   tilbakekreving: boolean;
+//   typeId: Sakstype;
+//   varsletFrist: string | null;
+//   ytelseId: string;
+//   isTildelt: boolean;
+//   tildeltEnhet: string | null;
+// }
 
 export enum Sakstype {
   KLAGE = '1',
   ANKE = '2',
-  ANKE_I_TRYGDERETTEN = '3',
+  // ANKE_I_TRYGDERETTEN = '3',
   BEHANDLING_ETTER_TR_OPPHEVET = '4',
   OMGJØRINGSKRAV = '5',
 }

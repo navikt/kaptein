@@ -9,13 +9,13 @@ interface Props {
   title: string;
   behandlinger: Behandling[];
   relevantYtelser: IKodeverkSimpleValue[];
-  klageenheterkodeverk: IKodeverkSimpleValue[];
+  klageenheter: IKodeverkSimpleValue[];
 }
 
 export const TildelteSakerPerYtelseOgKlageenhet = ({
   behandlinger,
   relevantYtelser,
-  klageenheterkodeverk,
+  klageenheter: klageenheterkodeverk,
   title,
 }: Props) => {
   const series = useMemo(

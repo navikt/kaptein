@@ -5,7 +5,7 @@ import type { GetGraphStateFn } from '@/lib/graphs';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const getAlderPerYtelseState: GetGraphStateFn<State> = ({ behandlinger, ytelser, searchParams }) => {
+export const getAlderPerYtelseState: GetGraphStateFn<State, Behandling> = ({ behandlinger, ytelser, searchParams }) => {
   const maxAge = parseMaxAge(searchParams);
   const relevanteYtelser = getRelevantYtelser(behandlinger, ytelser);
   const series = getSeries(relevanteYtelser, behandlinger, maxAge);

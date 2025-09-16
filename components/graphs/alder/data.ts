@@ -1,9 +1,10 @@
 import { Age } from '@/components/behandlinger/use-frist-color';
 import type { State } from '@/components/graphs/alder/types';
 import type { GetGraphStateFn } from '@/lib/graphs';
+import type { Behandling } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const getAlderState: GetGraphStateFn<State> = ({ behandlinger, searchParams }) => {
+export const getAlderState: GetGraphStateFn<State, Behandling> = ({ behandlinger, searchParams }) => {
   const maxAge = parseMaxAge(searchParams);
 
   const map = behandlinger.reduce<Record<Age, number>>(
