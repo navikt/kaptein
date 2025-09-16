@@ -7,6 +7,7 @@ import { getTraceparent } from './traceparent';
 const logger = getLogger('obo-token');
 
 export enum AppName {
+  KAPTEIN_API = 'kaptein-api',
   KABAL_API = 'kabal-api',
   KABAL_INNSTILLINGER = 'kabal-innstillinger',
   KLAGE_KODEVERK = 'klage-kodeverk',

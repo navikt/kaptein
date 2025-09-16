@@ -3,10 +3,10 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling } from '@/lib/server/types';
+import type { AktivBehandling } from '@/lib/server/types';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: AktivBehandling[];
 }
 
 const TITLE = 'Tildelte/ledige saker';
