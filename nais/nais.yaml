@@ -16,17 +16,19 @@ spec:
     max: 4
   resources:
     requests:
-      cpu: 100m
-      memory: 256Mi
+      cpu: 20m
+      memory: 128Mi
   liveness:
     failureThreshold: 10
     periodSeconds: 5
     timeout: 1
+    initialDelay: 0
     path: /isAlive
   readiness:
     failureThreshold: 10
     periodSeconds: 5
     timeout: 1
+    initialDelay: 0
     path: /isReady
   kafka:
     pool: {{kafka_pool}}

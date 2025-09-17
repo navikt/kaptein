@@ -1,6 +1,6 @@
 'use client';
 
-import { BodyLong, List, Loader, VStack } from '@navikt/ds-react';
+import { BodyLong, List } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
@@ -14,6 +14,7 @@ import { LoadingError } from '@/components/behandlinger/loading-error';
 import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
+import { SkeletonChartAktive } from '@/components/behandlinger/skeleton-chart';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
@@ -63,11 +64,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   } = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
 
   if (ledigeLoading || tildelteLoading) {
-    return (
-      <VStack align="center" justify="center" className="w-full">
-        <Loader size="3xlarge" />
-      </VStack>
-    );
+    return <SkeletonChartAktive />;
   }
 
   if (ledigeError !== null || tildelteError !== null) {
