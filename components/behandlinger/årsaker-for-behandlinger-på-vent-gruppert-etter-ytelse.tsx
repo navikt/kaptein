@@ -40,6 +40,10 @@ export const PåVentPerYtelse = ({ behandlinger, relevantYtelser, påVentReasons
     return <NoData title={TITLE} />;
   }
 
+  const labels = relevantYtelser.map(
+    (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
+  );
+
   return (
     <EChart
       option={{
@@ -59,7 +63,7 @@ export const PåVentPerYtelse = ({ behandlinger, relevantYtelser, påVentReasons
         },
         yAxis: {
           type: 'category',
-          data: relevantYtelser.map((y) => y.navn),
+          data: labels,
         },
         series,
       }}
