@@ -12,7 +12,7 @@ interface Props {
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
-const TITLE = 'Saker per ytelse og sakstype (gammel)';
+const TITLE = 'Saker per ytelse og sakstype';
 
 export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, sakstyper }: Props) => {
   const series = useMemo(
