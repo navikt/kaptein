@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader, VStack } from '@navikt/ds-react';
+import { BodyLong, List, Loader, VStack } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
@@ -10,6 +10,7 @@ import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
+import { LoadingError } from '@/components/behandlinger/loading-error';
 import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
@@ -50,14 +51,34 @@ interface KodeverkProps {
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
-  const ledige = useClientFetch<LedigeResponse>('/api/behandlinger/ledige');
-  const tildelte = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
+  const {
+    data: ledige,
+    error: ledigeError,
+    isLoading: ledigeLoading,
+  } = useClientFetch<LedigeResponse>('/api/behandlinger/ledige');
+  const {
+    data: tildelte,
+    error: tildelteError,
+    isLoading: tildelteLoading,
+  } = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
 
-  if (ledige === null || tildelte === null) {
+  if (ledigeLoading || tildelteLoading) {
     return (
       <VStack align="center" justify="center" className="w-full">
         <Loader size="3xlarge" />
       </VStack>
+    );
+  }
+
+  if (ledigeError !== null || tildelteError !== null) {
+    return (
+      <LoadingError>
+        <BodyLong>Feil ved lasting av data:</BodyLong>
+        <List>
+          {ledigeError === null ? null : <List.Item>{ledigeError}</List.Item>}
+          {tildelteError === null ? null : <List.Item>{tildelteError}</List.Item>}
+        </List>
+      </LoadingError>
     );
   }
 

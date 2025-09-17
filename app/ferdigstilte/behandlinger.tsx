@@ -5,6 +5,7 @@ import { Alder } from '@/components/behandlinger/alder';
 import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
 import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
+import { LoadingError } from '@/components/behandlinger/loading-error';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
@@ -33,9 +34,9 @@ interface KodeverkProps {
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
-  const response = useClientFetch<Response>('/api/behandlinger/ferdigstilte');
+  const { data, isLoading, error } = useClientFetch<Response>('/api/behandlinger/ferdigstilte');
 
-  if (response === null) {
+  if (isLoading) {
     return (
       <VStack align="center" justify="center" className="w-full">
         <Loader size="3xlarge" />
@@ -43,7 +44,11 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     );
   }
 
-  return <BehandlingerData {...response} {...kodeverk} />;
+  if (error !== null) {
+    return <LoadingError>Feil ved lasting av data: {error}</LoadingError>;
+  }
+
+  return <BehandlingerData {...data} {...kodeverk} />;
 };
 
 const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Response & KodeverkProps) => {
