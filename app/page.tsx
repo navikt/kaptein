@@ -1,7 +1,7 @@
 import { BodyShort, BoxNew, Heading, VStack } from '@navikt/ds-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import logo from './logo.png';
+import logo from './logo_small.png';
 
 export const metadata: Metadata = {
   title: 'Kaptein',
