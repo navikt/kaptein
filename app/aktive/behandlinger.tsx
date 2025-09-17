@@ -158,7 +158,7 @@ const BehandlingerData = ({
         <Card span={4}>
           <TildelteSakerPerYtelseOgKlageenhet
             title="Tildelte saker per ytelse og klageenhet"
-            behandlinger={filteredBehandlinger}
+            behandlinger={filteredTildelte}
             klageenheter={klageenheter}
             relevantYtelser={relevantYtelser}
           />
