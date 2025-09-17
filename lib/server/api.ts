@@ -5,13 +5,13 @@ import { getLogger } from '@/lib/logger';
 import { getFromKabal } from '@/lib/server/fetch';
 import { AppName } from '@/lib/server/get-obo-token';
 import { generateTraceParent } from '@/lib/server/traceparent';
-import type {
-  IKodeverkSimpleValue,
-  IKodeverkValue,
-  IUserData,
-  IYtelse,
+import {
+  type IKodeverkSimpleValue,
+  type IKodeverkValue,
+  type IUserData,
+  type IYtelse,
   Sakstype,
-  SakstypeToUtfall,
+  type SakstypeToUtfall,
 } from '@/lib/server/types';
 
 const logger = getLogger('api');
@@ -79,8 +79,11 @@ export const getUtfall = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KOD
 export const getKlageenheter = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/klageenheter');
 export const getLovkildeToRegistreringshjemler = () =>
   getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/lovkildetoregistreringshjemler');
-export const getSakstyper = () => getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
 export const getSakstyperToUtfall = () => getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
 export const getInnsendingshjemlerMap = () => getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/hjemlermap');
-
 export const getPåVentReasons = () => getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
+export const getSakstyper = async () => {
+  const sakstyper = await getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
+
+  return sakstyper.filter(({ id }) => id !== Sakstype.ANKE_I_TRYGDERETTEN);
+};

@@ -15,8 +15,8 @@ export default function KapteinPage() {
           Velkommen til Kaptein
         </Heading>
         <Image src={logo} alt="Kaptein-logo" width={200} height={200} />
-        <BodyShort className="border-ax-neutral-500 border-l-4 p-3 italic">
-          Statistikk er den vitenskap som sier at hvis man har et bein i fryseboksen og et annet på kokeplaten, så har
+        <BodyShort className="border-ax-neutral-500 border-l-4 p-3 italic" size="large">
+          Statistikk er den vitenskap som sier at hvis man har ett bein i fryseboksen og et annet på kokeplaten, så har
           man det i gjennomsnitt ganske skjønt.
         </BodyShort>
       </VStack>
