@@ -23,6 +23,7 @@ export class ProxyError extends Error {
   constructor(
     message: string,
     public duration: number,
+    public error: Error,
   ) {
     super(message);
     this.name = 'ProxyError';

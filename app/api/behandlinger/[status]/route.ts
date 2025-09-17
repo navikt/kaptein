@@ -3,9 +3,9 @@ import type { NextRequest } from 'next/server';
 import { formatBytes } from '@/app/api/behandlinger/[status]/format-bytes';
 import { isDeployed, isLocal } from '@/lib/environment';
 import { getLogger } from '@/lib/logger';
-import { AbortError, ProxyError, TimeoutError } from '@/lib/proxy/errors';
-import { type EndInfo, handleProxyRequest } from '@/lib/proxy/proxy';
 import { AppName, getOboToken } from '@/lib/server/get-obo-token';
+import { AbortError, ProxyError, TimeoutError } from '@/lib/server/proxy/errors';
+import { type EndInfo, handleProxyRequest } from '@/lib/server/proxy/proxy';
 import { generateTraceParent, parseTraceParent } from '@/lib/server/traceparent';
 
 const log = getLogger('behandlinger-proxy');

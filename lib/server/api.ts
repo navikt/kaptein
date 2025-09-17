@@ -76,7 +76,11 @@ export const getUser = () => getData<IUserData>(AppName.KABAL_INNSTILLINGER, '/m
 export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/${path}`);
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/ytelser');
 export const getUtfall = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/utfall');
-export const getKlageenheter = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/klageenheter');
+export const getKlageenheter = async () => {
+  const enheter = await getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/klageenheter');
+
+  return [...enheter, STYRINGSENHETEN];
+};
 export const getLovkildeToRegistreringshjemler = () =>
   getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/lovkildetoregistreringshjemler');
 export const getSakstyperToUtfall = () => getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
@@ -87,3 +91,5 @@ export const getSakstyper = async () => {
 
   return sakstyper.filter(({ id }) => id !== Sakstype.ANKE_I_TRYGDERETTEN);
 };
+
+const STYRINGSENHETEN = { value: '4200', label: 'Nav klageinstans styringsenhet' };

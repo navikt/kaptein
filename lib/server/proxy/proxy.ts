@@ -1,15 +1,14 @@
 import http, { type IncomingMessage, type OutgoingHttpHeaders } from 'node:http';
 import https from 'node:https';
-import type { NextRequest } from 'next/server';
-import { AbortError, ProxyError, TimeoutError } from '@/lib/proxy/errors';
-import { getResponseHeaders, prepareProxyHeaders } from '@/lib/proxy/headers';
+import { AbortError, ProxyError, TimeoutError } from '@/lib/server/proxy/errors';
+import { getResponseHeaders, prepareProxyHeaders } from '@/lib/server/proxy/headers';
 
 export interface EndInfo {
   bytes: number;
   duration: number;
 }
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 
 interface TargetOptions {
   targetUrl: URL | string;
@@ -20,8 +19,8 @@ interface TargetOptions {
 }
 
 export const handleProxyRequest = async (
-  req: NextRequest,
-  { targetUrl, method = 'GET', timeout = 30_000, overrideHeaders, onEnd }: TargetOptions,
+  req: Request,
+  { targetUrl, method = 'GET', timeout = 0, overrideHeaders, onEnd }: TargetOptions,
 ): Promise<Response> => {
   const url = typeof targetUrl === 'string' ? new URL(targetUrl) : targetUrl;
   const request = url.protocol === 'https:' ? https.request : http.request;
@@ -65,7 +64,7 @@ export const handleProxyRequest = async (
 
 const getProxyResponse = async (
   request: typeof http.request | typeof https.request,
-  req: NextRequest,
+  req: Request,
   method: Method,
   url: URL,
   headers: OutgoingHttpHeaders,
@@ -94,7 +93,7 @@ const getProxyResponse = async (
     });
 
     proxyReq.once('error', (error) => {
-      reject(new ProxyError(`Proxy error: ${error.message}`, getDuration(start)));
+      reject(new ProxyError(`Proxy error: ${error.message}`, getDuration(start), error));
     });
 
     proxyReq.end();
