@@ -98,7 +98,7 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
         <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
-      <Card span={4}>
+      <Card span={2}>
         <Alder behandlinger={filteredBehandlinger} />
       </Card>
 

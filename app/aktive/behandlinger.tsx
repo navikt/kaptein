@@ -11,7 +11,6 @@ import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
 import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
 import { LoadingError } from '@/components/behandlinger/loading-error';
-import { PåVentPerYtelse } from '@/components/behandlinger/på-vent-per-ytelse';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
 import { SkeletonChartAktive } from '@/components/behandlinger/skeleton-chart';
@@ -22,6 +21,7 @@ import { useAktive } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
 import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
+import { PåVentPerYtelse } from '@/components/behandlinger/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
@@ -180,7 +180,7 @@ const BehandlingerData = ({
         <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
-      <Card span={4}>
+      <Card span={2}>
         <Alder behandlinger={filteredBehandlinger} />
       </Card>
 
