@@ -3,11 +3,11 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, TildeltBehandling } from '@/lib/server/types';
 
 interface Props {
   title: string;
-  behandlinger: Behandling[];
+  behandlinger: TildeltBehandling[];
   klageenheter: IKodeverkSimpleValue[];
 }
 
@@ -22,10 +22,7 @@ export const TildelteSakerPerKlageenhet = ({ behandlinger, klageenheter, title }
         existing.value += 1;
       } else {
         map.set(b.tildeltEnhet, {
-          name:
-            b.tildeltEnhet === null
-              ? 'Ikke tildelt'
-              : (klageenheter.find((k) => k.id === b.tildeltEnhet)?.navn ?? b.tildeltEnhet),
+          name: klageenheter.find((k) => k.id === b.tildeltEnhet)?.navn ?? b.tildeltEnhet,
           value: 1,
         });
       }

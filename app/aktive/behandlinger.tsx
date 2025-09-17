@@ -17,7 +17,7 @@ import { SkeletonChartAktive } from '@/components/behandlinger/skeleton-chart';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
-import { useAktive } from '@/components/behandlinger/use-data';
+import { useAktive, useTildelte } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
 import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
@@ -107,6 +107,7 @@ const BehandlingerData = ({
   }, [tildelingFilter, ledige, tildelte]);
 
   const filteredBehandlinger = useAktive(behandlinger);
+  const filteredTildelte = useTildelte(tildelte.behandlinger);
   const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
 
   return (
@@ -146,7 +147,7 @@ const BehandlingerData = ({
       {showsLedige ? null : (
         <Card>
           <TildelteSakerPerKlageenhet
-            behandlinger={filteredBehandlinger}
+            behandlinger={filteredTildelte}
             klageenheter={klageenheter}
             title="Tildelte saker per klageenhet"
           />

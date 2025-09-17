@@ -51,6 +51,10 @@ export const useAktive = (behandlinger: (LedigBehandling | TildeltBehandling)[])
   return useFiltered(behandlinger);
 };
 
+export const useTildelte = (behandlinger: TildeltBehandling[]) => {
+  return useFiltered(behandlinger);
+};
+
 const useFiltered = <T extends Behandling>(behandlinger: T[]): T[] => {
   const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
   const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
