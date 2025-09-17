@@ -3,10 +3,10 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { AktivBehandling } from '@/lib/server/types';
+import type { TildeltBehandling } from '@/lib/server/types';
 
 interface Props {
-  behandlinger: AktivBehandling[];
+  behandlinger: TildeltBehandling[];
 }
 
 const TITLE = 'Tildelte saker på vent / ikke på vent';
