@@ -1,7 +1,10 @@
 import http, { type IncomingMessage, type OutgoingHttpHeaders } from 'node:http';
 import https from 'node:https';
+import { getLogger } from '@/lib/logger';
 import { AbortError, ProxyError, TimeoutError } from '@/lib/server/proxy/errors';
 import { getResponseHeaders, prepareProxyHeaders } from '@/lib/server/proxy/headers';
+
+const log = getLogger('behandlinger-proxy');
 
 export interface EndInfo {
   bytes: number;
@@ -14,23 +17,29 @@ interface TargetOptions {
   timeout?: number;
   overrideHeaders?: OutgoingHttpHeaders;
   onEnd?: (info: EndInfo) => void;
+  traceId: string;
+  spanId: string;
 }
 
 export const handleProxyRequest = async (
   req: Request,
-  { targetUrl, method = 'GET', timeout = 0, overrideHeaders, onEnd }: TargetOptions,
+  { targetUrl, method = 'GET', timeout = 0, overrideHeaders, onEnd, traceId, spanId }: TargetOptions,
 ): Promise<Response> => {
   const url = typeof targetUrl === 'string' ? new URL(targetUrl) : targetUrl;
-  const request = url.protocol === 'https:' ? https.request : http.request;
+  const request = url.protocol === 'https:' || url.protocol === 'wss:' ? https.request : http.request;
+  log.debug(`Preparing headers for ${method} ${url.href}`, traceId, spanId);
   const requestHeaders = prepareProxyHeaders(url, req, overrideHeaders);
 
   const start = performance.now();
 
   const res = await getProxyResponse(request, req, method, url, requestHeaders, req.signal, timeout);
+  log.debug(`Received response for ${method} ${url.href}`, traceId, spanId);
 
   const headers = getResponseHeaders(res);
 
   let bytes = 0; // Counter for bytes proxied.
+
+  log.debug(`Sending response from ${method} ${url.href} (${res.statusCode})`, traceId, spanId);
 
   return new Response(
     new ReadableStream({

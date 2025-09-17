@@ -23,6 +23,8 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger
 
   const { status } = await ctx.params;
 
+  log.debug(`Proxying GET /kaptein-api/behandlinger/${status}`, traceId, spanId);
+
   const url = new URL(KAPTEIN_URL);
 
   url.pathname += `/${status}`;
@@ -38,7 +40,8 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger
     log.info(`Proxied ${formatBytes(bytes)} bytes in ${duration} ms`, traceId, spanId);
 
   try {
-    return handleProxyRequest(req, { targetUrl: url, timeout: 5_000, overrideHeaders, onEnd });
+    log.debug(`Handling GET /kaptein-api/behandlinger/${status}`, traceId, spanId);
+    return handleProxyRequest(req, { targetUrl: url, overrideHeaders, onEnd, traceId, spanId });
   } catch (error) {
     if (error instanceof AbortError) {
       log.warn(`Request aborted after ${error.duration} ms: ${error.message}`, traceId, spanId, {
