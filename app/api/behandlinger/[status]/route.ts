@@ -23,6 +23,8 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger
 
   const { status } = await ctx.params;
 
+  log.debug(`Proxying GET /kaptein-api/behandlinger/${status}`, traceId, spanId);
+
   const url = new URL(KAPTEIN_URL);
 
   url.pathname += `/${status}`;
