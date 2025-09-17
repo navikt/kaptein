@@ -9,7 +9,7 @@ const randomPercentage = () => Math.floor(Math.random() * 100);
 const randomLegendTextWidth = () => Math.floor(Math.random() * 250) + 50;
 const randomTextWidth = () => Math.floor(Math.random() * 50) + 50;
 
-const BarChart = ({ bars = 18 }: { bars?: number }) => (
+const BarChart = ({ bars = 24 }: { bars?: number }) => (
   <VStack justify="space-between" padding="2" className="h-full">
     <Title />
     <div className="grid w-full grid-cols-[30%_70%] gap-x-2 gap-y-2">
@@ -72,7 +72,7 @@ const PieChartLegend = () => (
 
 export const SkeletonChartAktive = () => (
   <ChartsWrapper>
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
@@ -87,7 +87,7 @@ export const SkeletonChartAktive = () => (
     <Card>
       <PieChart />
     </Card>
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
@@ -95,7 +95,7 @@ export const SkeletonChartAktive = () => (
       <BarChart bars={7} />
     </Card>
 
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
@@ -107,11 +107,11 @@ export const SkeletonChartAktive = () => (
       <PieChart />
     </Card>
 
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
@@ -127,7 +127,7 @@ export const SkeletonChartAktive = () => (
 
 export const SkeletonChartFerdigstilte = () => (
   <ChartsWrapper>
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
@@ -139,7 +139,7 @@ export const SkeletonChartFerdigstilte = () => (
       <BarChart bars={7} />
     </Card>
 
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
@@ -151,11 +151,11 @@ export const SkeletonChartFerdigstilte = () => (
       <PieChart />
     </Card>
 
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 
-    <Card span={3}>
+    <Card span={4}>
       <BarChart />
     </Card>
 

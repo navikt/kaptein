@@ -53,7 +53,7 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
 
   return (
     <ChartsWrapper>
-      <Card span={3}>
+      <Card span={4}>
         <SakerPerYtelseOgSakstype
           behandlinger={filteredBehandlinger}
           sakstyper={sakstyper}
@@ -65,7 +65,7 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
         <SakerPerSakstype behandlinger={filteredBehandlinger} sakstyper={sakstyper} />
       </Card>
 
-      <Card span={3}>
+      <Card span={4}>
         <TildelteSakerPerKlageenhet
           title="Saker per klageenhet"
           behandlinger={filteredBehandlinger}
@@ -73,7 +73,7 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
         />
       </Card>
 
-      <Card span={3}>
+      <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Saker per ytelse og klageenhet"
           behandlinger={filteredBehandlinger}
@@ -90,15 +90,15 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
         <FristIKabal behandlinger={filteredBehandlinger} />
       </Card>
 
-      <Card span={3}>
+      <Card span={4}>
         <VarsletFristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
-      <Card span={3}>
+      <Card span={4}>
         <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
-      <Card span={3}>
+      <Card span={4}>
         <Alder behandlinger={filteredBehandlinger} />
       </Card>
 
