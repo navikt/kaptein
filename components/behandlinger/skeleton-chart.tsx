@@ -92,7 +92,7 @@ export const SkeletonChartAktive = () => (
     </Card>
 
     <Card>
-      <BarChart bars={7} />
+      <BarChart bars={6} />
     </Card>
 
     <Card span={4}>
