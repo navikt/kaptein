@@ -21,7 +21,7 @@ export const handleProxyRequest = async (
   { targetUrl, method = 'GET', timeout = 0, overrideHeaders, onEnd }: TargetOptions,
 ): Promise<Response> => {
   const url = typeof targetUrl === 'string' ? new URL(targetUrl) : targetUrl;
-  const request = url.protocol === 'https:' ? https.request : http.request;
+  const request = url.protocol === 'https:' || url.protocol === 'wss:' ? https.request : http.request;
   const requestHeaders = prepareProxyHeaders(url, req, overrideHeaders);
 
   const start = performance.now();
@@ -109,8 +109,9 @@ const writeStream = async (proxyReq: http.ClientRequest, body: ReadableStream<Ui
     proxyReq.write(value);
   }
 
-  const { value } = await reader.read();
-  proxyReq.end(value);
+  // const { value } = await reader.read();
+  // proxyReq.end(value);
+  proxyReq.end();
 };
 
 const getDuration = (start: number) => Math.round(performance.now() - start);
