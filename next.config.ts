@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['@navikt/ds-react', '@navikt/aksel-icons'],
     authInterrupts: true,
   },
+  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://cdn.nav.no/klage/kaptein' : undefined,
   output: 'standalone',
   poweredByHeader: false,
 };

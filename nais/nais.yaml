@@ -44,13 +44,6 @@ spec:
     sidecar:
       enabled: true
       autoLogin: true
-      autoLoginIgnorePaths:
-        - /*.js.map
-        - /*.js
-        - /*.html
-        - /*.txt
-        - /*.css
-        - /api/behandlinger-stream
   prometheus:
     enabled: true
     path: /metrics
