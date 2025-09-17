@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   assetPrefix: process.env.NODE_ENV === 'production' ? 'https://cdn.nav.no/klage/kaptein' : undefined,
   output: 'standalone',
   poweredByHeader: false,
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
