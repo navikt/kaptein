@@ -11,7 +11,7 @@ interface Props {
   påVentReasons: IKodeverkValue[];
 }
 
-const TITLE = 'Behandlinger på vent gruppert på ytelse';
+const TITLE = 'Årsaker for behandlinger på vent gruppert etter ytelse';
 
 export const PåVentPerYtelse = ({ behandlinger, relevantYtelser, påVentReasons }: Props) => {
   const påVentBehandlinger = useMemo(() => behandlinger.filter((b) => b.sattPaaVent !== null), [behandlinger]);
