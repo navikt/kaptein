@@ -13,7 +13,7 @@ const log = getLogger('behandlinger-proxy');
 export const dynamic = 'force-dynamic';
 
 const KAPTEIN_URL = isLocal
-  ? new URL('https://kaptein-api.intern.dev.nav.no/behandlinger')
+  ? new URL('https://kaptein.intern.dev.nav.no/api/behandlinger')
   : new URL('http://kaptein-api/behandlinger');
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger/[status]'>): Promise<Response> {
