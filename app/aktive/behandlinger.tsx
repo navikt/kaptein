@@ -21,7 +21,7 @@ import { useAktive, useTildelte } from '@/components/behandlinger/use-data';
 import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
 import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
-import { PåVentPerYtelse } from '@/components/behandlinger/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
+import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/behandlinger/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
@@ -136,13 +136,15 @@ const BehandlingerData = ({
         </Card>
       )}
 
-      <Card span={4}>
-        <PåVentPerYtelse
-          behandlinger={filteredBehandlinger}
-          relevantYtelser={relevantYtelser}
-          påVentReasons={påVentReasons}
-        />
-      </Card>
+      {showsLedige ? null : (
+        <Card span={4}>
+          <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
+            behandlinger={filteredBehandlinger}
+            relevantYtelser={relevantYtelser}
+            påVentReasons={påVentReasons}
+          />
+        </Card>
+      )}
 
       {showsLedige ? null : (
         <Card>
