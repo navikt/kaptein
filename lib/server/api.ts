@@ -83,7 +83,11 @@ export const getKlageenheter = async () => {
 };
 export const getLovkildeToRegistreringshjemler = () =>
   getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/lovkildetoregistreringshjemler');
-export const getSakstyperToUtfall = () => getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
+export const getSakstyperToUtfall = async () => {
+  const sakstyper = await getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
+
+  return sakstyper.filter(({ id }) => id !== Sakstype.ANKE_I_TRYGDERETTEN);
+};
 export const getInnsendingshjemlerMap = () => getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/hjemlermap');
 export const getPåVentReasons = () => getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
 export const getSakstyper = async () => {
