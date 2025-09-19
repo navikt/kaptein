@@ -136,7 +136,7 @@ export const SkeletonChartFerdigstilte = () => (
     </Card>
 
     <Card>
-      <BarChart bars={7} />
+      <BarChart bars={6} />
     </Card>
 
     <Card span={4}>
@@ -163,8 +163,8 @@ export const SkeletonChartFerdigstilte = () => (
       <PieChart />
     </Card>
 
-    <Card>
-      <BarChart bars={7} />
+    <Card span={4}>
+      <BarChart />
     </Card>
   </ChartsWrapper>
 );

@@ -7,7 +7,7 @@ import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
 import { LoadingError } from '@/components/behandlinger/loading-error';
 import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
-import { SkeletonChartAktive } from '@/components/behandlinger/skeleton-chart';
+import { SkeletonChartFerdigstilte } from '@/components/behandlinger/skeleton-chart';
 import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
 import { useFerdigstilte } from '@/components/behandlinger/use-data';
@@ -37,7 +37,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   const { data, isLoading, error } = useClientFetch<Response>('/api/behandlinger/ferdigstilte');
 
   if (isLoading) {
-    return <SkeletonChartAktive />;
+    return <SkeletonChartFerdigstilte />;
   }
 
   if (error !== null) {
