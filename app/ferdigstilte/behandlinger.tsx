@@ -65,7 +65,7 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
         <SakerPerSakstype behandlinger={filteredBehandlinger} sakstyper={sakstyper} />
       </Card>
 
-      <Card span={4}>
+      <Card>
         <TildelteSakerPerKlageenhet
           title="Saker per klageenhet"
           behandlinger={filteredBehandlinger}
