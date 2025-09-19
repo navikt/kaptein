@@ -11,5 +11,5 @@ export const useRelevantYtelser = (behandlinger: Behandling[], ytelser: IYtelse[
 
         return kodeverk === undefined ? { id, navn: id } : { id, navn: kodeverk.navn };
       })
-      .toSorted((a, b) => a.navn.localeCompare(b.navn));
+      .toSorted((a, b) => b.navn.localeCompare(a.navn));
   }, [behandlinger, ytelser]);
