@@ -47,7 +47,7 @@ export const YtelserAndRegistreringshjemler = ({ ytelser, lovkildeToRegistrering
 
       <SubFilter>
         <Registreringshjemler
-          relevantYtelserkoderverk={relevantKodeverk}
+          relevantYtelser={relevantKodeverk}
           lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
         />
       </SubFilter>
@@ -72,7 +72,7 @@ export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }
       />
 
       <SubFilter>
-        <Innsendingshjemler relevantYtelserkoderverk={relevantKodeverk} />
+        <Innsendingshjemler relevantYtelser={relevantKodeverk} />
       </SubFilter>
     </>
   );

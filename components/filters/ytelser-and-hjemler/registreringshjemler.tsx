@@ -9,11 +9,11 @@ import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  relevantYtelserkoderverk: IYtelse[];
+  relevantYtelser: IYtelse[];
   lovkildeToRegistreringshjemler: IKodeverkSimpleValue[];
 }
 
-export const Registreringshjemler = ({ relevantYtelserkoderverk, lovkildeToRegistreringshjemler }: Props) => {
+export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringshjemler }: Props) => {
   const [selectedHjemler, setSelectedHjemler] = useQueryState(
     QueryParam.REGISTRERINGSHJEMLER,
     parseAsArrayOf(parseAsString),
@@ -25,7 +25,7 @@ export const Registreringshjemler = ({ relevantYtelserkoderverk, lovkildeToRegis
     const hjemler: Map<string, Map<string, string>> = new Map();
 
     // Create map with unique entries
-    for (const ytelse of relevantYtelserkoderverk) {
+    for (const ytelse of relevantYtelser) {
       for (const { registreringshjemler, lovkilde } of ytelse.lovKildeToRegistreringshjemler) {
         for (const hjemmel of registreringshjemler) {
           const existing = hjemler.get(lovkilde.id);
@@ -54,7 +54,7 @@ export const Registreringshjemler = ({ relevantYtelserkoderverk, lovkildeToRegis
           .toSorted(([, a], [, b]) => sortWithOrdinals(a, b))
           .map(([value, label]) => ({ label, value })),
       }));
-  }, [relevantYtelserkoderverk, lovkildeToRegistreringshjemler]);
+  }, [relevantYtelser, lovkildeToRegistreringshjemler]);
 
   const selectedOptions = selectedHjemler ?? [];
 
