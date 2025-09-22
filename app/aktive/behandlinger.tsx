@@ -5,24 +5,24 @@ import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
-import { Alder } from '@/components/behandlinger/alder';
-import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
-import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
-import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
-import { LedigeVsTildelte } from '@/components/behandlinger/ledige-vs-tildelte';
-import { LoadingError } from '@/components/behandlinger/loading-error';
-import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
-import { SkeletonChartAktive } from '@/components/behandlinger/skeleton-chart';
-import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
-import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
-import { TildelteSakerPåVentIkkePåVent } from '@/components/behandlinger/tildelte-saker-på-vent-ikke-på-vent';
-import { useAktive, useTildelte } from '@/components/behandlinger/use-data';
-import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
-import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
-import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
-import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/behandlinger/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { Card } from '@/components/cards';
+import { Alder } from '@/components/charts/alder';
+import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
+import { LoadingError } from '@/components/charts/common/loading-error';
+import { SkeletonAktive } from '@/components/charts/common/skeleton-chart';
+import { useAktive, useTildelte } from '@/components/charts/common/use-data';
+import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
+import { FristIKabal } from '@/components/charts/frist-i-kabal';
+import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
+import { LedigeVsTildelte } from '@/components/charts/ledige-vs-tildelte';
+import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
+import { SakerPerYtelseOgSakstype } from '@/components/charts/saker-per-ytelse-og-sakstype';
+import { TildelteSakerPerKlageenhet } from '@/components/charts/tildelte-saker-per-klageenhet';
+import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
+import { TildelteSakerPåVentIkkePåVent } from '@/components/charts/tildelte-saker-på-vent-ikke-på-vent';
+import { VarsletFrist } from '@/components/charts/varslet-frist';
+import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-ytelse';
+import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/charts/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
 import type {
@@ -64,7 +64,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   } = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
 
   if (ledigeLoading || tildelteLoading) {
-    return <SkeletonChartAktive />;
+    return <SkeletonAktive />;
   }
 
   if (ledigeError !== null || tildelteError !== null) {

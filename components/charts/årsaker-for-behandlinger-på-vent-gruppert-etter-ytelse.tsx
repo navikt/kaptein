@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
-} from '@/components/behandlinger/common-chart-props';
+} from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { type AktivBehandling, type IKodeverkSimpleValue, type IKodeverkValue, PåVentReason } from '@/lib/server/types';

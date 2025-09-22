@@ -1,28 +1,29 @@
 'use client';
 
 import { useMemo } from 'react';
-import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/behandlinger/common-chart-props';
+import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { TildeltBehandling } from '@/lib/server/types';
+import { useSakstypeColor } from '@/lib/echarts/use-colors';
+import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
 
 interface Props {
-  behandlinger: TildeltBehandling[];
+  behandlinger: Behandling[];
+  sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
-const TITLE = 'Tildelte saker på vent / ikke på vent';
+const TITLE = 'Saker per sakstype';
 
-export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
+export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
   const data = useMemo(() => {
-    const map = behandlinger.reduce<Map<boolean, { value: number; name: string }>>((acc, curr) => {
-      const value = curr.sattPaaVent === null;
-      const existing = acc.get(value);
+    const map = behandlinger.reduce<Map<Sakstype, { value: number; name: string }>>((acc, curr) => {
+      const existing = acc.get(curr.typeId);
 
       if (existing) {
         existing.value += 1;
       } else {
-        acc.set(value, {
-          name: value ? 'Ikke på vent' : 'På vent',
+        acc.set(curr.typeId, {
+          name: sakstyper.find((s) => s.id === curr.typeId)?.navn ?? (curr.typeId || curr.typeId),
           value: 1,
         });
       }
@@ -31,7 +32,9 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
     }, new Map());
 
     return Object.values(Object.fromEntries(map));
-  }, [behandlinger]);
+  }, [behandlinger, sakstyper]);
+
+  const color = useSakstypeColor(behandlinger);
 
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;
@@ -45,6 +48,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
         series: [
           {
             ...COMMON_PIE_CHART_SERIES_PROPS,
+            color,
             data,
             label: {
               formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,

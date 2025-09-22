@@ -1,20 +1,20 @@
 'use client';
 
-import { Alder } from '@/components/behandlinger/alder';
-import { AlderPerYtelse } from '@/components/behandlinger/alder-per-ytelse';
-import { FristIKabal } from '@/components/behandlinger/frist-i-kabal';
-import { FristPerYtelse } from '@/components/behandlinger/frist-per-ytelse';
-import { LoadingError } from '@/components/behandlinger/loading-error';
-import { SakerPerSakstype } from '@/components/behandlinger/saker-per-sakstype';
-import { SakerPerYtelseOgSakstype } from '@/components/behandlinger/saker-per-ytelse-og-sakstype';
-import { SkeletonChartFerdigstilte } from '@/components/behandlinger/skeleton-chart';
-import { TildelteSakerPerKlageenhet } from '@/components/behandlinger/tildelte-saker-per-klageenhet';
-import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/behandlinger/tildelte-saker-per-ytelse-og-klageenhet';
-import { useFerdigstilte } from '@/components/behandlinger/use-data';
-import { useRelevantYtelser } from '@/components/behandlinger/use-relevant-ytelser';
-import { VarsletFrist } from '@/components/behandlinger/varslet-frist';
-import { VarsletFristPerYtelse } from '@/components/behandlinger/varslet-frist-per-ytelse';
 import { Card } from '@/components/cards';
+import { Alder } from '@/components/charts/alder';
+import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
+import { LoadingError } from '@/components/charts/common/loading-error';
+import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
+import { useFerdigstilte } from '@/components/charts/common/use-data';
+import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
+import { FristIKabal } from '@/components/charts/frist-i-kabal';
+import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
+import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
+import { SakerPerYtelseOgSakstype } from '@/components/charts/saker-per-ytelse-og-sakstype';
+import { TildelteSakerPerKlageenhet } from '@/components/charts/tildelte-saker-per-klageenhet';
+import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
+import { VarsletFrist } from '@/components/charts/varslet-frist';
+import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
 import type {
@@ -37,7 +37,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   const { data, isLoading, error } = useClientFetch<Response>('/api/behandlinger/ferdigstilte');
 
   if (isLoading) {
-    return <SkeletonChartFerdigstilte />;
+    return <SkeletonFerdigstilte />;
   }
 
   if (error !== null) {

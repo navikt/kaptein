@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { COMMON_BAR_CHART_PROPS } from '@/components/behandlinger/common-chart-props';
+import { COMMON_BAR_CHART_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { FerdigstiltBehandling, IKodeverkSimpleValue, TildeltBehandling } from '@/lib/server/types';

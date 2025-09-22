@@ -6,9 +6,9 @@ import { useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
-} from '@/components/behandlinger/common-chart-props';
-import { DayPicker } from '@/components/behandlinger/day-picker';
-import { Age, getAgeColor } from '@/components/behandlinger/use-frist-color';
+} from '@/components/charts/common/common-chart-props';
+import { DayPicker } from '@/components/charts/common/day-picker';
+import { Age, getAgeColor } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';

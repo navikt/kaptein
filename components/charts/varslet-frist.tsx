@@ -2,8 +2,8 @@
 
 import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
-import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/behandlinger/common-chart-props';
-import { ExceededFrist, useFristPieChartColors } from '@/components/behandlinger/use-frist-color';
+import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
+import { ExceededFrist, useFristPieChartColors } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/server/types';

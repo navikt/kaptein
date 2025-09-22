@@ -70,7 +70,7 @@ const PieChartLegend = () => (
   </div>
 );
 
-export const SkeletonChartAktive = () => (
+export const SkeletonAktive = () => (
   <ChartsWrapper>
     <Card span={4}>
       <BarChart />
@@ -125,7 +125,7 @@ export const SkeletonChartAktive = () => (
   </ChartsWrapper>
 );
 
-export const SkeletonChartFerdigstilte = () => (
+export const SkeletonFerdigstilte = () => (
   <ChartsWrapper>
     <Card span={4}>
       <BarChart />
