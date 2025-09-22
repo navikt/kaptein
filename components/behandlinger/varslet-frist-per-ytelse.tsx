@@ -49,13 +49,14 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
     [behandlinger, relevantYtelser],
   );
 
+  const labels = useMemo(
+    () => relevantYtelser.map((y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
+    [relevantYtelser, series],
+  );
+
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;
   }
-
-  const labels = relevantYtelser.map(
-    (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
-  );
 
   return (
     <EChart

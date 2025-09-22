@@ -39,13 +39,14 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
     [behandlinger, relevantYtelser, klageenheterkodeverk],
   );
 
+  const labels = useMemo(
+    () => relevantYtelser.map((y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
+    [relevantYtelser, series],
+  );
+
   if (behandlinger.length === 0) {
     return <NoData title={title} />;
   }
-
-  const labels = relevantYtelser.map(
-    (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
-  );
 
   return (
     <EChart

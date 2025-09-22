@@ -51,13 +51,14 @@ export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
     [behandlinger, relevantYtelser, maxAge],
   );
 
+  const labels = useMemo(
+    () => relevantYtelser.map((y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
+    [relevantYtelser, series],
+  );
+
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;
   }
-
-  const labels = relevantYtelser.map(
-    (y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
-  );
 
   return (
     <VStack justify="center" align="center" gap="4" className="h-full">

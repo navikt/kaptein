@@ -34,16 +34,20 @@ export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, saksty
     [behandlinger, relevantYtelser, sakstyper],
   );
 
+  const labels = useMemo(
+    () =>
+      relevantYtelser.map(
+        (y, i) =>
+          `${y.navn} (${series
+            .filter(({ data }) => data.some((d) => d !== null))
+            .reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
+      ),
+    [relevantYtelser, series],
+  );
+
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;
   }
-
-  const labels = relevantYtelser.map(
-    (y, i) =>
-      `${y.navn} (${series
-        .filter(({ data }) => data.some((d) => d !== null))
-        .reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
-  );
 
   return (
     <EChart
