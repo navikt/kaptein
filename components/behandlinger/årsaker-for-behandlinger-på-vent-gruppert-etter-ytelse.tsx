@@ -1,6 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
+import {
+  COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
+  COMMON_STACKED_BAR_CHART_PROPS,
+} from '@/components/behandlinger/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { type AktivBehandling, type IKodeverkSimpleValue, type IKodeverkValue, PåVentReason } from '@/lib/server/types';
@@ -23,10 +27,7 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
   const series = useMemo(
     () =>
       Object.values(PåVentReason).map((reason) => ({
-        type: 'bar',
-        stack: 'total',
-        label: { show: true },
-        emphasis: { focus: 'series' },
+        ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: påVentReasons.find((r) => r.id === reason)?.beskrivelse ?? reason,
         data: relevantYtelser
           .map(({ id }) =>
@@ -51,24 +52,9 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
   return (
     <EChart
       option={{
-        title: {
-          text: TITLE,
-          subtext: `Antall behandlinger på vent: ${påVentBehandlinger.length}`,
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        legend: {},
-        xAxis: {
-          type: 'value',
-        },
-        yAxis: {
-          type: 'category',
-          data: labels,
-        },
+        ...COMMON_STACKED_BAR_CHART_PROPS,
+        title: { text: TITLE, subtext: `Antall behandlinger på vent: ${påVentBehandlinger.length}` },
+        yAxis: { type: 'category', data: labels },
         series,
       }}
     />

@@ -2,6 +2,10 @@
 
 import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
+import {
+  COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
+  COMMON_STACKED_BAR_CHART_PROPS,
+} from '@/components/behandlinger/common-chart-props';
 import { ExceededFrist, getFristColor } from '@/components/behandlinger/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
@@ -31,10 +35,7 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
   const series = useMemo(
     () =>
       Object.values(ExceededFrist).map((type) => ({
-        type: 'bar',
-        stack: 'total',
-        label: { show: true },
-        emphasis: { focus: 'series' },
+        ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: type,
         color: getFristColor(type),
         data: relevantYtelser
@@ -59,24 +60,9 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
   return (
     <EChart
       option={{
-        title: {
-          text: TITLE,
-          subtext: `Viser data for ${behandlinger.length} saker`,
-        },
-        legend: {},
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        xAxis: {
-          type: 'value',
-        },
-        yAxis: {
-          type: 'category',
-          data: labels,
-        },
+        ...COMMON_STACKED_BAR_CHART_PROPS,
+        title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
+        yAxis: { type: 'category', data: labels },
         series,
       }}
     />

@@ -1,6 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
+import {
+  COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
+  COMMON_STACKED_BAR_CHART_PROPS,
+} from '@/components/behandlinger/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
@@ -18,10 +22,7 @@ export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, saksty
   const series = useMemo(
     () =>
       sakstyper.map((type) => ({
-        type: 'bar',
-        stack: 'total',
-        label: { show: true },
-        emphasis: { focus: 'series' },
+        ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: type.navn,
         color: getSakstypeColor(type.id),
         data: relevantYtelser
@@ -47,24 +48,9 @@ export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, saksty
   return (
     <EChart
       option={{
-        title: {
-          text: TITLE,
-          subtext: `Viser data for ${behandlinger.length} saker`,
-        },
-        legend: {},
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        xAxis: {
-          type: 'value',
-        },
-        yAxis: {
-          type: 'category',
-          data: labels,
-        },
+        ...COMMON_STACKED_BAR_CHART_PROPS,
+        title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
+        yAxis: { type: 'category', data: labels },
         series,
       }}
     />

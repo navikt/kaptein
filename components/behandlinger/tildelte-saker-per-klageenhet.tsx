@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { COMMON_BAR_CHART_PROPS } from '@/components/behandlinger/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { FerdigstiltBehandling, IKodeverkSimpleValue, TildeltBehandling } from '@/lib/server/types';
@@ -41,29 +42,10 @@ export const TildelteSakerPerKlageenhet = ({ behandlinger, klageenheter, title }
   return (
     <EChart
       option={{
-        title: {
-          text: title,
-          subtext: `Viser data for ${behandlinger.length} tildelte saker`,
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        xAxis: {
-          type: 'value',
-        },
-        yAxis: {
-          type: 'category',
-          data: labels,
-        },
-        series: [
-          {
-            data: values,
-            type: 'bar',
-          },
-        ],
+        ...COMMON_BAR_CHART_PROPS,
+        title: { text: title, subtext: `Viser data for ${behandlinger.length} tildelte saker` },
+        yAxis: { type: 'category', data: labels },
+        series: [{ data: values, type: 'bar' }],
       }}
     />
   );

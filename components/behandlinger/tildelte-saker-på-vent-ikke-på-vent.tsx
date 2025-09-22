@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/behandlinger/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { TildeltBehandling } from '@/lib/server/types';
@@ -25,6 +26,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
           value: 1,
         });
       }
+
       return acc;
     }, new Map());
 
@@ -38,31 +40,14 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger }: Props) => {
   return (
     <EChart
       option={{
-        title: {
-          text: TITLE,
-          subtext: `Viser data for ${behandlinger.length} saker`,
-        },
-        tooltip: {
-          trigger: 'item',
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-        },
+        ...COMMON_PIE_CHART_PROPS,
+        title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
         series: [
           {
-            type: 'pie',
-            radius: '50%',
+            ...COMMON_PIE_CHART_SERIES_PROPS,
             data,
             label: {
               formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
-            },
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
             },
           },
         ],

@@ -2,6 +2,7 @@
 
 import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
+import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/behandlinger/common-chart-props';
 import { ExceededFrist, useFristPieChartColors } from '@/components/behandlinger/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
@@ -51,32 +52,15 @@ export const FristIKabal = ({ behandlinger }: Props) => {
   return (
     <EChart
       option={{
-        title: {
-          text: TITLE,
-          subtext: `Viser data for ${behandlinger.length} saker`,
-        },
-        tooltip: {
-          trigger: 'item',
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-        },
+        ...COMMON_PIE_CHART_PROPS,
+        title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
         series: [
           {
+            ...COMMON_PIE_CHART_SERIES_PROPS,
             color,
-            type: 'pie',
-            radius: '50%',
             data,
             label: {
               formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
-            },
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
             },
           },
         ],

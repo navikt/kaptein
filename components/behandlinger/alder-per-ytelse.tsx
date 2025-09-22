@@ -3,6 +3,10 @@
 import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
+import {
+  COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
+  COMMON_STACKED_BAR_CHART_PROPS,
+} from '@/components/behandlinger/common-chart-props';
 import { DayPicker } from '@/components/behandlinger/day-picker';
 import { Age, getAgeColor } from '@/components/behandlinger/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
@@ -32,10 +36,7 @@ export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
   const series = useMemo(
     () =>
       Object.values(Age).map((type) => ({
-        type: 'bar',
-        stack: 'total',
-        label: { show: true },
-        emphasis: { focus: 'series' },
+        ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: type,
         color: getAgeColor(type),
         data: relevantYtelser
@@ -65,24 +66,9 @@ export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
         height="auto"
         className="grow"
         option={{
-          title: {
-            text: TITLE,
-            subtext: `Viser data for ${behandlinger.length} saker`,
-          },
-          legend: {},
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'shadow',
-            },
-          },
-          xAxis: {
-            type: 'value',
-          },
-          yAxis: {
-            type: 'category',
-            data: labels,
-          },
+          ...COMMON_STACKED_BAR_CHART_PROPS,
+          title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
+          yAxis: { type: 'category', data: labels },
           series,
         }}
       />

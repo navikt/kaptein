@@ -3,6 +3,7 @@
 import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
+import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/behandlinger/common-chart-props';
 import { DayPicker } from '@/components/behandlinger/day-picker';
 import { Age, useAgePieChartColors } from '@/components/behandlinger/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
@@ -27,6 +28,7 @@ export const Alder = ({ behandlinger }: Props) => {
         } else {
           acc[Age.YOUNGER] = acc[Age.YOUNGER] + 1;
         }
+
         return acc;
       },
       {
@@ -53,32 +55,15 @@ export const Alder = ({ behandlinger }: Props) => {
         height="auto"
         className="grow"
         option={{
-          title: {
-            text: TITLE,
-            subtext: `Viser data for ${behandlinger.length} saker`,
-          },
-          tooltip: {
-            trigger: 'item',
-          },
-          legend: {
-            orient: 'vertical',
-            left: 'left',
-          },
+          ...COMMON_PIE_CHART_PROPS,
+          title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
           series: [
             {
               color,
-              type: 'pie',
-              radius: '50%',
+              ...COMMON_PIE_CHART_SERIES_PROPS,
               data,
               label: {
                 formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
-              },
-              emphasis: {
-                itemStyle: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: 'rgba(0, 0, 0, 0.5)',
-                },
               },
             },
           ],
