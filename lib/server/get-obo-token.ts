@@ -19,16 +19,21 @@ export const getOboToken = async (appName: AppName, headers: ReadonlyHeaders) =>
 
   if (authorization === null) {
     logger.error('Missing authorization header', traceId, spanId);
-    unauthorized();
+    return unauthorized();
   }
 
   const [, token] = authorization.split(' ');
+
+  if (token === undefined) {
+    logger.error('Malformed authorization header', traceId, spanId);
+    return unauthorized();
+  }
 
   const validation = await validateToken(token);
 
   if (!validation.ok) {
     logger.error('Invalid token', traceId, spanId);
-    unauthorized();
+    return unauthorized();
   }
 
   const audience = `api://${process.env.NAIS_CLUSTER_NAME}.klage.${appName}/.default`;
@@ -37,7 +42,7 @@ export const getOboToken = async (appName: AppName, headers: ReadonlyHeaders) =>
 
   if (!obo.ok) {
     logger.error(`Failed to get on-behalf-of token for audience: ${audience}`, traceId, spanId);
-    unauthorized();
+    return unauthorized();
   }
 
   return obo.token;

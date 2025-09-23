@@ -19,7 +19,9 @@ const KAPTEIN_URL = isLocal
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger/[status]'>): Promise<Response> {
   const incomingTraceparent = req.headers.get('traceparent');
   const { traceparent, traceId, spanId } =
-    incomingTraceparent === null ? generateTraceParent() : parseTraceParent(incomingTraceparent);
+    incomingTraceparent === null
+      ? generateTraceParent()
+      : (parseTraceParent(incomingTraceparent) ?? generateTraceParent());
 
   const { status } = await ctx.params;
 

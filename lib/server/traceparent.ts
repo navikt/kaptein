@@ -7,7 +7,7 @@ interface TraceParent {
 export const getTraceparent = (incomingHeaders: Headers): TraceParent => {
   const traceparent = incomingHeaders.get('traceparent');
 
-  return traceparent === null ? generateTraceParent() : parseTraceParent(traceparent);
+  return traceparent === null ? generateTraceParent() : (parseTraceParent(traceparent) ?? generateTraceParent());
 };
 
 const TRACE_VERSION = '00';
@@ -31,8 +31,12 @@ export const generateSpanId = (): string => getUuid().substring(0, 16);
 
 const getUuid = () => crypto.randomUUID().replaceAll('-', '');
 
-export const parseTraceParent = (traceparent: string): TraceParent => {
+export const parseTraceParent = (traceparent: string): TraceParent | null => {
   const [_, traceId, spanId, __] = traceparent.split('-');
+
+  if (traceId === undefined || spanId === undefined) {
+    return null;
+  }
 
   return { traceparent, traceId, spanId };
 };
