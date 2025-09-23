@@ -15,7 +15,6 @@ const DEFAULT_TO = format(TODAY, ISO_DATE_FORMAT);
 const DEFAULT_FROM = format(startOfMonth(TODAY), ISO_DATE_FORMAT);
 
 export const Nav = () => {
-  const pathname = usePathname();
   const params = useSearchParams();
 
   const setDefaultParams = useCallback((searchParams: URLSearchParams) => {
@@ -54,21 +53,29 @@ export const Nav = () => {
 
   return (
     <>
-      <InternalHeader.Button
-        as={Link}
-        className={pathname === '/aktive' ? ACTIVE_CLASS : ''}
-        href={`/aktive?${aktiveParams}`}
-      >
-        Aktive saker
-      </InternalHeader.Button>
-
-      <InternalHeader.Button
-        as={Link}
-        className={pathname === '/ferdigstilte' ? ACTIVE_CLASS : ''}
-        href={`/ferdigstilte?${ferdigstilteParams}`}
-      >
-        Ferdigstilte saker
-      </InternalHeader.Button>
+      <NavLink path="/aktive" params={aktiveParams}>Aktive saker</NavLink>
+      <NavLink path="/ferdigstilte" params={ferdigstilteParams}>Ferdigstilte saker</NavLink>
+      <NavLink path="/anker-i-tr" params={ferdigstilteParams}>Anker i TR</NavLink>
     </>
+  );
+};
+
+interface Props {
+  path: string;
+  params: string;
+  children: React.ReactNode;
+}
+
+const NavLink = ({ path, params, children }: Props) => {
+  const pathname = usePathname();
+
+  return (
+    <InternalHeader.Button
+      as={Link}
+      className={pathname === path ? ACTIVE_CLASS : ''}
+      href={`${path}?${params}`}
+    >
+      {children}
+    </InternalHeader.Button>
   );
 };
