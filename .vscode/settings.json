@@ -12,6 +12,7 @@
   "typescript.validate.enable": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifier": "non-relative",
+  "biome.lsp.bin": "node_modules/.bin/biome",
   "workbench.editor.closeOnFileDelete": true,
   "npm-intellisense.importQuotes": "'",
   "npm-intellisense.importES6": true,
