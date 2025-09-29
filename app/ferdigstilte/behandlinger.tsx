@@ -9,6 +9,7 @@ import { useFerdigstilte } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
+import { InngangUtgang } from '@/components/charts/inngang-utgang';
 import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/charts/saker-per-ytelse-og-sakstype';
 import { TildelteSakerPerKlageenhet } from '@/components/charts/tildelte-saker-per-klageenhet';
@@ -104,6 +105,10 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
 
       <Card span={4}>
         <AlderPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+      </Card>
+
+      <Card fullWidth>
+        <InngangUtgang behandlinger={filteredBehandlinger} />
       </Card>
     </ChartsWrapper>
   );
