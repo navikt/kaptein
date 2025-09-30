@@ -4,7 +4,7 @@ import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { SubFilter } from '@/components/filters/sub-filter';
-import type { SakstypeToUtfall } from '@/lib/server/types';
+import type { SakstypeToUtfall } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {

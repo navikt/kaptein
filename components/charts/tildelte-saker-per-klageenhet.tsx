@@ -4,11 +4,11 @@ import { useMemo } from 'react';
 import { COMMON_BAR_CHART_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { FerdigstiltBehandling, IKodeverkSimpleValue, TildeltBehandling } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, Tildelt } from '@/lib/types';
 
 interface Props {
   title: string;
-  behandlinger: (TildeltBehandling | FerdigstiltBehandling)[];
+  behandlinger: Tildelt[];
   klageenheter: IKodeverkSimpleValue[];
 }
 

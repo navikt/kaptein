@@ -1,5 +1,5 @@
 import { ColorToken } from '@/lib/echarts/color-token';
-import { Sakstype } from '@/lib/server/types';
+import { Sakstype } from '@/lib/types';
 
 export const SAKSTYPE_COLORS: Record<Sakstype, ColorToken> = {
   [Sakstype.KLAGE]: ColorToken.Purple500,

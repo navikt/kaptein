@@ -26,20 +26,29 @@ import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
 import type {
+  AnkeLedig,
+  AnkerLedigeResponse,
+  AnkerTildelteResponse,
+  AnkeTildelt,
+  BetongLedig,
+  BetongLedigeResponse,
+  BetongTildelt,
+  BetongTildelteResponse,
   IKodeverkSimpleValue,
   IKodeverkValue,
   IYtelse,
-  LedigeResponse,
+  KlageLedig,
+  KlagerLedigeResponse,
+  KlagerTildelteResponse,
+  KlageTildelt,
+  OmgjøringskravLedig,
+  OmgjøringskravLedigeResponse,
+  OmgjøringskravTildelt,
+  OmgjøringskravTildelteResponse,
   PåVentReason,
   Sakstype,
-  TildelteResponse,
-} from '@/lib/server/types';
+} from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
-
-interface Props {
-  ledige: LedigeResponse;
-  tildelte: TildelteResponse;
-}
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -50,38 +59,121 @@ interface KodeverkProps {
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
   const {
-    data: ledige,
-    error: ledigeError,
-    isLoading: ledigeLoading,
-  } = useClientFetch<LedigeResponse>('/api/behandlinger/ledige');
+    data: klagerLedige,
+    error: klagerLedigeError,
+    isLoading: klagerLedigeLoading,
+  } = useClientFetch<KlagerLedigeResponse>('/api/klager/ledige');
   const {
-    data: tildelte,
-    error: tildelteError,
-    isLoading: tildelteLoading,
-  } = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
+    data: klagerTildelte,
+    error: klagerTildelteError,
+    isLoading: klagerTildelteLoading,
+  } = useClientFetch<KlagerTildelteResponse>('/api/klager/tildelte');
+  const {
+    data: ankerLedige,
+    error: ankerLedigeError,
+    isLoading: ankerLedigeLoading,
+  } = useClientFetch<AnkerLedigeResponse>('/api/anker/ledige');
+  const {
+    data: ankerTildelte,
+    error: ankerTildelteError,
+    isLoading: ankerTildelteLoading,
+  } = useClientFetch<AnkerTildelteResponse>('/api/anker/tildelte');
+  const {
+    data: betongLedige,
+    error: betongLedigeError,
+    isLoading: betongLedigeLoading,
+  } = useClientFetch<BetongLedigeResponse>('/api/behandlinger-etter-tr-opphevet/ledige');
+  const {
+    data: betongTildelte,
+    error: betongTildelteError,
+    isLoading: betongTildelteLoading,
+  } = useClientFetch<BetongTildelteResponse>('/api/behandlinger-etter-tr-opphevet/tildelte');
+  const {
+    data: omgjøringskravLedige,
+    error: omgjøringskravLedigeError,
+    isLoading: omgjøringskravLedigeLoading,
+  } = useClientFetch<OmgjøringskravLedigeResponse>('/api/behandlinger-etter-tr-opphevet/ledige');
+  const {
+    data: omgjøringskravTildelte,
+    error: omgjøringskravTildelteError,
+    isLoading: omgjøringskravTildelteLoading,
+  } = useClientFetch<OmgjøringskravTildelteResponse>('/api/behandlinger-etter-tr-opphevet/tildelte');
 
-  if (ledigeLoading || tildelteLoading) {
+  if (
+    klagerLedigeLoading ||
+    klagerTildelteLoading ||
+    ankerLedigeLoading ||
+    ankerTildelteLoading ||
+    betongLedigeLoading ||
+    betongTildelteLoading ||
+    omgjøringskravLedigeLoading ||
+    omgjøringskravTildelteLoading
+  ) {
     return <SkeletonAktive />;
   }
 
-  if (ledigeError !== null || tildelteError !== null) {
+  if (
+    klagerLedigeError !== null ||
+    klagerTildelteError !== null ||
+    ankerLedigeError !== null ||
+    ankerTildelteError !== null ||
+    betongLedigeError !== null ||
+    betongTildelteError !== null ||
+    omgjøringskravLedigeError !== null ||
+    omgjøringskravTildelteError !== null
+  ) {
     return (
       <LoadingError>
         <BodyLong>Feil ved lasting av data:</BodyLong>
         <List>
-          {ledigeError === null ? null : <List.Item>{ledigeError}</List.Item>}
-          {tildelteError === null ? null : <List.Item>{tildelteError}</List.Item>}
+          {klagerLedigeError === null ? null : <List.Item>{klagerLedigeError}</List.Item>}
+          {klagerTildelteError === null ? null : <List.Item>{klagerTildelteError}</List.Item>}
+          {ankerLedigeError === null ? null : <List.Item>{ankerLedigeError}</List.Item>}
+          {ankerTildelteError === null ? null : <List.Item>{ankerTildelteError}</List.Item>}
+          {betongLedigeError === null ? null : <List.Item>{betongLedigeError}</List.Item>}
+          {betongTildelteError === null ? null : <List.Item>{betongTildelteError}</List.Item>}
+          {omgjøringskravLedigeError === null ? null : <List.Item>{omgjøringskravLedigeError}</List.Item>}
+          {omgjøringskravTildelteError === null ? null : <List.Item>{omgjøringskravTildelteError}</List.Item>}
         </List>
       </LoadingError>
     );
   }
 
-  return <BehandlingerData ledige={ledige} tildelte={tildelte} {...kodeverk} />;
+  return (
+    <BehandlingerData
+      klagerLedige={klagerLedige.behandlinger}
+      klagerTildelte={klagerTildelte.behandlinger}
+      ankerLedige={ankerLedige.behandlinger}
+      ankerTildelte={ankerTildelte.behandlinger}
+      betongLedige={betongLedige.behandlinger}
+      betongTildelte={betongTildelte.behandlinger}
+      omgjøringskravLedige={omgjøringskravLedige.behandlinger}
+      omgjøringskravTildelte={omgjøringskravTildelte.behandlinger}
+      {...kodeverk}
+    />
+  );
 };
 
+interface Props {
+  klagerLedige: KlageLedig[];
+  ankerLedige: AnkeLedig[];
+  klagerTildelte: KlageTildelt[];
+  ankerTildelte: AnkeTildelt[];
+  betongLedige: BetongLedig[];
+  betongTildelte: BetongTildelt[];
+  omgjøringskravLedige: OmgjøringskravLedig[];
+  omgjøringskravTildelte: OmgjøringskravTildelt[];
+}
+
 const BehandlingerData = ({
-  ledige,
-  tildelte,
+  klagerLedige,
+  klagerTildelte,
+  ankerLedige,
+  ankerTildelte,
+  betongLedige,
+  betongTildelte,
+  omgjøringskravLedige,
+  omgjøringskravTildelte,
   sakstyper,
   ytelser,
   klageenheter,
@@ -91,20 +183,25 @@ const BehandlingerData = ({
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
 
+  const tildelte = useMemo(
+    () => [...klagerTildelte, ...ankerTildelte, ...betongTildelte, ...omgjøringskravTildelte],
+    [ankerTildelte, betongTildelte, klagerTildelte, omgjøringskravTildelte],
+  );
+
   const behandlinger = useMemo(() => {
     if (tildelingFilter === TildelingFilter.LEDIGE) {
-      return ledige.behandlinger;
+      return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige];
     }
 
     if (tildelingFilter === TildelingFilter.TILDELTE) {
-      return tildelte.behandlinger;
+      return tildelte;
     }
 
-    return [...ledige.behandlinger, ...tildelte.behandlinger];
-  }, [tildelingFilter, ledige, tildelte]);
+    return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige, ...tildelte];
+  }, [tildelingFilter, klagerLedige, ankerLedige, betongLedige, omgjøringskravLedige, tildelte]);
 
   const filteredBehandlinger = useAktive(behandlinger);
-  const filteredTildelte = useTildelte(tildelte.behandlinger);
+  const filteredTildelte = useTildelte(tildelte);
   const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
 
   return (
@@ -136,7 +233,7 @@ const BehandlingerData = ({
       {showsLedige ? null : (
         <Card span={4}>
           <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
-            behandlinger={filteredBehandlinger}
+            behandlinger={filteredTildelte}
             relevantYtelser={relevantYtelser}
             påVentReasons={påVentReasons}
           />

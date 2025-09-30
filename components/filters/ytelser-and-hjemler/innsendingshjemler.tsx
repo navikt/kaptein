@@ -1,8 +1,8 @@
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
-import type { IYtelse } from '@/lib/server/types';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
+import type { IYtelse } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {

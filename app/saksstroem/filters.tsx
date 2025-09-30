@@ -8,7 +8,7 @@ import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbak
 import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndAllHjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import { getKlageenheter, getLovkildeToRegistreringshjemler, getSakstyperToUtfall, getYtelser } from '@/lib/server/api';
-import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse, SakstypeToUtfall } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse, SakstypeToUtfall } from '@/lib/types';
 
 export const Filters = async () => (
   <Suspense fallback={<RenderFilters />}>
