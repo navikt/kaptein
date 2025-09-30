@@ -7,10 +7,16 @@ import {
 } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import { type AktivBehandling, type IKodeverkSimpleValue, type IKodeverkValue, PåVentReason } from '@/lib/server/types';
+import {
+  type BaseBehandling,
+  type IKodeverkSimpleValue,
+  type IKodeverkValue,
+  PåVentReason,
+  type Tildelt,
+} from '@/lib/types';
 
 interface Props {
-  behandlinger: AktivBehandling[];
+  behandlinger: (BaseBehandling & Tildelt)[];
   relevantYtelser: IKodeverkSimpleValue[];
   påVentReasons: IKodeverkValue<PåVentReason>[];
 }
@@ -22,7 +28,7 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
   relevantYtelser,
   påVentReasons,
 }: Props) => {
-  const påVentBehandlinger = useMemo(() => behandlinger.filter((b) => b.sattPaaVent !== null), [behandlinger]);
+  const påVentBehandlinger = useMemo(() => behandlinger.filter((b) => b.sattPaaVentReasonId !== null), [behandlinger]);
 
   const series = useMemo(
     () =>
@@ -32,7 +38,7 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
         data: relevantYtelser
           .map(({ id }) =>
             påVentBehandlinger.reduce(
-              (acc, curr) => (curr.ytelseId === id && curr.sattPaaVent?.reasonId === reason ? acc + 1 : acc),
+              (acc, curr) => (curr.ytelseId === id && curr.sattPaaVentReasonId === reason ? acc + 1 : acc),
               0,
             ),
           )

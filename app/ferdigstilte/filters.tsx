@@ -7,7 +7,7 @@ import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import { getKlageenheter, getLovkildeToRegistreringshjemler, getSakstyperToUtfall, getYtelser } from '@/lib/server/api';
-import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse, SakstypeToUtfall } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse, SakstypeToUtfall } from '@/lib/types';
 
 export const Filters = async () => (
   <Suspense fallback={<RenderFilters />}>

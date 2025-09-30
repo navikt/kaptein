@@ -6,10 +6,10 @@ import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/compone
 import { ExceededFrist, useFristPieChartColors } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling } from '@/lib/server/types';
+import type { Frist } from '@/lib/types';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: Frist[];
 }
 
 const TODAY = new Date();

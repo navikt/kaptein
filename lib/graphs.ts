@@ -1,4 +1,4 @@
-import type { IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/types';
 
 export enum Graph {
   ALDER_PER_YTELSE = 'alder-per-ytelse',

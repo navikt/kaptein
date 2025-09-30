@@ -8,11 +8,11 @@ import { DayPicker } from '@/components/charts/common/day-picker';
 import { Age, useAgePieChartColors } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling } from '@/lib/server/types';
+import type { BaseBehandling } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: Pick<BaseBehandling, 'ageKA'>[];
 }
 
 const TITLE = 'Alder';

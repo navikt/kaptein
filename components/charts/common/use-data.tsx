@@ -6,16 +6,10 @@ import { useMemo } from 'react';
 import { parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
-import {
-  type Behandling,
-  type FerdigstiltBehandling,
-  isFerdigstilt,
-  type LedigBehandling,
-  type TildeltBehandling,
-} from '@/lib/server/types';
+import type { BaseBehandling, Ferdigstilt, Frist, Ledig, Tildelt } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
+export const useFerdigstilte = (behandlinger: (BaseBehandling & Ferdigstilt & Frist)[]) => {
   const { fromFilter, toFilter } = useDateFilter();
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
@@ -41,71 +35,73 @@ export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
     const filteredForRegistreringshjemler =
       registreringshjemler.length === 0
         ? filteredForTo
-        : filteredForTo.filter((b) => registreringshjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)));
+        : filteredForTo.filter((b) =>
+            registreringshjemler.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
+          );
 
     return filteredForRegistreringshjemler;
   }, [baseFiltered, fromFilter, toFilter, registreringshjemler, utfall]);
 };
 
-export const useSaksstrøm = (behandlinger: Behandling[]) => {
+export const useFerdigstiltSaksstrøm = (ferdigstilteBehandlinger: (BaseBehandling & Ferdigstilt)[]) => {
   const { fromFilter, toFilter } = useDateFilter();
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
   const registreringshjemler = registreringshjemlerFilter ?? [];
   const utfall = utfallFilter ?? [];
 
-  const baseFiltered = useFiltered(behandlinger);
-
-  console.log(toFilter);
+  const ferdigstilteFilteredBase = useFiltered(ferdigstilteBehandlinger);
 
   return useMemo(() => {
-    const filteredForUtfall =
-      utfall.length === 0
-        ? baseFiltered
-        : baseFiltered.filter((b) => isFerdigstilt(b) && utfall.includes(b.resultat.utfallId));
-
-    console.log('filteredForUtfall', filteredForUtfall);
-
-    const filteredForFrom =
+    const filteredForAvsluttetFrom =
       fromFilter === null
-        ? filteredForUtfall
-        : filteredForUtfall.filter((b) =>
-            isFerdigstilt(b)
-              ? !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter)
-              : !isBefore(new Date(b.created), fromFilter),
-          );
-    console.log('filteredForFrom', filteredForFrom);
+        ? ferdigstilteFilteredBase
+        : ferdigstilteFilteredBase.filter((b) => !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter));
 
-    const filteredForTo =
+    const filteredForAvsluttetTo =
       toFilter === null
-        ? filteredForFrom
-        : filteredForFrom.filter((b) =>
-            isFerdigstilt(b) ? !isAfter(new Date(b.created), toFilter) : !isAfter(new Date(b.created), toFilter),
-          );
-
-    console.log('filteredForTo', filteredForTo);
+        ? filteredForAvsluttetFrom
+        : filteredForAvsluttetFrom.filter((b) => !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter));
 
     const filteredForRegistreringshjemler =
       registreringshjemler.length === 0
-        ? filteredForTo
-        : filteredForTo.filter((b) =>
-            registreringshjemler.some((h) => isFerdigstilt(b) && b.resultat.hjemmelIdSet.includes(h)),
+        ? filteredForAvsluttetTo
+        : filteredForAvsluttetTo.filter((b) =>
+            registreringshjemler.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
           );
-    console.log('filteredForRegistreringshjemler', filteredForRegistreringshjemler);
 
-    return filteredForRegistreringshjemler;
-  }, [baseFiltered, fromFilter, toFilter, registreringshjemler, utfall]);
+    const filteredForUtfall =
+      utfall.length === 0
+        ? filteredForRegistreringshjemler
+        : filteredForRegistreringshjemler.filter((b) => utfall.includes(b.resultat.utfallId));
+
+    return filteredForUtfall;
+  }, [ferdigstilteFilteredBase, fromFilter, toFilter, registreringshjemler, utfall]);
 };
 
-export const useAktive = (behandlinger: (LedigBehandling | TildeltBehandling)[]) => {
-  return useFiltered(behandlinger);
+export const useUferdigeSaksstrøm = (behandlinger: (BaseBehandling & (Ledig | Tildelt))[]) => {
+  const { fromFilter, toFilter } = useDateFilter();
+
+  const filteredBase = useFiltered(behandlinger);
+
+  return useMemo(() => {
+    const filteredForCreatedFrom =
+      fromFilter === null ? filteredBase : filteredBase.filter((b) => !isBefore(new Date(b.created), fromFilter));
+
+    const filteredForCreatedTo =
+      toFilter === null
+        ? filteredForCreatedFrom
+        : filteredForCreatedFrom.filter((b) => !isAfter(new Date(b.created), toFilter));
+
+    return filteredForCreatedTo;
+  }, [filteredBase, fromFilter, toFilter]);
 };
 
-export const useTildelte = (behandlinger: TildeltBehandling[]) => {
-  return useFiltered(behandlinger);
-};
+export const useAktive = <T extends BaseBehandling>(behandlinger: T[]) => useFiltered<T>(behandlinger);
 
-const useFiltered = <T extends Behandling>(behandlinger: T[]): T[] => {
+export const useTildelte = <T extends BaseBehandling & Tildelt>(behandlinger: T[]) => useFiltered<T>(behandlinger);
+
+const useFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
   const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
   const [innsendingshjemlerFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
@@ -141,7 +137,7 @@ const useFiltered = <T extends Behandling>(behandlinger: T[]): T[] => {
     const filteredForInnsendingshjemler =
       innsendingshjemler.length === 0
         ? filteredForKlageenheter
-        : filteredForKlageenheter.filter((b) => innsendingshjemler.some((h) => b.hjemmelIdList.includes(h)));
+        : filteredForKlageenheter.filter((b) => innsendingshjemler.some((h) => b.innsendingshjemmelIdList.includes(h)));
 
     return filteredForInnsendingshjemler;
   }, [behandlinger, ytelser, klageenheter, innsendingshjemler, sakstyper, tilbakekreving]);
