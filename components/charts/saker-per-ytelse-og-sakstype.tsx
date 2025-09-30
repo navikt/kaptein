@@ -8,10 +8,10 @@ import {
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
-import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
+import type { BaseBehandling, IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: BaseBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }

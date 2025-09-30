@@ -26,19 +26,23 @@ import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
 import type {
+  AnkerLedigeResponse,
+  AnkerTildelteResponse,
   IKodeverkSimpleValue,
   IKodeverkValue,
   IYtelse,
-  LedigeResponse,
+  KlagerLedigeResponse,
+  KlagerTildelteResponse,
   PåVentReason,
   Sakstype,
-  TildelteResponse,
-} from '@/lib/server/types';
+} from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  ledige: LedigeResponse;
-  tildelte: TildelteResponse;
+  klagerLedige: KlagerLedigeResponse;
+  ankerLedige: AnkerLedigeResponse;
+  klagaerTildelte: KlagerTildelteResponse;
+  ankerTildelte: AnkerTildelteResponse;
 }
 
 interface KodeverkProps {
@@ -50,38 +54,63 @@ interface KodeverkProps {
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
   const {
-    data: ledige,
-    error: ledigeError,
-    isLoading: ledigeLoading,
-  } = useClientFetch<LedigeResponse>('/api/behandlinger/ledige');
+    data: klagerLedige,
+    error: klagerLedigeError,
+    isLoading: klagerLedigeLoading,
+  } = useClientFetch<KlagerLedigeResponse>('/api/klager/ledige');
   const {
-    data: tildelte,
-    error: tildelteError,
-    isLoading: tildelteLoading,
-  } = useClientFetch<TildelteResponse>('/api/behandlinger/tildelte');
+    data: klagerTildelte,
+    error: klagerTildelteError,
+    isLoading: klagerTildelteLoading,
+  } = useClientFetch<KlagerTildelteResponse>('/api/klager/tildelte');
+  const {
+    data: ankerLedige,
+    error: ankerLedigeError,
+    isLoading: ankerLedigeLoading,
+  } = useClientFetch<AnkerLedigeResponse>('/api/anker/ledige');
+  const {
+    data: ankerTildelte,
+    error: ankerTildelteError,
+    isLoading: ankerTildelteLoading,
+  } = useClientFetch<AnkerTildelteResponse>('/api/anker/tildelte');
 
-  if (ledigeLoading || tildelteLoading) {
+  if (klagerLedigeLoading || klagerTildelteLoading || ankerLedigeLoading || ankerTildelteLoading) {
     return <SkeletonAktive />;
   }
 
-  if (ledigeError !== null || tildelteError !== null) {
+  if (
+    klagerLedigeError !== null ||
+    klagerTildelteError !== null ||
+    ankerLedigeError !== null ||
+    ankerTildelteError !== null
+  ) {
     return (
       <LoadingError>
         <BodyLong>Feil ved lasting av data:</BodyLong>
         <List>
-          {ledigeError === null ? null : <List.Item>{ledigeError}</List.Item>}
-          {tildelteError === null ? null : <List.Item>{tildelteError}</List.Item>}
+          {klagerLedigeError === null ? null : <List.Item>{klagerLedigeError}</List.Item>}
+          {klagerTildelteError === null ? null : <List.Item>{klagerTildelteError}</List.Item>}
+          {ankerLedigeError === null ? null : <List.Item>{ankerLedigeError}</List.Item>}
+          {ankerTildelteError === null ? null : <List.Item>{ankerTildelteError}</List.Item>}
         </List>
       </LoadingError>
     );
   }
 
-  return <BehandlingerData ledige={ledige} tildelte={tildelte} {...kodeverk} />;
+  return (
+    <BehandlingerData
+      klagerLedige={klagerLedige}
+      klagaerTildelte={klagerTildelte}
+      ankerLedige={ankerLedige}
+      ankerTildelte={ankerTildelte}
+      {...kodeverk}
+    />
+  );
 };
 
 const BehandlingerData = ({
-  ledige,
-  tildelte,
+  klagerLedige: ledige,
+  klagaerTildelte: tildelte,
   sakstyper,
   ytelser,
   klageenheter,
@@ -136,7 +165,7 @@ const BehandlingerData = ({
       {showsLedige ? null : (
         <Card span={4}>
           <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
-            behandlinger={filteredBehandlinger}
+            behandlinger={filteredTildelte}
             relevantYtelser={relevantYtelser}
             påVentReasons={påVentReasons}
           />

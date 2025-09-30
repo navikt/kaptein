@@ -5,7 +5,7 @@ import { ActionMenu, Spacer } from '@navikt/ds-react';
 import { InternalHeader } from '@navikt/ds-react/InternalHeader';
 import { AppThemeSwitcher } from '@/components/header/app-theme';
 import { Nav } from '@/components/header/nav';
-import type { IUserData } from '@/lib/server/types';
+import type { IUserData } from '@/lib/types';
 
 export const Header = ({ user }: { user: IUserData }) => {
   return (

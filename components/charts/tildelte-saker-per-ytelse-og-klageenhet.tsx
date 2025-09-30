@@ -7,11 +7,11 @@ import {
 } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { FerdigstiltBehandling, IKodeverkSimpleValue, TildeltBehandling } from '@/lib/server/types';
+import type { BaseBehandling, IKodeverkSimpleValue, Tildelt } from '@/lib/types';
 
 interface Props {
   title: string;
-  behandlinger: (TildeltBehandling | FerdigstiltBehandling)[];
+  behandlinger: (BaseBehandling & Tildelt)[];
   relevantYtelser: IKodeverkSimpleValue[];
   klageenheter: IKodeverkSimpleValue[];
 }

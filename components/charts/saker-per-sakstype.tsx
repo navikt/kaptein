@@ -5,10 +5,10 @@ import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/compone
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { useSakstypeColor } from '@/lib/echarts/use-colors';
-import type { Behandling, IKodeverkSimpleValue, Sakstype } from '@/lib/server/types';
+import type { BaseBehandling, IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: BaseBehandling[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 

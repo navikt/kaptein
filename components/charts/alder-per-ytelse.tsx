@@ -11,17 +11,17 @@ import { DayPicker } from '@/components/charts/common/day-picker';
 import { Age, getAgeColor } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
+import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: BaseBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
 }
 
 const TITLE = 'Alder per ytelse';
 
-const getData = (behandling: Behandling, age: Age, maxAge: number): number => {
+const getData = (behandling: BaseBehandling, age: Age, maxAge: number): number => {
   switch (age) {
     case Age.OLDER:
       return behandling.ageKA !== null && behandling.ageKA >= maxAge ? 1 : 0;

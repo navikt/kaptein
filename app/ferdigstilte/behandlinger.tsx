@@ -18,15 +18,16 @@ import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-yte
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
 import type {
-  FerdigstiltBehandling,
-  FerdigstilteResponse,
+  AnkeFerdigstilt,
   IKodeverkSimpleValue,
   IYtelse,
   KapteinApiResponse,
+  KlageFerdigstilt,
   Sakstype,
-} from '@/lib/server/types';
+} from '@/lib/types';
 
-type Response = KapteinApiResponse<FerdigstiltBehandling>;
+type KlageResponse = KapteinApiResponse<KlageFerdigstilt>;
+type AnkeResponse = KapteinApiResponse<AnkeFerdigstilt>;
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -35,41 +36,57 @@ interface KodeverkProps {
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
-  const { data, isLoading, error } = useClientFetch<FerdigstilteResponse>('/api/behandlinger/ferdigstilte');
+  const {
+    data: klager,
+    isLoading: isLoadingKlager,
+    error: errorKlager,
+  } = useClientFetch<KlageResponse>('/api/klager/ferdigstilte');
+  const {
+    data: anker,
+    isLoading: isLoadingAnker,
+    error: errorAnker,
+  } = useClientFetch<AnkeResponse>('/api/anker/ferdigstilte');
 
-  if (isLoading) {
+  if (isLoadingKlager || isLoadingAnker) {
     return <SkeletonFerdigstilte />;
   }
 
-  if (error !== null) {
-    return <LoadingError>Feil ved lasting av data: {error}</LoadingError>;
+  if (errorKlager !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorKlager}</LoadingError>;
   }
 
-  return <BehandlingerData {...data} {...kodeverk} />;
+  if (errorAnker !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorAnker}</LoadingError>;
+  }
+
+  return <BehandlingerData {...kodeverk} klager={klager.behandlinger} anker={anker.behandlinger} />;
 };
 
-const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Response & KodeverkProps) => {
-  const filteredBehandlinger = useFerdigstilte(behandlinger);
-  const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
+interface DataProps extends KodeverkProps {
+  klager: KlageFerdigstilt[];
+  anker: AnkeFerdigstilt[];
+}
+
+const BehandlingerData = ({ klager, anker, sakstyper, ytelser, klageenheter }: DataProps) => {
+  const filteredKlager = useFerdigstilte(klager);
+  const filteredAnker = useFerdigstilte(anker);
+  const behandlinger = [...filteredKlager, ...filteredAnker];
+  const relevantYtelser = useRelevantYtelser(behandlinger, ytelser);
 
   return (
     <ChartsWrapper>
       <Card span={4}>
-        <SakerPerYtelseOgSakstype
-          behandlinger={filteredBehandlinger}
-          sakstyper={sakstyper}
-          relevantYtelser={relevantYtelser}
-        />
+        <SakerPerYtelseOgSakstype behandlinger={behandlinger} sakstyper={sakstyper} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card>
-        <SakerPerSakstype behandlinger={filteredBehandlinger} sakstyper={sakstyper} />
+        <SakerPerSakstype behandlinger={behandlinger} sakstyper={sakstyper} />
       </Card>
 
       <Card>
         <TildelteSakerPerKlageenhet
           title="Saker per klageenhet"
-          behandlinger={filteredBehandlinger}
+          behandlinger={behandlinger}
           klageenheter={klageenheter}
         />
       </Card>
@@ -77,34 +94,34 @@ const BehandlingerData = ({ behandlinger, sakstyper, ytelser, klageenheter }: Re
       <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Saker per ytelse og klageenhet"
-          behandlinger={filteredBehandlinger}
+          behandlinger={behandlinger}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
         />
       </Card>
 
       <Card>
-        <VarsletFrist behandlinger={filteredBehandlinger} />
+        <VarsletFrist behandlinger={behandlinger} />
       </Card>
 
       <Card>
-        <FristIKabal behandlinger={filteredBehandlinger} />
+        <FristIKabal behandlinger={behandlinger} />
       </Card>
 
       <Card span={4}>
-        <VarsletFristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+        <VarsletFristPerYtelse behandlinger={behandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={4}>
-        <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+        <FristPerYtelse behandlinger={behandlinger} relevantYtelser={relevantYtelser} />
       </Card>
 
       <Card span={2}>
-        <Alder behandlinger={filteredBehandlinger} />
+        <Alder behandlinger={behandlinger} />
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+        <AlderPerYtelse behandlinger={behandlinger} relevantYtelser={relevantYtelser} />
       </Card>
     </ChartsWrapper>
   );

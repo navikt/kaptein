@@ -5,10 +5,10 @@ import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/compone
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { percent } from '@/lib/percent';
-import type { IKodeverkValue, PåVentReason, TildeltBehandling } from '@/lib/server/types';
+import type { AnkeTildelt, IKodeverkValue, KlageTildelt, PåVentReason } from '@/lib/types';
 
 interface Props {
-  behandlinger: TildeltBehandling[];
+  behandlinger: (KlageTildelt | AnkeTildelt)[];
   påVentReasons: IKodeverkValue<PåVentReason>[];
 }
 
@@ -47,8 +47,8 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
     ]);
 
     for (const behandling of behandlinger) {
-      const { sattPaaVent } = behandling;
-      const value = sattPaaVent === null ? IKKE_PÅ_VENT_KEY : sattPaaVent.reasonId;
+      const { sattPaaVentReasonId } = behandling;
+      const value = sattPaaVentReasonId ?? IKKE_PÅ_VENT_KEY;
       const existing = map.get(value);
 
       if (existing !== undefined) {
