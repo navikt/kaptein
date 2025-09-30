@@ -29,15 +29,11 @@ import type {
   IKodeverkSimpleValue,
   IKodeverkValue,
   IYtelse,
-  KapteinApiResponse,
-  LedigBehandling,
+  LedigeResponse,
   Sakstype,
-  TildeltBehandling,
+  TildelteResponse,
 } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
-
-type LedigeResponse = KapteinApiResponse<LedigBehandling>;
-type TildelteResponse = KapteinApiResponse<TildeltBehandling>;
 
 interface Props {
   ledige: LedigeResponse;

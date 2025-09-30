@@ -41,8 +41,18 @@ export const Nav = () => {
     const searchParams = new URLSearchParams(params.toString());
 
     searchParams.delete(QueryParam.TILDELING);
-    searchParams.delete(QueryParam.KLAGEENHETER);
     searchParams.delete(QueryParam.INNSENDINGSHJEMLER);
+
+    searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
+    searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);
+
+    setDefaultParams(searchParams);
+
+    return searchParams.toString();
+  }, [params, setDefaultParams]);
+
+  const saksstrømParams = useMemo(() => {
+    const searchParams = new URLSearchParams(params.toString());
 
     searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
     searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);
@@ -68,6 +78,14 @@ export const Nav = () => {
         href={`/ferdigstilte?${ferdigstilteParams}`}
       >
         Ferdigstilte saker
+      </InternalHeader.Button>
+
+      <InternalHeader.Button
+        as={Link}
+        className={pathname === '/saksstroem' ? ACTIVE_CLASS : ''}
+        href={`/saksstroem?${saksstrømParams}`}
+      >
+        Saksstrøm
       </InternalHeader.Button>
     </>
   );

@@ -77,3 +77,33 @@ export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }
     </>
   );
 };
+
+export const YtelserAndAllHjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
+  const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
+  const [, setSelectedHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
+
+  return (
+    <>
+      <MultiselectFilter
+        label="Ytelser"
+        selected={selectedYtelser}
+        setSelected={(v) => {
+          setSelectedYtelser(v);
+          setSelectedHjemler(null);
+        }}
+        options={ytelserOptions}
+      />
+
+      <SubFilter>
+        <Innsendingshjemler relevantYtelser={relevantKodeverk} />
+      </SubFilter>
+
+      <SubFilter>
+        <Registreringshjemler
+          relevantYtelser={relevantKodeverk}
+          lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
+        />
+      </SubFilter>
+    </>
+  );
+};
