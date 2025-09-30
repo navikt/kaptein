@@ -4,10 +4,10 @@ import { useMemo } from 'react';
 import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { AktivBehandling } from '@/lib/server/types';
+import type { Ledig, Tildelt } from '@/lib/types';
 
 interface Props {
-  behandlinger: AktivBehandling[];
+  behandlinger: (Tildelt | Ledig)[];
 }
 
 const TITLE = 'Tildelte/ledige saker';

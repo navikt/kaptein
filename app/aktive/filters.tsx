@@ -7,7 +7,7 @@ import { HelpForAktive, Tilbakekreving } from '@/components/filters/tilbakekrevi
 import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import { getInnsendingshjemlerMap, getKlageenheter, getSakstyper, getYtelser } from '@/lib/server/api';
-import type { IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/server/types';
+import type { IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/types';
 
 export const Filters = async () => (
   <Suspense fallback={<RenderFilters />}>

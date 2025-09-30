@@ -4,8 +4,8 @@ import { ChevronDownIcon } from '@navikt/aksel-icons';
 import { ActionMenu, Button, HStack, TextField } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
-import type { IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
+import type { IKodeverkSimpleValue, IYtelse } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {

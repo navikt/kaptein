@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
-import type { Behandling, IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
+import type { BaseBehandling, IKodeverkSimpleValue, IYtelse } from '@/lib/types';
 
-export const useRelevantYtelser = (behandlinger: Behandling[], ytelser: IYtelse[]): IKodeverkSimpleValue[] =>
+export const useRelevantYtelser = (
+  behandlinger: Pick<BaseBehandling, 'ytelseId'>[],
+  ytelser: IYtelse[],
+): IKodeverkSimpleValue[] =>
   useMemo(() => {
     const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
 

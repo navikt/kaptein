@@ -6,7 +6,7 @@ import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { SubFilter } from '@/components/filters/sub-filter';
 import { Innsendingshjemler } from '@/components/filters/ytelser-and-hjemler/innsendingshjemler';
 import { Registreringshjemler } from '@/components/filters/ytelser-and-hjemler/registreringshjemler';
-import type { IKodeverkValue, IYtelse } from '@/lib/server/types';
+import type { IKodeverkValue, IYtelse } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {

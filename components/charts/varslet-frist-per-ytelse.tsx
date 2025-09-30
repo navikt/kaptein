@@ -9,10 +9,10 @@ import {
 import { ExceededFrist, getFristColor } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { Behandling, IKodeverkSimpleValue } from '@/lib/server/types';
+import type { BaseBehandling, Frist, IKodeverkSimpleValue } from '@/lib/types';
 
 interface Props {
-  behandlinger: Behandling[];
+  behandlinger: (BaseBehandling & Frist)[];
   relevantYtelser: IKodeverkSimpleValue[];
 }
 
@@ -20,7 +20,7 @@ const TODAY = new Date();
 
 const TITLE = 'Varslet frist per ytelse';
 
-const getData = (behandling: Behandling, exceeded: ExceededFrist): number => {
+const getData = (behandling: Frist, exceeded: ExceededFrist): number => {
   switch (exceeded) {
     case ExceededFrist.NULL:
       return behandling.varsletFrist === null ? 1 : 0;

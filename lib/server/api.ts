@@ -13,7 +13,7 @@ import {
   type PåVentReason,
   Sakstype,
   type SakstypeToUtfall,
-} from '@/lib/server/types';
+} from '@/lib/types';
 
 const logger = getLogger('api');
 
