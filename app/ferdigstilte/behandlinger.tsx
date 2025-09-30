@@ -19,6 +19,7 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientFetch } from '@/lib/client/use-client-fetch';
 import type {
   FerdigstiltBehandling,
+  FerdigstilteResponse,
   IKodeverkSimpleValue,
   IYtelse,
   KapteinApiResponse,
@@ -34,7 +35,7 @@ interface KodeverkProps {
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
-  const { data, isLoading, error } = useClientFetch<Response>('/api/behandlinger/ferdigstilte');
+  const { data, isLoading, error } = useClientFetch<FerdigstilteResponse>('/api/behandlinger/ferdigstilte');
 
   if (isLoading) {
     return <SkeletonFerdigstilte />;

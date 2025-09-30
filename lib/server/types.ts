@@ -132,3 +132,10 @@ type Reason =
 export interface SakstypeToUtfall extends IKodeverkSimpleValue<Sakstype> {
   utfall: IKodeverkSimpleValue[];
 }
+
+export type LedigeResponse = KapteinApiResponse<LedigBehandling>;
+export type TildelteResponse = KapteinApiResponse<TildeltBehandling>;
+export type FerdigstilteResponse = KapteinApiResponse<FerdigstiltBehandling>;
+
+export const isFerdigstilt = (behandling: Behandling): behandling is FerdigstiltBehandling =>
+  'avsluttetAvSaksbehandlerDate' in behandling;

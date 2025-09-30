@@ -53,6 +53,10 @@ const theme: ThemeOption = {
     symbolSize: 8,
     smooth: false,
   },
+  grid: {
+    left: 0,
+    right: 0,
+  },
   radar: {
     itemStyle: {
       borderWidth: 2,
