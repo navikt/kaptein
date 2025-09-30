@@ -1,6 +1,6 @@
 import type { OutgoingHttpHeaders } from 'node:http';
 import type { NextRequest } from 'next/server';
-import { formatBytes } from '@/app/api/behandlinger/[status]/format-bytes';
+import { formatBytes } from '@/app/api/[type]/[status]/format-bytes';
 import { isDeployed, isLocal } from '@/lib/environment';
 import { getLogger } from '@/lib/logger';
 import { AppName, getOboToken } from '@/lib/server/get-obo-token';
@@ -12,22 +12,20 @@ const log = getLogger('behandlinger-proxy');
 
 export const dynamic = 'force-dynamic';
 
-const KAPTEIN_URL = isLocal
-  ? new URL('https://kaptein.intern.dev.nav.no/api/behandlinger')
-  : new URL('http://kaptein-api/behandlinger');
+const KAPTEIN_URL = isLocal ? new URL('https://kaptein.intern.dev.nav.no/api') : new URL('http://kaptein-api');
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/behandlinger/[status]'>): Promise<Response> {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/[type]/[status]'>): Promise<Response> {
   const incomingTraceparent = req.headers.get('traceparent');
   const { traceparent, traceId, spanId } =
     incomingTraceparent === null ? generateTraceParent() : parseTraceParent(incomingTraceparent);
 
-  const { status } = await ctx.params;
+  const { type, status } = await ctx.params;
 
-  log.debug(`Proxying GET /kaptein-api/behandlinger/${status}`, traceId, spanId);
+  log.debug(`Proxying GET /kaptein-api/${type}/${status}`, traceId, spanId);
 
   const url = new URL(KAPTEIN_URL);
 
-  url.pathname += `/${status}`;
+  url.pathname += `/${type}/${status}`;
 
   const overrideHeaders: OutgoingHttpHeaders = { traceparent };
 

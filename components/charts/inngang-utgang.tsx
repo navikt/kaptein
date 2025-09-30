@@ -6,15 +6,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import { type Behandling, type FerdigstiltBehandling, isFerdigstilt } from '@/lib/server/types';
+import type { BaseBehandling, Ferdigstilt, Ledig, Tildelt } from '@/lib/types';
 
 export type Bucket = { inn: number; ut: number; label: string };
 export type Buckets = Record<number, Bucket>;
 
 interface Props {
-  behandlinger: Behandling[];
-  getInBucketIndex: (b: Behandling, from: Date) => number;
-  getOutBucketIndex: (b: FerdigstiltBehandling, from: Date) => number;
+  ferdigstilte: (BaseBehandling & Ferdigstilt)[];
+  uferdige: (BaseBehandling & (Ledig | Tildelt))[];
+  getInBucketIndex: (b: BaseBehandling, from: Date) => number;
+  getOutBucketIndex: (b: Ferdigstilt, from: Date) => number;
   createBuckets: (from: Date, to: Date) => Buckets;
   title: string;
 }
@@ -28,7 +29,8 @@ interface Data {
 }
 
 export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
-  behandlinger,
+  ferdigstilte,
+  uferdige,
   title,
   createBuckets,
   getInBucketIndex,
@@ -59,20 +61,24 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     let innTotal = 0;
     let utTotal = 0;
 
-    for (const b of behandlinger) {
+    for (const b of ferdigstilte) {
       if (!isBefore(new Date(b.created), fromFilter) && !isAfter(new Date(b.created), toFilter)) {
         buckets[getInBucketIndex(b, fromFilter)].inn += 1;
         innTotal += 1;
       }
 
       if (
-        isFerdigstilt(b) &&
         !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter) &&
         !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter)
       ) {
         buckets[getOutBucketIndex(b, fromFilter)].ut += 1;
         utTotal += 1;
       }
+    }
+
+    for (const b of uferdige) {
+      buckets[getInBucketIndex(b, fromFilter)].inn += 1;
+      innTotal += 1;
     }
 
     const values = Object.values(buckets);
@@ -84,9 +90,9 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       innTotal: innTotal,
       utTotal: utTotal,
     };
-  }, [behandlinger, fromFilter, toFilter, createBuckets, getInBucketIndex, getOutBucketIndex]);
+  }, [ferdigstilte, fromFilter, toFilter, uferdige, createBuckets, getInBucketIndex, getOutBucketIndex]);
 
-  if (behandlinger.length === 0 || labels.length === 0 || inn.length === 0) {
+  if ((ferdigstilte.length === 0 && uferdige.length === 0) || labels.length === 0 || inn.length === 0) {
     return <NoData title={title} />;
   }
 
