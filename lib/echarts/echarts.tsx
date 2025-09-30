@@ -2,6 +2,7 @@
 
 import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import {
+  AriaComponent,
   DatasetComponent,
   GridComponent,
   LegendComponent,
@@ -13,6 +14,8 @@ import {
 // biome-ignore lint/performance/noNamespaceImport: https://echarts.apache.org/handbook/en/basics/import
 import * as Echarts from 'echarts/core';
 import { LabelLayout, UniversalTransition } from 'echarts/features';
+// @ts-expect-error - No types available
+import nbNO from 'echarts/lib/i18n/langnb-NO.js';
 import { SVGRenderer } from 'echarts/renderers';
 import type { ECBasicOption } from 'echarts/types/dist/shared';
 import { useEffect, useRef, useState } from 'react';
@@ -20,6 +23,7 @@ import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
 Echarts.use([
+  AriaComponent,
   BarChart,
   TitleComponent,
   TooltipComponent,
@@ -37,6 +41,7 @@ Echarts.use([
 
 Echarts.registerTheme(AppTheme.DARK, DARK_THEME);
 Echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
+Echarts.registerLocale('nb-NO', nbNO);
 
 interface Props {
   option: ECBasicOption;
@@ -85,7 +90,7 @@ export const EChart = ({ option, width = '100%', height = '100%', className }: P
       return;
     }
 
-    eChartsRef.current.setOption(option);
+    eChartsRef.current.setOption({ aria: { show: true }, ...option });
   }, [option]);
 
   // Initialize ECharts instance
@@ -94,9 +99,9 @@ export const EChart = ({ option, width = '100%', height = '100%', className }: P
       return;
     }
 
-    eChartsRef.current = Echarts.init(ref.current, theme);
+    eChartsRef.current = Echarts.init(ref.current, theme, { locale: 'nb-NO' });
 
-    eChartsRef.current.setOption(option);
+    eChartsRef.current.setOption({ aria: { show: true }, ...option });
   }, [option, theme]);
 
   // Update theme when it changes
@@ -108,7 +113,7 @@ export const EChart = ({ option, width = '100%', height = '100%', className }: P
 
     eChartsRef.current.setTheme(theme);
     // Without this eChart would show data from previous filtering after changing theme
-    eChartsRef.current.setOption(option);
+    eChartsRef.current.setOption({ aria: { show: true }, ...option });
   }, [theme]);
 
   return <div style={{ width, height }} ref={ref} className={className} />;
