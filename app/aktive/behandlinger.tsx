@@ -30,6 +30,7 @@ import type {
   IKodeverkValue,
   IYtelse,
   LedigeResponse,
+  PåVentReason,
   Sakstype,
   TildelteResponse,
 } from '@/lib/server/types';
@@ -44,7 +45,7 @@ interface KodeverkProps {
   ytelser: IYtelse[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
   klageenheter: IKodeverkSimpleValue[];
-  påVentReasons: IKodeverkValue[];
+  påVentReasons: IKodeverkValue<PåVentReason>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -128,7 +129,7 @@ const BehandlingerData = ({
 
       {showsLedige ? null : (
         <Card>
-          <TildelteSakerPåVentIkkePåVent behandlinger={filteredTildelte} />
+          <TildelteSakerPåVentIkkePåVent behandlinger={filteredTildelte} påVentReasons={påVentReasons} />
         </Card>
       )}
 

@@ -12,7 +12,7 @@ import { type AktivBehandling, type IKodeverkSimpleValue, type IKodeverkValue, P
 interface Props {
   behandlinger: AktivBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
-  påVentReasons: IKodeverkValue[];
+  påVentReasons: IKodeverkValue<PåVentReason>[];
 }
 
 const TITLE = 'Årsaker for behandlinger på vent gruppert etter ytelse';

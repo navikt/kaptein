@@ -10,6 +10,7 @@ import {
   type IKodeverkValue,
   type IUserData,
   type IYtelse,
+  type PåVentReason,
   Sakstype,
   type SakstypeToUtfall,
 } from '@/lib/server/types';
@@ -89,7 +90,8 @@ export const getSakstyperToUtfall = async () => {
   return sakstyper.filter(({ id }) => id !== Sakstype.ANKE_I_TRYGDERETTEN);
 };
 export const getInnsendingshjemlerMap = () => getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/hjemlermap');
-export const getPåVentReasons = () => getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
+export const getPåVentReasons = () =>
+  getData<IKodeverkValue<PåVentReason>[]>(AppName.KLAGE_KODEVERK, '/satt-paa-vent-reasons');
 export const getSakstyper = async () => {
   const sakstyper = await getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
 
