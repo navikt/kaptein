@@ -1,8 +1,9 @@
 'use client';
 
 import { eachWeekOfInterval, getISOWeek, getISOWeekYear } from 'date-fns';
+import type { ECharts } from 'echarts/core';
 import { useQueryState } from 'nuqs';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { parseAsDate } from '@/app/custom-query-parsers';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
@@ -18,6 +19,19 @@ const title = 'Inngang/utgang';
 export const InngangUtgang = ({ behandlinger }: Props) => {
   const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
   const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
+  const [eChartsInstance, setEChartsInstance] = useState<ECharts>();
+
+  useEffect(() => {
+    if (eChartsInstance === undefined) {
+      return;
+    }
+
+    eChartsInstance
+      .getZr()
+      .on('dblclick', () => eChartsInstance.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }));
+
+    return () => eChartsInstance.getZr().off('dblclick');
+  }, [eChartsInstance]);
 
   const { labels, inngang, utgang } = useMemo<{ labels: string[]; inngang: number[]; utgang: number[] }>(() => {
     if (fromFilter === null || toFilter === null) {
@@ -55,11 +69,14 @@ export const InngangUtgang = ({ behandlinger }: Props) => {
 
   return (
     <EChart
+      getInstance={setEChartsInstance}
       option={{
+        grid: { bottom: 140 },
+        dataZoom: [{ type: 'slider' }],
         title: { text: title, subtext: `Viser data for ${behandlinger.length} saker` },
         yAxis: { type: 'value', name: 'Antall saker' },
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: 'Ukenr.' },
-        legend: {},
+        legend: { bottom: 60 },
         tooltip: { trigger: 'axis' },
         series: [
           { type: 'line', smooth: true, data: inngang, name: 'Inngang' },

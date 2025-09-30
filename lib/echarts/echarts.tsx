@@ -4,6 +4,8 @@ import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import {
   AriaComponent,
   DatasetComponent,
+  DataZoomComponent,
+  DataZoomSliderComponent,
   GridComponent,
   LegendComponent,
   TitleComponent,
@@ -11,8 +13,9 @@ import {
   TooltipComponent,
   TransformComponent,
 } from 'echarts/components';
+import type { ECharts } from 'echarts/core';
 // biome-ignore lint/performance/noNamespaceImport: https://echarts.apache.org/handbook/en/basics/import
-import * as Echarts from 'echarts/core';
+import * as echarts from 'echarts/core';
 import { LabelLayout, UniversalTransition } from 'echarts/features';
 // @ts-expect-error - No types available
 import nbNO from 'echarts/lib/i18n/langnb-NO.js';
@@ -22,7 +25,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
-Echarts.use([
+echarts.use([
   AriaComponent,
   BarChart,
   TitleComponent,
@@ -37,23 +40,26 @@ Echarts.use([
   SVGRenderer,
   LineChart,
   PieChart,
+  DataZoomComponent,
+  DataZoomSliderComponent,
 ]);
 
-Echarts.registerTheme(AppTheme.DARK, DARK_THEME);
-Echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
-Echarts.registerLocale('nb-NO', nbNO);
+echarts.registerTheme(AppTheme.DARK, DARK_THEME);
+echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
+echarts.registerLocale('nb-NO', nbNO);
 
 interface Props {
   option: ECBasicOption;
   width?: string;
   height?: string;
   className?: string;
+  getInstance?: (instance: ECharts) => void;
 }
 
-export const EChart = ({ option, width = '100%', height = '100%', className }: Props) => {
+export const EChart = ({ option, width = '100%', height = '100%', className, getInstance }: Props) => {
   const theme = useAppTheme();
   const ref = useRef<HTMLDivElement>(null);
-  const eChartsRef = useRef<Echarts.ECharts | null>(null);
+  const eChartsRef = useRef<ECharts | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   // Create ResizeObserver to update chart size when container size changes
@@ -99,10 +105,14 @@ export const EChart = ({ option, width = '100%', height = '100%', className }: P
       return;
     }
 
-    eChartsRef.current = Echarts.init(ref.current, theme, { locale: 'nb-NO' });
+    eChartsRef.current = echarts.init(ref.current, theme, { locale: 'nb-NO' });
 
     eChartsRef.current.setOption({ aria: { show: true }, ...option });
-  }, [option, theme]);
+
+    if (getInstance !== undefined) {
+      getInstance(eChartsRef.current);
+    }
+  }, [option, theme, getInstance]);
 
   // Update theme when it changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: setOption(option) is a workaround for a bug in ECharts
