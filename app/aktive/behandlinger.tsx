@@ -128,7 +128,7 @@ const BehandlingerData = ({
 
       {showsLedige ? null : (
         <Card>
-          <TildelteSakerPåVentIkkePåVent behandlinger={filteredTildelte} />
+          <TildelteSakerPåVentIkkePåVent behandlinger={filteredTildelte} påVentReasons={påVentReasons} />
         </Card>
       )}
 
