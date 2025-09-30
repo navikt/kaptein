@@ -98,6 +98,20 @@ export interface FerdigstiltBehandling extends BaseBehandling {
 
 export type Behandling = AktivBehandling | FerdigstiltBehandling;
 
+export interface AkrivAnkeITRBehandling extends BaseBehandling {
+  typeId: Sakstype.ANKE_I_TRYGDERETTEN;
+}
+
+export interface AnkeITRBehandling extends BaseBehandling {
+  typeId: Sakstype.ANKE_I_TRYGDERETTEN;
+  avsluttetAvSaksbehandlerDate: string;
+  tildeltEnhet: string;
+  resultat: {
+    hjemmelIdSet: string[];
+    utfallId: string;
+  };
+}
+
 export interface KapteinApiResponse<T> {
   behandlinger: T[];
   total: number;

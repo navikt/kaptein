@@ -3,9 +3,9 @@
 import { Card } from '@/components/cards';
 import { Alder } from '@/components/charts/alder';
 import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
+import { useFerdigstilte } from '@/components/charts/common/data/use-ferdigstilte';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
-import { useFerdigstilte } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';

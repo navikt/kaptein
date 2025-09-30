@@ -10,6 +10,7 @@ interface Props {
 export const Card = ({ children, span = 2, fullWidth = false }: Props) => {
   return (
     <BoxNew
+      as="section"
       padding="4"
       shadow="dialog"
       background="neutral-soft"

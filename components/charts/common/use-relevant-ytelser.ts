@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Behandling, IKodeverkSimpleValue, IYtelse } from '@/lib/server/types';
 
-export const useRelevantYtelser = (behandlinger: Behandling[], ytelser: IYtelse[]): IKodeverkSimpleValue[] =>
+type YtelseBehandling = Pick<Behandling, 'ytelseId'>;
+
+export const useRelevantYtelser = (behandlinger: YtelseBehandling[], ytelser: IYtelse[]): IKodeverkSimpleValue[] =>
   useMemo(() => {
     const ids = Array.from(new Set(behandlinger.map((b) => b.ytelseId)));
 
