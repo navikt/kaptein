@@ -87,7 +87,7 @@ export const getLovkildeToRegistreringshjemler = () =>
 export const getSakstyperToUtfall = async () => {
   const sakstyper = await getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/sakstypertoutfall');
 
-  return sakstyper.filter(({ id }) => id !== Sakstype.ANKE_I_TRYGDERETTEN);
+  return sakstyper.filter(({ id }) => RELEVANT_SAKSTYPER.includes(id));
 };
 export const getInnsendingshjemlerMap = () => getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/hjemlermap');
 export const getPåVentReasons = () =>
@@ -95,7 +95,14 @@ export const getPåVentReasons = () =>
 export const getSakstyper = async () => {
   const sakstyper = await getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/sakstyper');
 
-  return sakstyper.filter(({ id }) => id !== Sakstype.ANKE_I_TRYGDERETTEN);
+  return sakstyper.filter(({ id }) => RELEVANT_SAKSTYPER.includes(id));
 };
 
 const STYRINGSENHETEN: IKodeverkSimpleValue = { id: '4200', navn: 'Nav klageinstans styringsenhet' };
+
+const RELEVANT_SAKSTYPER = [
+  Sakstype.KLAGE,
+  Sakstype.ANKE,
+  Sakstype.BEHANDLING_ETTER_TR_OPPHEVET,
+  Sakstype.OMGJØRINGSKRAV,
+];
