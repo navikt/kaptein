@@ -1,10 +1,11 @@
 'use client';
 
-import { endOfDay, isAfter, isBefore, startOfDay } from 'date-fns';
+import { isAfter, isBefore } from 'date-fns';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsDate, parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
+import { parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
+import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import {
   type Behandling,
   type FerdigstiltBehandling,
@@ -13,16 +14,6 @@ import {
   type TildeltBehandling,
 } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
-
-const useDateFilter = () => {
-  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
-  const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
-
-  return {
-    fromFilter: fromFilter === null ? null : startOfDay(fromFilter),
-    toFilter: toFilter === null ? null : endOfDay(toFilter),
-  };
-};
 
 export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
   const { fromFilter, toFilter } = useDateFilter();
@@ -65,11 +56,15 @@ export const useSaksstrøm = (behandlinger: Behandling[]) => {
 
   const baseFiltered = useFiltered(behandlinger);
 
+  console.log(toFilter);
+
   return useMemo(() => {
     const filteredForUtfall =
       utfall.length === 0
         ? baseFiltered
         : baseFiltered.filter((b) => isFerdigstilt(b) && utfall.includes(b.resultat.utfallId));
+
+    console.log('filteredForUtfall', filteredForUtfall);
 
     const filteredForFrom =
       fromFilter === null
@@ -79,6 +74,7 @@ export const useSaksstrøm = (behandlinger: Behandling[]) => {
               ? !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter)
               : !isBefore(new Date(b.created), fromFilter),
           );
+    console.log('filteredForFrom', filteredForFrom);
 
     const filteredForTo =
       toFilter === null
@@ -87,12 +83,15 @@ export const useSaksstrøm = (behandlinger: Behandling[]) => {
             isFerdigstilt(b) ? !isAfter(new Date(b.created), toFilter) : !isAfter(new Date(b.created), toFilter),
           );
 
+    console.log('filteredForTo', filteredForTo);
+
     const filteredForRegistreringshjemler =
       registreringshjemler.length === 0
         ? filteredForTo
         : filteredForTo.filter((b) =>
             registreringshjemler.some((h) => isFerdigstilt(b) && b.resultat.hjemmelIdSet.includes(h)),
           );
+    console.log('filteredForRegistreringshjemler', filteredForRegistreringshjemler);
 
     return filteredForRegistreringshjemler;
   }, [baseFiltered, fromFilter, toFilter, registreringshjemler, utfall]);

@@ -2,13 +2,11 @@
 
 import { isAfter, isBefore } from 'date-fns';
 import type { ECharts } from 'echarts/core';
-import { useQueryState } from 'nuqs';
 import { useEffect, useMemo, useState } from 'react';
-import { parseAsDate } from '@/app/custom-query-parsers';
+import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { type Behandling, type FerdigstiltBehandling, isFerdigstilt } from '@/lib/server/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 export type Bucket = { inn: number; ut: number; label: string };
 export type Buckets = Record<number, Bucket>;
@@ -36,8 +34,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   getInBucketIndex,
   getOutBucketIndex,
 }: Props) => {
-  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
-  const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
+  const { fromFilter, toFilter } = useDateFilter();
   const [eChartsInstance, setEChartsInstance] = useState<ECharts>();
 
   useEffect(() => {
