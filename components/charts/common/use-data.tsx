@@ -1,6 +1,6 @@
 'use client';
 
-import { isAfter, isBefore } from 'date-fns';
+import { endOfDay, isAfter, isBefore, startOfDay } from 'date-fns';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsDate, parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
@@ -14,9 +14,18 @@ import {
 } from '@/lib/server/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
+const useDateFilter = () => {
   const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
   const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
+
+  return {
+    fromFilter: fromFilter === null ? null : startOfDay(fromFilter),
+    toFilter: toFilter === null ? null : endOfDay(toFilter),
+  };
+};
+
+export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
+  const { fromFilter, toFilter } = useDateFilter();
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
   const registreringshjemler = registreringshjemlerFilter ?? [];
@@ -48,8 +57,7 @@ export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
 };
 
 export const useSaksstrøm = (behandlinger: Behandling[]) => {
-  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
-  const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
+  const { fromFilter, toFilter } = useDateFilter();
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
   const registreringshjemler = registreringshjemlerFilter ?? [];
