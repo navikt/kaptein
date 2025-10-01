@@ -92,7 +92,7 @@ const BehandlingerData = ({
 
   return (
     <ChartsWrapper>
-      <Card fullWidth>
+      <Card fullWidth span={3}>
         <InngangUtgang behandlinger={filtered} />
       </Card>
     </ChartsWrapper>
