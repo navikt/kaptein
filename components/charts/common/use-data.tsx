@@ -24,25 +24,27 @@ export const useFerdigstilte = (behandlinger: FerdigstiltBehandling[]) => {
 
   const baseFiltered = useFiltered(behandlinger);
 
-  const filteredForUtfall =
-    utfall.length === 0 ? baseFiltered : baseFiltered.filter((b) => utfall.includes(b.resultat.utfallId));
+  return useMemo(() => {
+    const filteredForUtfall =
+      utfall.length === 0 ? baseFiltered : baseFiltered.filter((b) => utfall.includes(b.resultat.utfallId));
 
-  const filteredForFrom =
-    fromFilter === null
-      ? filteredForUtfall
-      : filteredForUtfall.filter((b) => !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter));
+    const filteredForFrom =
+      fromFilter === null
+        ? filteredForUtfall
+        : filteredForUtfall.filter((b) => !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter));
 
-  const filteredForTo =
-    toFilter === null
-      ? filteredForFrom
-      : filteredForFrom.filter((b) => !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter));
+    const filteredForTo =
+      toFilter === null
+        ? filteredForFrom
+        : filteredForFrom.filter((b) => !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter));
 
-  const filteredForRegistreringshjemler =
-    registreringshjemler.length === 0
-      ? filteredForTo
-      : filteredForTo.filter((b) => registreringshjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)));
+    const filteredForRegistreringshjemler =
+      registreringshjemler.length === 0
+        ? filteredForTo
+        : filteredForTo.filter((b) => registreringshjemler.some((h) => b.resultat.hjemmelIdSet.includes(h)));
 
-  return filteredForRegistreringshjemler;
+    return filteredForRegistreringshjemler;
+  }, [baseFiltered, fromFilter, toFilter, registreringshjemler, utfall]);
 };
 
 export const useSaksstrøm = (behandlinger: Behandling[]) => {
@@ -55,38 +57,37 @@ export const useSaksstrøm = (behandlinger: Behandling[]) => {
 
   const baseFiltered = useFiltered(behandlinger);
 
-  const filteredForUtfall =
-    utfall.length === 0
-      ? baseFiltered
-      : baseFiltered.filter((b) => isFerdigstilt(b) && utfall.includes(b.resultat.utfallId));
+  return useMemo(() => {
+    const filteredForUtfall =
+      utfall.length === 0
+        ? baseFiltered
+        : baseFiltered.filter((b) => isFerdigstilt(b) && utfall.includes(b.resultat.utfallId));
 
-  const filteredForFrom =
-    fromFilter === null
-      ? filteredForUtfall
-      : filteredForUtfall.filter((b) =>
-          isFerdigstilt(b)
-            ? !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter) &&
-              !isBefore(new Date(b.created), fromFilter)
-            : !isBefore(new Date(b.created), fromFilter),
-        );
+    const filteredForFrom =
+      fromFilter === null
+        ? filteredForUtfall
+        : filteredForUtfall.filter((b) =>
+            isFerdigstilt(b)
+              ? !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter)
+              : !isBefore(new Date(b.created), fromFilter),
+          );
 
-  const filteredForTo =
-    toFilter === null
-      ? filteredForFrom
-      : filteredForFrom.filter((b) =>
-          isFerdigstilt(b)
-            ? !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter) && !isAfter(new Date(b.created), toFilter)
-            : !isAfter(new Date(b.created), toFilter),
-        );
+    const filteredForTo =
+      toFilter === null
+        ? filteredForFrom
+        : filteredForFrom.filter((b) =>
+            isFerdigstilt(b) ? !isAfter(new Date(b.created), toFilter) : !isAfter(new Date(b.created), toFilter),
+          );
 
-  const filteredForRegistreringshjemler =
-    registreringshjemler.length === 0
-      ? filteredForTo
-      : filteredForTo.filter((b) =>
-          registreringshjemler.some((h) => isFerdigstilt(b) && b.resultat.hjemmelIdSet.includes(h)),
-        );
+    const filteredForRegistreringshjemler =
+      registreringshjemler.length === 0
+        ? filteredForTo
+        : filteredForTo.filter((b) =>
+            registreringshjemler.some((h) => isFerdigstilt(b) && b.resultat.hjemmelIdSet.includes(h)),
+          );
 
-  return filteredForRegistreringshjemler;
+    return filteredForRegistreringshjemler;
+  }, [baseFiltered, fromFilter, toFilter, registreringshjemler, utfall]);
 };
 
 export const useAktive = (behandlinger: (LedigBehandling | TildeltBehandling)[]) => {
