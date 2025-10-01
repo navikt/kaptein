@@ -52,17 +52,17 @@ export const DateRange = () => {
         return;
       }
 
-      if (range.from.isEmpty) newFromErrors.push('Fra og med dato må være valgt');
-      if (range.from.isInvalid && !range.from.isEmpty) newFromErrors.push('Fra og med dato er ugyldig');
-      if (range.from.isAfter) newFromErrors.push('Fra og med dato kan ikke være etter til og med dato');
-      if (range.from.isBefore) newFromErrors.push(`Fra og med dato kan ikke være før ${PRETTY_START_OF_KABAL}`);
+      if (range.from.isEmpty) newFromErrors.push('Fra og med-dato må være valgt');
+      if (range.from.isInvalid && !range.from.isEmpty) newFromErrors.push('Fra og med-dato er ugyldig');
+      if (range.from.isAfter) newFromErrors.push('Fra og med-dato kan ikke være etter til og med-dato');
+      if (range.from.isBefore) newFromErrors.push(`Fra og med-dato kan ikke være før ${PRETTY_START_OF_KABAL}`);
 
-      if (range.to.isEmpty) newToErrors.push('Til og med dato må være valgt');
-      if (range.to.isInvalid && !range.to.isEmpty) newToErrors.push('Til og med dato er ugyldig');
-      if (range.to.isAfter) newToErrors.push('Til og med dato kan ikke være etter i dag');
-      if (range.to.isBefore) newToErrors.push(`Til og med dato kan ikke være før ${PRETTY_START_OF_KABAL}`);
+      if (range.to.isEmpty) newToErrors.push('Til og med-dato må være valgt');
+      if (range.to.isInvalid && !range.to.isEmpty) newToErrors.push('Til og med-dato er ugyldig');
+      if (range.to.isAfter) newToErrors.push('Til og med-dato kan ikke være etter i dag');
+      if (range.to.isBefore) newToErrors.push(`Til og med-dato kan ikke være før ${PRETTY_START_OF_KABAL}`);
 
-      if (range.to.isBeforeFrom) newToErrors.push('Til og med dato kan ikke være før fra og med dato');
+      if (range.to.isBeforeFrom) newToErrors.push('Til og med-dato kan ikke være før fra og med-dato');
 
       setFromErrors(newFromErrors);
       setToErrors(newToErrors);
