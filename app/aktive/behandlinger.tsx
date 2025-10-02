@@ -24,7 +24,7 @@ import { VarsletFrist } from '@/components/charts/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-ytelse';
 import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/charts/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { useClientFetch } from '@/lib/client/use-client-fetch';
+import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import type {
   AnkeLedig,
   AnkerLedigeResponse,
@@ -62,42 +62,42 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     data: klagerLedige,
     error: klagerLedigeError,
     isLoading: klagerLedigeLoading,
-  } = useClientFetch<KlagerLedigeResponse>('/api/klager/ledige');
+  } = useClientKapteinApiFetch<KlagerLedigeResponse>('/klager/ledige');
   const {
     data: klagerTildelte,
     error: klagerTildelteError,
     isLoading: klagerTildelteLoading,
-  } = useClientFetch<KlagerTildelteResponse>('/api/klager/tildelte');
+  } = useClientKapteinApiFetch<KlagerTildelteResponse>('/klager/tildelte');
   const {
     data: ankerLedige,
     error: ankerLedigeError,
     isLoading: ankerLedigeLoading,
-  } = useClientFetch<AnkerLedigeResponse>('/api/anker/ledige');
+  } = useClientKapteinApiFetch<AnkerLedigeResponse>('/anker/ledige');
   const {
     data: ankerTildelte,
     error: ankerTildelteError,
     isLoading: ankerTildelteLoading,
-  } = useClientFetch<AnkerTildelteResponse>('/api/anker/tildelte');
+  } = useClientKapteinApiFetch<AnkerTildelteResponse>('/anker/tildelte');
   const {
     data: betongLedige,
     error: betongLedigeError,
     isLoading: betongLedigeLoading,
-  } = useClientFetch<BetongLedigeResponse>('/api/behandlinger-etter-tr-opphevet/ledige');
+  } = useClientKapteinApiFetch<BetongLedigeResponse>('/behandlinger-etter-tr-opphevet/ledige');
   const {
     data: betongTildelte,
     error: betongTildelteError,
     isLoading: betongTildelteLoading,
-  } = useClientFetch<BetongTildelteResponse>('/api/behandlinger-etter-tr-opphevet/tildelte');
+  } = useClientKapteinApiFetch<BetongTildelteResponse>('/behandlinger-etter-tr-opphevet/tildelte');
   const {
     data: omgjøringskravLedige,
     error: omgjøringskravLedigeError,
     isLoading: omgjøringskravLedigeLoading,
-  } = useClientFetch<OmgjøringskravLedigeResponse>('/api/omgjoeringskrav/ledige');
+  } = useClientKapteinApiFetch<OmgjøringskravLedigeResponse>('/omgjoeringskrav/ledige');
   const {
     data: omgjøringskravTildelte,
     error: omgjøringskravTildelteError,
     isLoading: omgjøringskravTildelteLoading,
-  } = useClientFetch<OmgjøringskravTildelteResponse>('/api/omgjoeringskrav/tildelte');
+  } = useClientKapteinApiFetch<OmgjøringskravTildelteResponse>('/omgjoeringskrav/tildelte');
 
   if (
     klagerLedigeLoading ||

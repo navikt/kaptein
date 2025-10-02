@@ -1,17 +1,13 @@
+'use server';
+
 import { requestOboToken, validateToken } from '@navikt/oasis';
 import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 import { unauthorized } from 'next/navigation';
+import type { AppName } from '@/lib/app-name';
 import { getLogger } from '@/lib/logger';
 import { getTraceparent } from './traceparent';
 
 const logger = getLogger('obo-token');
-
-export enum AppName {
-  KAPTEIN_API = 'kaptein-api',
-  KABAL_API = 'kabal-api',
-  KABAL_INNSTILLINGER = 'kabal-innstillinger',
-  KLAGE_KODEVERK = 'klage-kodeverk',
-}
 
 export const getOboToken = async (appName: AppName, headers: ReadonlyHeaders) => {
   const authorization = headers.get('authorization');

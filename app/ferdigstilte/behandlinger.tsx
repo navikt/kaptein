@@ -16,7 +16,7 @@ import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte
 import { VarsletFrist } from '@/components/charts/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { useClientFetch } from '@/lib/client/use-client-fetch';
+import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import type {
   AnkeFerdigstilt,
   BetongFerdigstilt,
@@ -44,22 +44,22 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     data: klager,
     isLoading: isLoadingKlager,
     error: errorKlager,
-  } = useClientFetch<KlageResponse>('/api/klager/ferdigstilte');
+  } = useClientKapteinApiFetch<KlageResponse>('/klager/ferdigstilte');
   const {
     data: anker,
     isLoading: isLoadingAnker,
     error: errorAnker,
-  } = useClientFetch<AnkeResponse>('/api/anker/ferdigstilte');
+  } = useClientKapteinApiFetch<AnkeResponse>('/anker/ferdigstilte');
   const {
     data: betongFerdigstilte,
     isLoading: betongFerdigstilteLoading,
     error: betongFerdigstilteError,
-  } = useClientFetch<BetongFerdigstilteResponse>('/api/behandlinger-etter-tr-opphevet/ferdigstilte');
+  } = useClientKapteinApiFetch<BetongFerdigstilteResponse>('/behandlinger-etter-tr-opphevet/ferdigstilte');
   const {
     data: omgjøringskravFerdigstilte,
     isLoading: omgjøringskravFerdigstilteLoading,
     error: omgjøringskravFerdigstilteError,
-  } = useClientFetch<OmgjøringskravFerdigstilteResponse>('/api/omgjoeringskrav/ferdigstilte');
+  } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
 
   if (isLoadingKlager || isLoadingAnker || betongFerdigstilteLoading || omgjøringskravFerdigstilteLoading) {
     return <SkeletonFerdigstilte />;
