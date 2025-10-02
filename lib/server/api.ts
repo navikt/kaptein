@@ -1,9 +1,8 @@
 import { headers } from 'next/headers';
-import { isLocal } from '@/lib/environment';
+import { isDeployed, isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
-import { getFromKabal } from '@/lib/server/fetch';
-import { AppName } from '@/lib/server/get-obo-token';
+import { AppName, getOboToken } from '@/lib/server/get-obo-token';
 import { generateTraceParent } from '@/lib/server/traceparent';
 import {
   type IKodeverkSimpleValue,
@@ -34,13 +33,22 @@ export const getUrl = (appName: AppName) => {
   }
 };
 
-export const getResponse = async (appName: AppName, path: string): Promise<Response> => {
+const getResponse = async (appName: AppName, path: string): Promise<Response> => {
   const { traceparent, traceId, spanId } = generateTraceParent();
   const h = await headers();
   const url = getUrl(appName) + path;
 
   try {
-    const res = await (isLocal ? fetch(url, { headers: h }) : getFromKabal(appName, url, h, traceparent));
+    const outgoingHeaders = new Headers(h);
+
+    outgoingHeaders.set('accept', 'application/json');
+    outgoingHeaders.set('traceparent', traceparent);
+
+    if (isDeployed && appName !== AppName.KLAGE_KODEVERK) {
+      outgoingHeaders.set('authorization', `Bearer ${await getOboToken(appName, h)}`);
+    }
+
+    const res = await fetch(url, { method: 'GET', headers: outgoingHeaders });
 
     if (res.status === 401) {
       logger.warn('Unauthorized', traceId, spanId, { url });
