@@ -13,7 +13,7 @@ import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart'
 import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { useClientFetch } from '@/lib/client/use-client-fetch';
+import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { PRETTY_DATE_FORMAT } from '@/lib/date';
 import type {
   AnkerFerdigstilteResponse,
@@ -41,62 +41,62 @@ export const Behandlinger = () => {
     data: klagerLedige,
     error: klagerLedigeError,
     isLoading: klagerLedigeLoading,
-  } = useClientFetch<KlagerLedigeResponse>('/api/klager/ledige');
+  } = useClientKapteinApiFetch<KlagerLedigeResponse>('/klager/ledige');
   const {
     data: klagerTildelte,
     error: klagerTildelteError,
     isLoading: klagerTildelteLoading,
-  } = useClientFetch<KlagerTildelteResponse>('/api/klager/tildelte');
+  } = useClientKapteinApiFetch<KlagerTildelteResponse>('/klager/tildelte');
   const {
     data: klagerFerdigstilte,
     isLoading: klagerFerdigstilteLoading,
     error: klagerFerdigstilteError,
-  } = useClientFetch<KlagerFerdigstilteResponse>('/api/klager/ferdigstilte');
+  } = useClientKapteinApiFetch<KlagerFerdigstilteResponse>('/klager/ferdigstilte');
   const {
     data: ankerLedige,
     error: ankerLedigeError,
     isLoading: ankerLedigeLoading,
-  } = useClientFetch<AnkerLedigeResponse>('/api/anker/ledige');
+  } = useClientKapteinApiFetch<AnkerLedigeResponse>('/anker/ledige');
   const {
     data: ankerTildelte,
     error: ankerTildelteError,
     isLoading: ankerTildelteLoading,
-  } = useClientFetch<AnkerTildelteResponse>('/api/anker/tildelte');
+  } = useClientKapteinApiFetch<AnkerTildelteResponse>('/anker/tildelte');
   const {
     data: ankerFerdigstilte,
     isLoading: ankerFerdigstilteLoading,
     error: ankerFerdigstilteError,
-  } = useClientFetch<AnkerFerdigstilteResponse>('/api/anker/ferdigstilte');
+  } = useClientKapteinApiFetch<AnkerFerdigstilteResponse>('/anker/ferdigstilte');
   const {
     data: betongLedige,
     error: betongLedigeError,
     isLoading: betongLedigeLoading,
-  } = useClientFetch<BetongLedigeResponse>('/api/behandlinger-etter-tr-opphevet/ledige');
+  } = useClientKapteinApiFetch<BetongLedigeResponse>('/behandlinger-etter-tr-opphevet/ledige');
   const {
     data: betongTildelte,
     error: betongTildelteError,
     isLoading: betongTildelteLoading,
-  } = useClientFetch<BetongTildelteResponse>('/api/behandlinger-etter-tr-opphevet/tildelte');
+  } = useClientKapteinApiFetch<BetongTildelteResponse>('/behandlinger-etter-tr-opphevet/tildelte');
   const {
     data: betongFerdigstilte,
     isLoading: betongFerdigstilteLoading,
     error: betongFerdigstilteError,
-  } = useClientFetch<BetongFerdigstilteResponse>('/api/behandlinger-etter-tr-opphevet/ferdigstilte');
+  } = useClientKapteinApiFetch<BetongFerdigstilteResponse>('/behandlinger-etter-tr-opphevet/ferdigstilte');
   const {
     data: omgjøringskravLedige,
     error: omgjøringskravLedigeError,
     isLoading: omgjøringskravLedigeLoading,
-  } = useClientFetch<OmgjøringskravLedigeResponse>('/api/omgjoeringskrav/ledige');
+  } = useClientKapteinApiFetch<OmgjøringskravLedigeResponse>('/omgjoeringskrav/ledige');
   const {
     data: omgjøringskravTildelte,
     error: omgjøringskravTildelteError,
     isLoading: omgjøringskravTildelteLoading,
-  } = useClientFetch<OmgjøringskravTildelteResponse>('/api/omgjoeringskrav/tildelte');
+  } = useClientKapteinApiFetch<OmgjøringskravTildelteResponse>('/omgjoeringskrav/tildelte');
   const {
     data: omgjøringskravFerdigstilte,
     isLoading: omgjøringskravFerdigstilteLoading,
     error: omgjøringskravFerdigstilteError,
-  } = useClientFetch<OmgjøringskravFerdigstilteResponse>('/api/omgjoeringskrav/ferdigstilte');
+  } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
 
   if (
     klagerLedigeLoading ||

@@ -1,41 +1,60 @@
 import type { OutgoingHttpHeaders } from 'node:http';
 import type { NextRequest } from 'next/server';
-import { formatBytes } from '@/app/api/[type]/[status]/format-bytes';
-import { isDeployed, isLocal } from '@/lib/environment';
+import { isAppName } from '@/lib/app-name';
+import { isDeployed } from '@/lib/environment';
+import { formatBytes } from '@/lib/format-bytes';
 import { getLogger } from '@/lib/logger';
-import { AppName, getOboToken } from '@/lib/server/get-obo-token';
+import { SERVICE_URLS } from '@/lib/server/api';
+import { getOboToken } from '@/lib/server/get-obo-token';
 import { AbortError, ProxyError, TimeoutError } from '@/lib/server/proxy/errors';
 import { type EndInfo, handleProxyRequest } from '@/lib/server/proxy/proxy';
 import { generateTraceParent, parseTraceParent } from '@/lib/server/traceparent';
 
-const log = getLogger('behandlinger-proxy');
+const log = getLogger('proxy');
 
 export const dynamic = 'force-dynamic';
 
-const KAPTEIN_URL = isLocal ? new URL('https://kaptein.intern.dev.nav.no/api') : new URL('http://kaptein-api');
-
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/[type]/[status]'>): Promise<Response> {
+const handler = async (
+  req: NextRequest,
+  ctx: RouteContext<'/api/proxy/[service]/[...pathSegments]'>,
+): Promise<Response> => {
   const incomingTraceparent = req.headers.get('traceparent');
   const { traceparent, traceId, spanId } =
     incomingTraceparent === null ? generateTraceParent() : parseTraceParent(incomingTraceparent);
 
-  const { type, status } = await ctx.params;
+  const { service, pathSegments } = await ctx.params;
 
-  log.debug(`Proxying GET /kaptein-api/${type}/${status}`, traceId, spanId);
+  if (!isAppName(service)) {
+    const message = `Invalid service name "${service}" in path "${req.nextUrl.pathname}"`;
+    log.error(message, traceId, spanId, { service });
+    return new Response(JSON.stringify({ message }), { status: 404 });
+  }
 
-  const url = new URL(KAPTEIN_URL);
+  const path = pathSegments.join('/');
 
-  url.pathname += `/${type}/${status}`;
+  const url = SERVICE_URLS[service]({ path, searchParams: req.nextUrl.searchParams });
+
+  log.debug(`Proxying ${req.method} ${service}/${path}`, traceId, spanId, {
+    method: req.method,
+    service,
+    path,
+    url: url.toString(),
+  });
 
   const overrideHeaders: OutgoingHttpHeaders = { traceparent };
 
   if (isDeployed) {
-    const token = await getOboToken(AppName.KAPTEIN_API, req.headers);
+    const token = await getOboToken(service, req.headers);
     overrideHeaders.authorization = `Bearer ${token}`;
   }
 
-  const onEnd = ({ bytes, duration }: EndInfo) =>
-    log.info(`Proxied ${formatBytes(bytes)} bytes in ${duration} ms`, traceId, spanId);
+  const onEnd = ({ bytes, duration, status }: EndInfo) =>
+    log.info(
+      `Proxied ${req.method} ${service}/${path} - ${formatBytes(bytes)} in ${duration} ms - status: ${status ?? 'NONE'}`,
+      traceId,
+      spanId,
+      { status, method: req.method, service, path, bytes, duration, url: url.toString() },
+    );
 
   try {
     return handleProxyRequest(req, { targetUrl: url, overrideHeaders, onEnd });
@@ -83,4 +102,12 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/[type]/[stat
       status: 502,
     });
   }
-}
+};
+
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const PATCH = handler;
+export const DELETE = handler;
+export const HEAD = handler;
+export const OPTIONS = handler;
