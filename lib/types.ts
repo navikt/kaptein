@@ -144,6 +144,8 @@ export enum Sakstype {
   ANKE_I_TRYGDERETTEN = '3',
   BEHANDLING_ETTER_TR_OPPHEVET = '4',
   OMGJØRINGSKRAV = '5',
+  BEGJÆRING_OM_GJENOPPTAK = '6',
+  BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN = '7',
 }
 
 export enum PåVentReason {
