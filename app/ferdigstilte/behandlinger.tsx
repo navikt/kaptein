@@ -44,22 +44,22 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     data: klager,
     isLoading: isLoadingKlager,
     error: errorKlager,
-  } = useClientFetch<KlageResponse>('/api/klager/ferdigstilte');
+  } = useClientFetch<KlageResponse>('/api/proxy/kaptein-api/klager/ferdigstilte');
   const {
     data: anker,
     isLoading: isLoadingAnker,
     error: errorAnker,
-  } = useClientFetch<AnkeResponse>('/api/anker/ferdigstilte');
+  } = useClientFetch<AnkeResponse>('/api/proxy/kaptein-api/anker/ferdigstilte');
   const {
     data: betongFerdigstilte,
     isLoading: betongFerdigstilteLoading,
     error: betongFerdigstilteError,
-  } = useClientFetch<BetongFerdigstilteResponse>('/api/behandlinger-etter-tr-opphevet/ferdigstilte');
+  } = useClientFetch<BetongFerdigstilteResponse>('/api/proxy/kaptein-api/behandlinger-etter-tr-opphevet/ferdigstilte');
   const {
     data: omgjøringskravFerdigstilte,
     isLoading: omgjøringskravFerdigstilteLoading,
     error: omgjøringskravFerdigstilteError,
-  } = useClientFetch<OmgjøringskravFerdigstilteResponse>('/api/omgjoeringskrav/ferdigstilte');
+  } = useClientFetch<OmgjøringskravFerdigstilteResponse>('/api/proxy/kaptein-api/omgjoeringskrav/ferdigstilte');
 
   if (isLoadingKlager || isLoadingAnker || betongFerdigstilteLoading || omgjøringskravFerdigstilteLoading) {
     return <SkeletonFerdigstilte />;

@@ -6,6 +6,7 @@ import { getResponseHeaders, prepareProxyHeaders } from '@/lib/server/proxy/head
 export interface EndInfo {
   bytes: number;
   duration: number;
+  status: number | undefined;
 }
 
 interface TargetOptions {
@@ -42,7 +43,7 @@ export const handleProxyRequest = async (
 
         res.once('end', () => {
           controller.close();
-          onEnd?.({ bytes, duration: performance.now() - start });
+          onEnd?.({ bytes, duration: getDuration(start), status: res.statusCode });
         });
 
         res.once('error', (error) => {
