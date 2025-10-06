@@ -120,12 +120,12 @@ export const EChart = ({
 
     eChartsRef.current = echarts.init(ref.current, theme, { locale: 'nb-NO' });
 
-    eChartsRef.current.setOption({ aria: { show: true }, ...option });
+    eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
 
     if (getInstance !== undefined) {
       getInstance(eChartsRef.current);
     }
-  }, [option, theme, getInstance]);
+  }, [option, theme, getInstance, description, title]);
 
   // Update theme when it changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: setOption(option) is a workaround for a bug in ECharts
@@ -136,7 +136,7 @@ export const EChart = ({
 
     eChartsRef.current.setTheme(theme);
     // Without this eChart would show data from previous filtering after changing theme
-    eChartsRef.current.setOption({ aria: { show: true }, ...option });
+    eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
   }, [theme]);
 
   return <div style={{ width, height }} ref={ref} className={className} />;
