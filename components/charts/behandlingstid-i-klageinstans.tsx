@@ -14,7 +14,7 @@ interface Props {
   ferdigstilte: (BaseBehandling & Ferdigstilt)[];
 }
 
-const TITLE = 'Behandlingstid';
+const TITLE = 'Behandlingstid i klageinstans';
 
 export const Behandlingstid = ({ ferdigstilte }: Props) => {
   const [eChartsInstance, setEChartsInstance] = useState<ECharts>();
@@ -65,7 +65,7 @@ export const Behandlingstid = ({ ferdigstilte }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Viser data for ${ferdigstilte.length} saker`}
+      description={`Viser data for ${ferdigstilte.length} ferdigstilte saker`}
       getInstance={setEChartsInstance}
       option={{
         grid: { bottom: 150 },

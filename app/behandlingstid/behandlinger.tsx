@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/cards';
-import { Behandlingstid } from '@/components/charts/behandlingstid';
+import { Behandlingstid } from '@/components/charts/behandlingstid-i-klageinstans';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonBehandlingstid } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstilte } from '@/components/charts/common/use-data';
