@@ -65,7 +65,7 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Viser  data for ${uferdigeList.length} aktive saker`}
+      description={`Viser data for ${uferdigeList.length} aktive saker`}
       getInstance={setEChartsInstance}
       option={{
         grid: { bottom: 150 },

@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
-import { Aldersfordeling } from '@/components/charts/alder-histogram';
+import { Aldersfordeling } from '@/components/charts/aldersfordeling';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
