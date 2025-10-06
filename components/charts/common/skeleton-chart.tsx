@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/suspicious/noArrayIndexKey: Only static items */
 import { HStack, Skeleton, VStack } from '@navikt/ds-react';
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { Card } from '@/components/cards';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 
@@ -21,6 +21,32 @@ const BarChart = ({ bars = 24 }: { bars?: number }) => (
 
           <Skeleton variant="rectangle" height="25px" width={`${randomPercentage()}%`} />
         </Fragment>
+      ))}
+    </div>
+    <BarChartLegend />
+  </VStack>
+);
+
+export function generateHistogram(count: number): number[] {
+  const max = 100;
+  const mean = count / 2;
+  const stdDev = count / 6;
+
+  return Array.from({ length: count }, (_, i) => {
+    const x = i - mean;
+    const baseValue = Math.exp(-(x * x) / (2 * stdDev * stdDev));
+    const randomFactor = 0.8 + Math.random() * 0.4;
+
+    return Math.min(max, Math.round(max * baseValue * randomFactor));
+  });
+}
+
+const Histogram = ({ bars = 50 }: { bars?: number }) => (
+  <VStack justify="space-between" padding="2" className="h-full gap-4">
+    <Title />
+    <div className="flex grow items-end justify-center gap-2">
+      {generateHistogram(bars).map((height, i) => (
+        <Skeleton key={i} variant="rectangle" width="25px" height={`${height}%`} />
       ))}
     </div>
     <BarChartLegend />
@@ -70,7 +96,7 @@ const PieChartLegend = () => (
   </div>
 );
 
-export const SkeletonAktive = () => (
+export const SkeletonAktive = memo(() => (
   <ChartsWrapper>
     <Card span={4}>
       <BarChart />
@@ -123,9 +149,9 @@ export const SkeletonAktive = () => (
       <BarChart />
     </Card>
   </ChartsWrapper>
-);
+));
 
-export const SkeletonFerdigstilte = () => (
+export const SkeletonFerdigstilte = memo(() => (
   <ChartsWrapper>
     <Card span={4}>
       <BarChart />
@@ -167,4 +193,18 @@ export const SkeletonFerdigstilte = () => (
       <BarChart />
     </Card>
   </ChartsWrapper>
-);
+));
+
+export const SkeletonSaksstrøm = memo(() => (
+  <ChartsWrapper>
+    <Card fullWidth>
+      <Histogram />
+    </Card>
+    <Card fullWidth>
+      <Histogram />
+    </Card>
+    <Card fullWidth>
+      <Histogram />
+    </Card>
+  </ChartsWrapper>
+));

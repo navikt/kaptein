@@ -10,7 +10,7 @@ import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { Aldersfordeling } from '@/components/charts/alder-histogram';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
+import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
@@ -113,7 +113,7 @@ export const Behandlinger = () => {
     omgjøringskravTildelteLoading ||
     omgjøringskravFerdigstilteLoading
   ) {
-    return <SkeletonFerdigstilte />;
+    return <SkeletonSaksstrøm />;
   }
 
   if (
