@@ -44,7 +44,7 @@ export function generateHistogram(count: number): number[] {
 const Histogram = ({ bars = 50 }: { bars?: number }) => (
   <VStack justify="space-between" padding="2" className="h-full gap-4">
     <Title />
-    <div className="flex grow items-end justify-center gap-2">
+    <div className="flex grow items-end justify-start gap-2">
       {generateHistogram(bars).map((height, i) => (
         <Skeleton key={i} variant="rectangle" width="25px" height={`${height}%`} />
       ))}
@@ -204,6 +204,14 @@ export const SkeletonSaksstrøm = memo(() => (
       <Histogram />
     </Card>
     <Card fullWidth span={4}>
+      <Histogram />
+    </Card>
+  </ChartsWrapper>
+));
+
+export const SkeletonBehandlingstid = memo(() => (
+  <ChartsWrapper>
+    <Card fullWidth span={3}>
       <Histogram />
     </Card>
   </ChartsWrapper>

@@ -38,16 +38,16 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
   const { labels, aktive } = useMemo<Data>(() => {
     const maxAge = uferdigeList.reduce((max, b) => (b.ageKA > max ? b.ageKA : max), 0);
 
-    const buckets: Buckets = new Array(Math.floor(maxAge / 7) + 1).fill(null).reduce<Buckets>((acc, _, i) => {
+    const buckets: Buckets = new Array(Math.ceil(maxAge / 7)).fill(null).reduce<Buckets>((acc, _, i) => {
       acc[i] = { aktive: 0, label: `${i}-${i + 1} uker` };
 
       return acc;
     }, {});
 
     for (const b of uferdigeList) {
-      const label = Math.floor(b.ageKA / 7);
+      const index = Math.floor(b.ageKA / 7);
 
-      buckets[label].aktive += 1;
+      buckets[index].aktive += 1;
     }
 
     const values = Object.values(buckets);

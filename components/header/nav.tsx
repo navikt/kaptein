@@ -97,6 +97,15 @@ export const Nav = () => {
       >
         Saksstrøm
       </InternalHeader.Button>
+
+      <InternalHeader.Button
+        as={Link}
+        className={pathname === '/behandlingstid' ? ACTIVE_CLASS : ''}
+        // Same as ferdigstilteParams for now
+        href={`/behandlingstid?${ferdigstilteParams}`}
+      >
+        Behandlingstid
+      </InternalHeader.Button>
     </>
   );
 };
