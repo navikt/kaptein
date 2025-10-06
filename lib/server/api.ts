@@ -18,20 +18,21 @@ import {
 
 const logger = getLogger('api');
 
-const KAPTEIN_DEV_DOMAIN = 'https://kaptein.intern.dev.nav.no';
-const KAPTEIN_PROXY_URL = new URL(`${KAPTEIN_DEV_DOMAIN}/api/proxy`);
+const KAPTEIN_PROXY_TARGET = new URL('https://kaptein.intern.nav.no/api/proxy');
 
-const KABAL_API = new URL(isLocal ? `${KAPTEIN_PROXY_URL}/${AppName.KABAL_API}` : `http://${AppName.KABAL_API}`);
+const KABAL_API = new URL(isLocal ? `${KAPTEIN_PROXY_TARGET}/${AppName.KABAL_API}` : `http://${AppName.KABAL_API}`);
 
 const KABAL_INNSTILLINGER = new URL(
-  isLocal ? `${KAPTEIN_PROXY_URL}/${AppName.KABAL_INNSTILLINGER}` : `http://${AppName.KABAL_INNSTILLINGER}`,
+  isLocal ? `${KAPTEIN_PROXY_TARGET}/${AppName.KABAL_INNSTILLINGER}` : `http://${AppName.KABAL_INNSTILLINGER}`,
 );
 
 const KLAGE_KODEVERK = new URL(
-  isLocal ? `${KAPTEIN_PROXY_URL}/${AppName.KLAGE_KODEVERK}` : `http://${AppName.KLAGE_KODEVERK}`,
+  isLocal ? `${KAPTEIN_PROXY_TARGET}/${AppName.KLAGE_KODEVERK}` : `http://${AppName.KLAGE_KODEVERK}`,
 );
 
-const KAPTEIN_API = new URL(isLocal ? `${KAPTEIN_PROXY_URL}/${AppName.KAPTEIN_API}` : `http://${AppName.KAPTEIN_API}`);
+const KAPTEIN_API = new URL(
+  isLocal ? `${KAPTEIN_PROXY_TARGET}/${AppName.KAPTEIN_API}` : `http://${AppName.KAPTEIN_API}`,
+);
 
 interface UrlOptions {
   path?: string;
