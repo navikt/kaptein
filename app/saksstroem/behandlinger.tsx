@@ -223,7 +223,7 @@ const BehandlingerData = ({
           getOutBucketIndex={getMonthOutBucketIndex}
         />
       </Card>
-      <Card fullWidth>
+      <Card fullWidth span={4}>
         <Aldersfordeling uferdigeList={uferdigeFiltered} />
       </Card>
     </ChartsWrapper>

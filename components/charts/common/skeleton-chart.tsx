@@ -197,13 +197,13 @@ export const SkeletonFerdigstilte = memo(() => (
 
 export const SkeletonSaksstrøm = memo(() => (
   <ChartsWrapper>
-    <Card fullWidth>
+    <Card fullWidth span={3}>
       <Histogram />
     </Card>
-    <Card fullWidth>
+    <Card fullWidth span={3}>
       <Histogram />
     </Card>
-    <Card fullWidth>
+    <Card fullWidth span={4}>
       <Histogram />
     </Card>
   </ChartsWrapper>

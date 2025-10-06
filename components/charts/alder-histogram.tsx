@@ -68,11 +68,10 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
       description={`Viser  data for ${uferdigeList.length} aktive saker`}
       getInstance={setEChartsInstance}
       option={{
-        grid: { bottom: 225 },
+        grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Antall' }],
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: 'Alder' },
-        legend: { bottom: 60 },
         tooltip: { trigger: 'axis' },
         series: [{ type: 'bar', data: aktive, name: 'Aktive' }],
       }}
