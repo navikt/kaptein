@@ -48,9 +48,9 @@ const theme: ThemeOption = {
       borderWidth: 2,
     },
     lineStyle: {
-      width: 3,
+      width: 1,
     },
-    symbolSize: 8,
+    symbolSize: 4,
     smooth: false,
   },
   grid: {
