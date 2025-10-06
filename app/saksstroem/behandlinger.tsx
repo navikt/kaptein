@@ -206,7 +206,7 @@ const BehandlingerData = ({
         <AntallSakerInnTilKabalFerdigstiltIKabal
           title="Antall saker inn til Kabal / ferdigstilt i Kabal per uke"
           ferdigstilte={ferdigstilteFiltered}
-          uferdige={uferdigeFiltered}
+          uferdigeList={uferdigeFiltered}
           createBuckets={createWeekBuckets}
           getInBucketIndex={getWeekInBucketIndex}
           getOutBucketIndex={getWeekOutBucketIndex}
@@ -216,7 +216,7 @@ const BehandlingerData = ({
         <AntallSakerInnTilKabalFerdigstiltIKabal
           title="Antall saker inn til Kabal / ferdigstilt i Kabal per måned"
           ferdigstilte={ferdigstilteFiltered}
-          uferdige={uferdigeFiltered}
+          uferdigeList={uferdigeFiltered}
           createBuckets={createMonthBuckets}
           getInBucketIndex={getMonthInBucketIndex}
           getOutBucketIndex={getMonthOutBucketIndex}
@@ -232,7 +232,7 @@ const createWeekBuckets = (from: Date, to: Date) => {
   const buckets: Buckets = {};
 
   for (let i = 0, t = from.getTime(); t <= to.getTime(); t += WEEK_IN_MS, i++) {
-    buckets[i] = { inn: 0, ut: 0, label: getWeekLabel(new Date(t), to) };
+    buckets[i] = { inn: 0, ut: 0, uferdige: 0, label: getWeekLabel(new Date(t), to) };
   }
 
   return buckets;
@@ -248,7 +248,7 @@ const getWeekLabel = (date: Date, toDate: Date) => {
 
 const createMonthBuckets = (from: Date, to: Date) =>
   eachMonthOfInterval({ start: from, end: to }).reduce<Buckets>((acc, date, index) => {
-    acc[index] = { inn: 0, ut: 0, label: format(date, 'LLL yy', { locale: nb }) };
+    acc[index] = { inn: 0, ut: 0, uferdige: 0, label: format(date, 'LLL yy', { locale: nb }) };
 
     return acc;
   }, {});

@@ -64,11 +64,12 @@ export const AlderPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
     <VStack justify="center" align="center" gap="4" className="h-full">
       <DayPicker value={maxAge} setValue={setMaxAge} title="Alder" options={DAY_PICKER_OPTIONS} />
       <EChart
+        title={TITLE}
+        description={`Viser data for ${behandlinger.length} saker`}
         height="auto"
         className="grow"
         option={{
           ...COMMON_STACKED_BAR_CHART_PROPS,
-          title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
           yAxis: { type: 'category', data: labels },
           series,
         }}

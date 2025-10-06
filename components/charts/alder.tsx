@@ -3,11 +3,11 @@
 import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
+import { COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { DayPicker } from '@/components/charts/common/day-picker';
 import { Age, useAgePieChartColors } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
-import { EChart } from '@/lib/echarts/echarts';
+import { PieChart } from '@/lib/echarts/pie-chart';
 import type { BaseBehandling } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -15,12 +15,17 @@ interface Props {
   behandlinger: Pick<BaseBehandling, 'ageKA'>[];
 }
 
+interface AgeData {
+  name: string;
+  value: number;
+}
+
 const TITLE = 'Alder';
 
 export const Alder = ({ behandlinger }: Props) => {
   const [maxAge, setMaxAge] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
-  const data = useMemo(() => {
+  const data = useMemo<AgeData[]>(() => {
     const map = behandlinger.reduce<Record<Age, number>>(
       (acc, curr) => {
         if (curr.ageKA > (maxAge ?? 0)) {
@@ -51,23 +56,21 @@ export const Alder = ({ behandlinger }: Props) => {
   return (
     <VStack justify="center" align="center" gap="4" className="h-full">
       <DayPicker value={maxAge} setValue={setMaxAge} title="Alder" options={DAY_PICKER_OPTIONS} />
-      <EChart
+      <PieChart<AgeData>
+        title={TITLE}
+        description={`Viser data for ${behandlinger.length} saker`}
         height="auto"
         className="grow"
-        option={{
-          ...COMMON_PIE_CHART_PROPS,
-          title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
-          series: [
-            {
-              color,
-              ...COMMON_PIE_CHART_SERIES_PROPS,
-              data,
-              label: {
-                formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
-              },
+        series={[
+          {
+            ...COMMON_PIE_CHART_SERIES_PROPS,
+            color,
+            data,
+            label: {
+              formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
             },
-          ],
-        }}
+          },
+        ]}
       />
     </VStack>
   );

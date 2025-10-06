@@ -50,9 +50,10 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
 
   return (
     <EChart
+      title={title}
+      description={`Viser data for ${behandlinger.length} tildelte saker`}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
-        title: { text: title, subtext: `Viser data for ${behandlinger.length} tildelte saker` },
         yAxis: { type: 'category', data: labels },
         series,
       }}

@@ -38,9 +38,10 @@ export const LedigeVsTildelte = ({ behandlinger }: Props) => {
 
   return (
     <EChart
+      title={TITLE}
+      description={`Viser data for ${behandlinger.length} saker`}
       option={{
         ...COMMON_PIE_CHART_PROPS,
-        title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
         series: [
           {
             ...COMMON_PIE_CHART_SERIES_PROPS,

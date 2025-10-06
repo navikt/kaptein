@@ -51,9 +51,10 @@ export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, saksty
 
   return (
     <EChart
+      title={TITLE}
+      description={`Viser data for ${behandlinger.length} saker`}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
-        title: { text: TITLE, subtext: `Viser data for ${behandlinger.length} saker` },
         yAxis: { type: 'category', data: labels },
         series,
       }}

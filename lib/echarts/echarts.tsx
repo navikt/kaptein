@@ -20,7 +20,7 @@ import { LabelLayout, UniversalTransition } from 'echarts/features';
 // @ts-expect-error - No types available
 import nbNO from 'echarts/lib/i18n/langnb-NO.js';
 import { SVGRenderer } from 'echarts/renderers';
-import type { ECBasicOption } from 'echarts/types/dist/shared';
+import type { EChartsOption } from 'echarts/types/dist/shared';
 import { useEffect, useRef, useState } from 'react';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
@@ -48,15 +48,28 @@ echarts.registerTheme(AppTheme.DARK, DARK_THEME);
 echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
 echarts.registerLocale('nb-NO', nbNO);
 
-interface Props {
-  option: ECBasicOption;
+export interface CommonChartProps {
+  title: string;
+  description?: string;
   width?: string;
   height?: string;
   className?: string;
   getInstance?: (instance: ECharts) => void;
 }
 
-export const EChart = ({ option, width = '100%', height = '100%', className, getInstance }: Props) => {
+interface EChartProps extends CommonChartProps {
+  option: Omit<EChartsOption, 'title'>;
+}
+
+export const EChart = ({
+  option,
+  title,
+  description,
+  width = '100%',
+  height = '100%',
+  className,
+  getInstance,
+}: EChartProps) => {
   const theme = useAppTheme();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
@@ -96,8 +109,8 @@ export const EChart = ({ option, width = '100%', height = '100%', className, get
       return;
     }
 
-    eChartsRef.current.setOption({ aria: { show: true }, ...option });
-  }, [option]);
+    eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
+  }, [option, description, title]);
 
   // Initialize ECharts instance
   useEffect(() => {

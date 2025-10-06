@@ -58,9 +58,10 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
 
   return (
     <EChart
+      title={TITLE}
+      description={`Antall behandlinger på vent: ${påVentBehandlinger.length}`}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
-        title: { text: TITLE, subtext: `Antall behandlinger på vent: ${påVentBehandlinger.length}` },
         yAxis: { type: 'category', data: labels },
         series,
       }}

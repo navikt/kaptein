@@ -1,5 +1,5 @@
+import { join } from 'node:path';
 import { headers } from 'next/headers';
-import { join } from 'path';
 import { AppName } from '@/lib/app-name';
 import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';

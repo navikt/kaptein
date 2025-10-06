@@ -80,12 +80,10 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
 
   return (
     <EChart
+      title={TITLE}
+      description={`Viser data for ${total} saker, hvorav ${waiting} (${percent(waiting, total)}) er på vent.`}
       option={{
         ...COMMON_PIE_CHART_PROPS,
-        title: {
-          text: TITLE,
-          subtext: `Viser data for ${total} saker, hvorav ${waiting} (${percent(waiting, total)}) er på vent.`,
-        },
         series: [
           {
             ...COMMON_PIE_CHART_SERIES_PROPS,
