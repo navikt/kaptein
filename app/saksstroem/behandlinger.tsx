@@ -224,7 +224,7 @@ const BehandlingerData = ({
         />
       </Card>
       <Card fullWidth>
-        <Aldersfordeling ferdigstilte={ferdigstilteFiltered} uferdigeList={uferdigeFiltered} />
+        <Aldersfordeling uferdigeList={uferdigeFiltered} />
       </Card>
     </ChartsWrapper>
   );
