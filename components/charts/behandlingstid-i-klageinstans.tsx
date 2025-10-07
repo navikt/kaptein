@@ -45,7 +45,7 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
 
     return {
       labels: values.map((b) => b.label),
-      data: values.map(({ count }, index) => ({ value: count, itemStyle: { color: getColor(index) } })),
+      data: values.map((b) => b.count),
     };
   }, [ferdigstilte]);
 
@@ -68,16 +68,4 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
       }}
     />
   );
-};
-
-const getColor = (value: number) => {
-  if (value <= 12) {
-    return 'var(--ax-accent-500)';
-  }
-
-  if (value <= 15) {
-    return 'var(--ax-warning-500)';
-  }
-
-  return 'var(--ax-danger-500)';
 };
