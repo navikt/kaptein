@@ -58,7 +58,7 @@ export interface IYtelse extends IKodeverkSimpleValue {
 
 export interface BaseBehandling<T extends Sakstype = Sakstype> {
   id: string;
-  created: string;
+  mottattKlageinstans: string;
   typeId: T;
   ytelseId: string;
   ageKA: number;

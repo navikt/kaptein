@@ -86,12 +86,14 @@ export const useUferdigeSaksstrøm = (behandlinger: (BaseBehandling & (Ledig | T
 
   return useMemo(() => {
     const filteredForCreatedFrom =
-      fromFilter === null ? filteredBase : filteredBase.filter((b) => !isBefore(new Date(b.created), fromFilter));
+      fromFilter === null
+        ? filteredBase
+        : filteredBase.filter((b) => !isBefore(new Date(b.mottattKlageinstans), fromFilter));
 
     const filteredForCreatedTo =
       toFilter === null
         ? filteredForCreatedFrom
-        : filteredForCreatedFrom.filter((b) => !isAfter(new Date(b.created), toFilter));
+        : filteredForCreatedFrom.filter((b) => !isAfter(new Date(b.mottattKlageinstans), toFilter));
 
     return filteredForCreatedTo;
   }, [filteredBase, fromFilter, toFilter]);
