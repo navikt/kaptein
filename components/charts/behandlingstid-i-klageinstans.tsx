@@ -19,7 +19,10 @@ const TITLE = 'Behandlingstid i klageinstans';
 export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
   const { labels, data } = useMemo(() => {
     const max = ferdigstilte.reduce((max, b) => {
-      const behandlingstid = differenceInDays(new Date(b.avsluttetAvSaksbehandlerDate), new Date(b.created));
+      const behandlingstid = differenceInDays(
+        new Date(b.avsluttetAvSaksbehandlerDate),
+        new Date(b.mottattKlageinstans),
+      );
 
       return behandlingstid > max ? behandlingstid : max;
     }, 0);
@@ -31,7 +34,9 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
     }, {});
 
     for (const b of ferdigstilte) {
-      const index = Math.floor(differenceInDays(new Date(b.avsluttetAvSaksbehandlerDate), new Date(b.created)) / 7);
+      const index = Math.floor(
+        differenceInDays(new Date(b.avsluttetAvSaksbehandlerDate), new Date(b.mottattKlageinstans)) / 7,
+      );
 
       buckets[index].count += 1;
     }

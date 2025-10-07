@@ -63,7 +63,10 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     let utTotal = 0;
 
     for (const b of ferdigstilte) {
-      if (!isBefore(new Date(b.created), fromFilter) && !isAfter(new Date(b.created), toFilter)) {
+      if (
+        !isBefore(new Date(b.mottattKlageinstans), fromFilter) &&
+        !isAfter(new Date(b.mottattKlageinstans), toFilter)
+      ) {
         buckets[getInBucketIndex(b, fromFilter)].inn += 1;
         innTotal += 1;
       }

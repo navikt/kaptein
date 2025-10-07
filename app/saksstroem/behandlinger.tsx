@@ -257,11 +257,11 @@ const createMonthBuckets = (from: Date, to: Date) =>
     return acc;
   }, {});
 
-const getWeekInBucketIndex = (b: BaseBehandling, from: Date): number => differenceInWeeks(b.created, from);
+const getWeekInBucketIndex = (b: BaseBehandling, from: Date): number => differenceInWeeks(b.mottattKlageinstans, from);
 
 const getWeekOutBucketIndex = (b: Ferdigstilt, from: Date): number =>
   differenceInWeeks(b.avsluttetAvSaksbehandlerDate, from);
 
-const getMonthInBucketIndex = (b: BaseBehandling, from: Date) => differenceInMonths(b.created, from);
+const getMonthInBucketIndex = (b: BaseBehandling, from: Date) => differenceInMonths(b.mottattKlageinstans, from);
 
 const getMonthOutBucketIndex = (b: Ferdigstilt, from: Date) => differenceInMonths(b.avsluttetAvSaksbehandlerDate, from);
