@@ -1,6 +1,5 @@
 'use client';
 
-import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
@@ -8,6 +7,7 @@ import {
 } from '@/components/charts/common/common-chart-props';
 import { ExceededFrist, getFristColor } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
+import { TODAY } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, Frist, IKodeverkSimpleValue } from '@/lib/types';
 
@@ -16,8 +16,6 @@ interface Props {
   relevantYtelser: IKodeverkSimpleValue[];
 }
 
-const TODAY = new Date();
-
 const TITLE = 'Varslet frist per ytelse';
 
 const getData = (behandling: Frist, exceeded: ExceededFrist): number => {
@@ -25,9 +23,9 @@ const getData = (behandling: Frist, exceeded: ExceededFrist): number => {
     case ExceededFrist.NULL:
       return behandling.varsletFrist === null ? 1 : 0;
     case ExceededFrist.EXCEEDED:
-      return behandling.varsletFrist !== null && isBefore(new Date(behandling.varsletFrist), TODAY) ? 1 : 0;
+      return behandling.varsletFrist !== null && behandling.varsletFrist < TODAY ? 1 : 0;
     case ExceededFrist.NOT_EXCEEDED:
-      return behandling.varsletFrist !== null && !isBefore(new Date(behandling.varsletFrist), TODAY) ? 1 : 0;
+      return behandling.varsletFrist !== null && behandling.varsletFrist >= TODAY ? 1 : 0;
   }
 };
 

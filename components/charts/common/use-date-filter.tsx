@@ -1,16 +1,15 @@
 'use client';
 
-import { endOfDay, startOfDay } from 'date-fns';
 import { useQueryState } from 'nuqs';
-import { parseAsDate } from '@/app/custom-query-parsers';
+import { parseAsDateString } from '@/app/custom-query-parsers';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const useDateFilter = () => {
-  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDate);
-  const [toFilter] = useQueryState(QueryParam.TO, parseAsDate);
+  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDateString);
+  const [toFilter] = useQueryState(QueryParam.TO, parseAsDateString);
 
   return {
-    fromFilter: fromFilter === null ? null : startOfDay(fromFilter),
-    toFilter: toFilter === null ? null : endOfDay(toFilter),
+    fromFilter: fromFilter === null ? null : fromFilter,
+    toFilter: toFilter === null ? null : toFilter,
   };
 };

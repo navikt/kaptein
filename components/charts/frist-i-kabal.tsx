@@ -1,18 +1,16 @@
 'use client';
 
-import { isBefore } from 'date-fns';
 import { useMemo } from 'react';
 import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { ExceededFrist, useFristPieChartColors } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
+import { TODAY } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Frist } from '@/lib/types';
 
 interface Props {
   behandlinger: Frist[];
 }
-
-const TODAY = new Date();
 
 const TITLE = 'Frist i Kabal';
 
@@ -23,7 +21,7 @@ export const FristIKabal = ({ behandlinger }: Props) => {
         const key =
           curr.frist === null
             ? ExceededFrist.NULL
-            : isBefore(new Date(curr.frist), TODAY)
+            : curr.frist < TODAY
               ? ExceededFrist.EXCEEDED
               : ExceededFrist.NOT_EXCEEDED;
 

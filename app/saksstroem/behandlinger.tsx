@@ -1,7 +1,7 @@
 'use client';
 
 import { BodyLong, List } from '@navikt/ds-react';
-import { differenceInMonths, differenceInWeeks, eachMonthOfInterval, format, min, subDays } from 'date-fns';
+import { addDays, differenceInMonths, differenceInWeeks, eachMonthOfInterval, format, parse } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
@@ -15,7 +15,7 @@ import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/ch
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { PRETTY_DATE_FORMAT } from '@/lib/date';
+import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
 import type {
   AnkerFerdigstilteResponse,
   AnkerLedigeResponse,
@@ -230,38 +230,75 @@ const BehandlingerData = ({
   );
 };
 
-const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
-
-const createWeekBuckets = (from: Date, to: Date) => {
+const createWeekBuckets = (from: string, to: string) => {
   const buckets: Buckets = {};
 
-  for (let i = 0, t = from.getTime(); t <= to.getTime(); t += WEEK_IN_MS, i++) {
-    buckets[i] = { inn: 0, ut: 0, uferdige: 0, label: getWeekLabel(new Date(t), to) };
+  let currentDate = from;
+  let weekNumber = 0;
+
+  while (currentDate < to) {
+    const endOfWeek = format(addDays(currentDate, 6), ISO_DATE_FORMAT);
+
+    if (endOfWeek >= to) {
+      break;
+    }
+
+    weekNumber += 1;
+    buckets[weekNumber] = { inn: 0, ut: 0, label: getWeekLabel(currentDate, endOfWeek) };
+
+    const firstDayInNextWeek = format(addDays(endOfWeek, 1), ISO_DATE_FORMAT);
+    currentDate = firstDayInNextWeek;
   }
 
   return buckets;
 };
 
-const getWeekLabel = (date: Date, toDate: Date) => {
-  const from = format(date, PRETTY_DATE_FORMAT);
-  const weekEnd = subDays(date.getTime() + WEEK_IN_MS, 1);
-  const to = format(min([weekEnd, toDate]), PRETTY_DATE_FORMAT);
+const getWeekLabel = (start: string, end: string) => {
+  const from = format(start, PRETTY_DATE_FORMAT);
+  const to = format(end, PRETTY_DATE_FORMAT);
 
   return `${from} - ${to}`;
 };
 
-const createMonthBuckets = (from: Date, to: Date) =>
-  eachMonthOfInterval({ start: from, end: to }).reduce<Buckets>((acc, date, index) => {
-    acc[index] = { inn: 0, ut: 0, uferdige: 0, label: format(date, 'LLL yy', { locale: nb }) };
+const createMonthBuckets = (from: string, to: string) => {
+  const monthStarts = eachMonthOfInterval({ start: from, end: to });
 
-    return acc;
-  }, {});
+  const buckets: Buckets = {};
 
-const getWeekInBucketIndex = (b: BaseBehandling, from: Date): number => differenceInWeeks(b.mottattKlageinstans, from);
+  for (const monthStart of monthStarts) {
+    const relativeMonthNumber = differenceInMonths(monthStart, from);
 
-const getWeekOutBucketIndex = (b: Ferdigstilt, from: Date): number =>
-  differenceInWeeks(b.avsluttetAvSaksbehandlerDate, from);
+    if (relativeMonthNumber === 0 || differenceInMonths(monthStart, to) === 0) {
+      // Skip first and/or last month if it is not full
+      continue;
+    }
 
-const getMonthInBucketIndex = (b: BaseBehandling, from: Date) => differenceInMonths(b.mottattKlageinstans, from);
+    buckets[relativeMonthNumber] = { inn: 0, ut: 0, label: format(monthStart, 'LLL yy', { locale: nb }) };
+  }
 
-const getMonthOutBucketIndex = (b: Ferdigstilt, from: Date) => differenceInMonths(b.avsluttetAvSaksbehandlerDate, from);
+  return buckets;
+};
+
+const getWeekInBucketIndex = (b: BaseBehandling, from: string): number =>
+  differenceInWeeks(
+    parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
+    parse(from, ISO_DATE_FORMAT, new Date()),
+  );
+
+const getWeekOutBucketIndex = (b: Ferdigstilt, from: string): number =>
+  differenceInWeeks(
+    parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+    parse(from, ISO_DATE_FORMAT, new Date()),
+  );
+
+const getMonthInBucketIndex = (b: BaseBehandling, from: string) =>
+  differenceInMonths(
+    parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
+    parse(from, ISO_DATE_FORMAT, new Date()),
+  );
+
+const getMonthOutBucketIndex = (b: Ferdigstilt, from: string) =>
+  differenceInMonths(
+    parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+    parse(from, ISO_DATE_FORMAT, new Date()),
+  );

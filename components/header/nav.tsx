@@ -6,16 +6,15 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { TildelingFilter } from '@/app/query-types';
-import { ISO_DATE_FORMAT } from '@/lib/date';
+import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
 const ACTIVE_CLASS = '!bg-ax-bg-accent-strong-pressed !text-ax-text-accent-contrast';
-const TODAY = new Date();
-const DEFAULT_TO = format(TODAY, ISO_DATE_FORMAT);
-const DEFAULT_FROM = format(startOfMonth(TODAY), ISO_DATE_FORMAT);
+const DEFAULT_TO = TODAY;
+const DEFAULT_FROM = format(startOfMonth(NOW), ISO_DATE_FORMAT);
 
-const SAKSSTRØM_DEFAULT_FROM = format(startOfMonth(subMonths(TODAY, 4)), ISO_DATE_FORMAT);
-const SAKSSTRØM_DEFAULT_TO = format(endOfMonth(subMonths(TODAY, 1)), ISO_DATE_FORMAT);
+const SAKSSTRØM_DEFAULT_FROM = format(startOfMonth(subMonths(NOW, 4)), ISO_DATE_FORMAT);
+const SAKSSTRØM_DEFAULT_TO = format(endOfMonth(subMonths(NOW, 1)), ISO_DATE_FORMAT);
 
 export const Nav = () => {
   const pathname = usePathname();

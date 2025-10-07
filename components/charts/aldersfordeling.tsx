@@ -33,7 +33,14 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
     for (const b of uferdigeList) {
       const index = Math.floor(b.ageKA / 7);
 
-      buckets[index].aktive += 1;
+      const bucket = buckets[index];
+
+      if (bucket === undefined) {
+        // This should never happen
+        continue;
+      }
+
+      bucket.aktive += 1;
     }
 
     const values = Object.values(buckets);

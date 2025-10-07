@@ -8,10 +8,13 @@ import {
   DataZoomSliderComponent,
   GridComponent,
   LegendComponent,
+  MarkAreaComponent,
+  MarkLineComponent,
   TitleComponent,
   ToolboxComponent,
   TooltipComponent,
   TransformComponent,
+  VisualMapComponent,
 } from 'echarts/components';
 import type { ECharts } from 'echarts/core';
 // biome-ignore lint/performance/noNamespaceImport: https://echarts.apache.org/handbook/en/basics/import
@@ -35,6 +38,8 @@ echarts.use([
   TransformComponent,
   LegendComponent,
   ToolboxComponent,
+  MarkAreaComponent,
+  MarkLineComponent,
   LabelLayout,
   UniversalTransition,
   SVGRenderer,
@@ -42,6 +47,7 @@ echarts.use([
   PieChart,
   DataZoomComponent,
   DataZoomSliderComponent,
+  VisualMapComponent,
 ]);
 
 echarts.registerTheme(AppTheme.DARK, DARK_THEME);

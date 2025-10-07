@@ -1,7 +1,5 @@
-import { format, isValid } from 'date-fns';
 import { createParser } from 'nuqs';
 import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
-import { ISO_DATE_FORMAT } from '@/lib/date';
 
 const TILDELT_FILTER_VALUES = Object.values(TildelingFilter);
 const TILBAKEKREVING_FILTER_VALUES = Object.values(TilbakekrevingFilter);
@@ -48,18 +46,17 @@ export const parseAsTilbakekrevingFilter = createParser({
   },
 });
 
-export const parseAsDate = createParser({
-  parse: (value): Date => {
-    const date = new Date(value);
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const isDateString = (value: string): value is `${number}-${number}-${number}` => DATE_REGEX.test(value);
 
-    if (isValid(date)) {
-      return date;
+export const parseAsDateString = createParser({
+  parse: (value): string => {
+    if (!isDateString(value)) {
+      throw new Error('Invalid date format, expected YYYY-MM-DD');
     }
 
-    return new Date();
+    return value;
   },
 
-  serialize(value) {
-    return format(value, ISO_DATE_FORMAT);
-  },
+  serialize: (value) => value,
 });
