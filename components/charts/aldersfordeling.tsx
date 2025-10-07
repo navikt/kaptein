@@ -1,7 +1,7 @@
 'use client';
 
-import type { ECharts } from 'echarts/core';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, Ledig, Tildelt } from '@/lib/types';
@@ -21,20 +21,6 @@ interface Data {
 const TITLE = 'Aldersfordeling';
 
 export const Aldersfordeling = ({ uferdigeList }: Props) => {
-  const [eChartsInstance, setEChartsInstance] = useState<ECharts>();
-
-  useEffect(() => {
-    if (eChartsInstance === undefined) {
-      return;
-    }
-
-    eChartsInstance
-      .getZr()
-      .on('dblclick', () => eChartsInstance.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }));
-
-    return () => eChartsInstance.getZr().off('dblclick');
-  }, [eChartsInstance]);
-
   const { labels, aktive } = useMemo<Data>(() => {
     const maxAge = uferdigeList.reduce((max, b) => (b.ageKA > max ? b.ageKA : max), 0);
 
@@ -66,7 +52,7 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
     <EChart
       title={TITLE}
       description={`Viser data for ${uferdigeList.length} aktive saker`}
-      getInstance={setEChartsInstance}
+      getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],

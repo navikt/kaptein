@@ -1,8 +1,8 @@
 'use client';
 
 import { differenceInDays } from 'date-fns';
-import type { ECharts } from 'echarts/core';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, Ferdigstilt } from '@/lib/types';
@@ -16,21 +16,7 @@ interface Props {
 
 const TITLE = 'Behandlingstid i klageinstans';
 
-export const Behandlingstid = ({ ferdigstilte }: Props) => {
-  const [eChartsInstance, setEChartsInstance] = useState<ECharts>();
-
-  useEffect(() => {
-    if (eChartsInstance === undefined) {
-      return;
-    }
-
-    eChartsInstance
-      .getZr()
-      .on('dblclick', () => eChartsInstance.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }));
-
-    return () => eChartsInstance.getZr().off('dblclick');
-  }, [eChartsInstance]);
-
+export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
   const { labels, data } = useMemo(() => {
     const max = ferdigstilte.reduce((max, b) => {
       const behandlingstid = differenceInDays(new Date(b.avsluttetAvSaksbehandlerDate), new Date(b.created));
@@ -66,7 +52,7 @@ export const Behandlingstid = ({ ferdigstilte }: Props) => {
     <EChart
       title={TITLE}
       description={`Viser data for ${ferdigstilte.length} ferdigstilte saker`}
-      getInstance={setEChartsInstance}
+      getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],

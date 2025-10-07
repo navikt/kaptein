@@ -139,5 +139,15 @@ export const EChart = ({
     eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
   }, [theme]);
 
+  // Dispose ECharts instance on unmount
+  useEffect(() => {
+    return () => {
+      if (eChartsRef.current !== null) {
+        eChartsRef.current.dispose();
+        eChartsRef.current = null;
+      }
+    };
+  }, []);
+
   return <div style={{ width, height }} ref={ref} className={className} />;
 };

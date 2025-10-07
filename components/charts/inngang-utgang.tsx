@@ -1,8 +1,8 @@
 'use client';
 
 import { isAfter, isBefore } from 'date-fns';
-import type { ECharts } from 'echarts/core';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
@@ -38,19 +38,6 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   getOutBucketIndex,
 }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
-  const [eChartsInstance, setEChartsInstance] = useState<ECharts>();
-
-  useEffect(() => {
-    if (eChartsInstance === undefined) {
-      return;
-    }
-
-    eChartsInstance
-      .getZr()
-      .on('dblclick', () => eChartsInstance.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }));
-
-    return () => eChartsInstance.getZr().off('dblclick');
-  }, [eChartsInstance]);
 
   const { labels, inn, ut, uferdige, innTotal, utTotal } = useMemo<Data>(() => {
     if (fromFilter === null || toFilter === null) {
@@ -129,7 +116,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     <EChart
       title={title}
       description={`Antall saker inn til Kabal: ${innTotal}, antall saker ferdigstilt i Kabal: ${utTotal}`}
-      getInstance={setEChartsInstance}
+      getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 225 },
         dataZoom: [{ type: 'slider' }],
