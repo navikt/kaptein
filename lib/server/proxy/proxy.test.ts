@@ -41,7 +41,10 @@ describe('Proxy Server', () => {
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ message: 'Hello from remote server!' });
-    const firstCall = handlerFn.mock.calls[0];
+    const [firstCall] = handlerFn.mock.calls;
+    if (firstCall === undefined) {
+      throw new Error('Handler function was not called');
+    }
     const [headers, body] = firstCall;
     expect(headers.get('content-type')).toBe('application/json');
     expect(body).not.toBeNull();
@@ -76,7 +79,11 @@ describe('Proxy Server', () => {
 
     expect(response.status).toBe(200);
     expect(handlerFn).toHaveBeenCalledTimes(1);
-    const [headers, body] = handlerFn.mock.calls[0];
+    const [firstCall] = handlerFn.mock.calls;
+    if (firstCall === undefined) {
+      throw new Error('Handler function was not called');
+    }
+    const [headers, body] = firstCall;
     expect(headers.get('X-Custom-Header')).toBe('CustomValue');
     expect(body).toBeNull();
   });

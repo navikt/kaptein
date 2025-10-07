@@ -1,9 +1,10 @@
 'use client';
 
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, parse } from 'date-fns';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { NoData } from '@/components/no-data/no-data';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, Ferdigstilt } from '@/lib/types';
 
@@ -20,8 +21,8 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
   const { labels, data } = useMemo(() => {
     const max = ferdigstilte.reduce((max, b) => {
       const behandlingstid = differenceInDays(
-        new Date(b.avsluttetAvSaksbehandlerDate),
-        new Date(b.mottattKlageinstans),
+        parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+        parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
       );
 
       return behandlingstid > max ? behandlingstid : max;
@@ -35,10 +36,19 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
 
     for (const b of ferdigstilte) {
       const index = Math.floor(
-        differenceInDays(new Date(b.avsluttetAvSaksbehandlerDate), new Date(b.mottattKlageinstans)) / 7,
+        differenceInDays(
+          parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+          parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
+        ) / 7,
       );
 
-      buckets[index].count += 1;
+      const bucket = buckets[index];
+
+      if (bucket === undefined) {
+        continue;
+      }
+
+      bucket.count += 1;
     }
 
     const values = Object.values(buckets);

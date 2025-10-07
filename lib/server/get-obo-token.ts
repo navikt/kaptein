@@ -20,6 +20,11 @@ export const getOboToken = async (appName: AppName, headers: ReadonlyHeaders) =>
 
   const [, token] = authorization.split(' ');
 
+  if (token === undefined) {
+    logger.error('Malformed authorization header', traceId, spanId);
+    unauthorized();
+  }
+
   const validation = await validateToken(token);
 
   if (!validation.ok) {

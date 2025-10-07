@@ -52,6 +52,13 @@ const theme: ThemeOption = {
     },
     symbolSize: 4,
     smooth: false,
+    emphasis: {
+      disabled: true,
+      label: {
+        shadowBlur: 0,
+        color: 'var(--ax-text-neutral)',
+      },
+    },
   },
   grid: {
     left: 0,

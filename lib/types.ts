@@ -94,7 +94,6 @@ export interface Ferdigstilt {
 export interface Frist {
   frist: string | null;
   varsletFrist: string | null;
-  avsluttetAvSaksbehandlerDate: never;
 }
 
 // Klage

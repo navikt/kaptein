@@ -34,5 +34,9 @@ const getUuid = () => crypto.randomUUID().replaceAll('-', '');
 export const parseTraceParent = (traceparent: string): TraceParent => {
   const [_, traceId, spanId, __] = traceparent.split('-');
 
+  if (traceId === undefined || spanId === undefined) {
+    return generateTraceParent();
+  }
+
   return { traceparent, traceId, spanId };
 };

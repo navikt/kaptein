@@ -4,12 +4,11 @@ import { ArrowUndoIcon } from '@navikt/aksel-icons';
 import { Button } from '@navikt/ds-react';
 import { format, startOfMonth } from 'date-fns';
 import { usePathname, useRouter } from 'next/navigation';
-import { ISO_DATE_FORMAT } from '@/lib/date';
+import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
-const TODAY = new Date();
-const DEFAULT_TO = format(TODAY, ISO_DATE_FORMAT);
-const DEFAULT_FROM = format(startOfMonth(TODAY), ISO_DATE_FORMAT);
+const DEFAULT_TO = TODAY;
+const DEFAULT_FROM = format(startOfMonth(NOW), ISO_DATE_FORMAT);
 
 export const Reset = () => {
   const router = useRouter();

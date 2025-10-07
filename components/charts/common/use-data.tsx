@@ -1,6 +1,5 @@
 'use client';
 
-import { isAfter, isBefore } from 'date-fns';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
@@ -25,12 +24,10 @@ export const useFerdigstilte = (behandlinger: (BaseBehandling & Ferdigstilt & Fr
     const filteredForFrom =
       fromFilter === null
         ? filteredForUtfall
-        : filteredForUtfall.filter((b) => !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter));
+        : filteredForUtfall.filter((b) => b.avsluttetAvSaksbehandlerDate >= fromFilter);
 
     const filteredForTo =
-      toFilter === null
-        ? filteredForFrom
-        : filteredForFrom.filter((b) => !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter));
+      toFilter === null ? filteredForFrom : filteredForFrom.filter((b) => b.avsluttetAvSaksbehandlerDate <= toFilter);
 
     const filteredForRegistreringshjemler =
       registreringshjemler.length === 0
@@ -53,20 +50,24 @@ export const useFerdigstiltSaksstrøm = (ferdigstilteBehandlinger: (BaseBehandli
   const ferdigstilteFilteredBase = useFiltered(ferdigstilteBehandlinger);
 
   return useMemo(() => {
-    const filteredForAvsluttetFrom =
+    const filteredForFrom =
       fromFilter === null
         ? ferdigstilteFilteredBase
-        : ferdigstilteFilteredBase.filter((b) => !isBefore(new Date(b.avsluttetAvSaksbehandlerDate), fromFilter));
+        : ferdigstilteFilteredBase.filter(
+            (b) => b.mottattKlageinstans >= fromFilter || b.avsluttetAvSaksbehandlerDate >= fromFilter,
+          );
 
-    const filteredForAvsluttetTo =
+    const filteredForTo =
       toFilter === null
-        ? filteredForAvsluttetFrom
-        : filteredForAvsluttetFrom.filter((b) => !isAfter(new Date(b.avsluttetAvSaksbehandlerDate), toFilter));
+        ? filteredForFrom
+        : filteredForFrom.filter(
+            (b) => b.mottattKlageinstans <= toFilter || b.avsluttetAvSaksbehandlerDate <= toFilter,
+          );
 
     const filteredForRegistreringshjemler =
       registreringshjemler.length === 0
-        ? filteredForAvsluttetTo
-        : filteredForAvsluttetTo.filter((b) =>
+        ? filteredForTo
+        : filteredForTo.filter((b) =>
             registreringshjemler.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
           );
 
@@ -85,17 +86,13 @@ export const useUferdigeSaksstrøm = (behandlinger: (BaseBehandling & (Ledig | T
   const filteredBase = useFiltered(behandlinger);
 
   return useMemo(() => {
-    const filteredForCreatedFrom =
-      fromFilter === null
-        ? filteredBase
-        : filteredBase.filter((b) => !isBefore(new Date(b.mottattKlageinstans), fromFilter));
+    const filteredForFrom =
+      fromFilter === null ? filteredBase : filteredBase.filter((b) => b.mottattKlageinstans >= fromFilter);
 
-    const filteredForCreatedTo =
-      toFilter === null
-        ? filteredForCreatedFrom
-        : filteredForCreatedFrom.filter((b) => !isAfter(new Date(b.mottattKlageinstans), toFilter));
+    const filteredForTo =
+      toFilter === null ? filteredForFrom : filteredForFrom.filter((b) => b.mottattKlageinstans <= toFilter);
 
-    return filteredForCreatedTo;
+    return filteredForTo;
   }, [filteredBase, fromFilter, toFilter]);
 };
 
