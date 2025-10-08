@@ -23,8 +23,7 @@ interface Data {
   labels: string[];
   inn: number[];
   ut: number[];
-  diff: number[];
-  ratio: number[];
+  pressure: number[];
   innTotal: number;
   utTotal: number;
   diffTotal: number;
@@ -43,20 +42,19 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   const { fromFilter, toFilter } = useDateFilter();
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
-  const { labels, inn, ut, diff, ratio, innTotal, utTotal, diffTotal } = useMemo<Data>(() => {
+  const { labels, inn, ut, pressure, innTotal, utTotal, diffTotal } = useMemo<Data>(() => {
     if (fromFilter === null || toFilter === null) {
       return {
         labels: [],
         inn: [],
         ut: [],
-        diff: [],
-        ratio: [],
+        pressure: [],
         innTotal: 0,
         utTotal: 0,
         diffTotal: 0,
         innAverage: 0,
         utAverage: 0,
-      };
+      } satisfies Data;
     }
 
     const buckets = createBuckets(fromFilter, toFilter);
@@ -98,8 +96,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     const labels: string[] = [];
     const inn: number[] = [];
     const ut: number[] = [];
-    const diff: number[] = [];
-    const ratio: number[] = [];
+    const pressure: number[] = [];
     let innTotal = 0;
     let utTotal = 0;
 
@@ -109,13 +106,12 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       ut.push(v.ut);
       innTotal += v.inn;
       utTotal += v.ut;
-      diff.push(v.ut - v.inn);
       if (v.ut === 0 && v.inn === 0) {
-        ratio.push(0);
+        pressure.push(0);
       } else if (v.ut === 0) {
-        ratio.push(200); // Arbitrary high value to indicate overload when no cases are completed
+        pressure.push(1_000); // Arbitrary high value to indicate overload when no cases are completed
       } else {
-        ratio.push(Math.round((v.inn / v.ut) * 100)); // Real value otherwise
+        pressure.push(Math.round((v.inn / v.ut) * 100)); // Real value otherwise
       }
     }
 
@@ -123,7 +119,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     const utAverage = Math.round(utTotal / values.length);
     const innAverage = Math.round(innTotal / values.length);
 
-    return { labels, inn, ut, diff, ratio, diffTotal, innTotal, utTotal, innAverage, utAverage };
+    return { labels, inn, ut, pressure: pressure, diffTotal, innTotal, utTotal, innAverage, utAverage };
   }, [ferdigstilte, fromFilter, toFilter, createBuckets, getInBucketIndex, getOutBucketIndex, uferdigeList]);
 
   if ((ferdigstilte.length === 0 && uferdigeList.length === 0) || labels.length === 0) {
@@ -142,18 +138,21 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
           {
             type: 'value',
             name: 'Mottatt / ferdigstilt',
-            max: getNiceMax([...inn, ...ut]),
+            max: getNiceMax([...inn, ...ut], 5),
             axisPointer: {
               snap: true,
             },
           },
           {
             type: 'value',
-            name: 'Ferdigstilt %',
+            name: 'Trykk %',
             inverse: true, // This makes the axis grow downwards
             position: 'right',
-            max: Math.max(...ratio) * 10,
+            max: 100_000,
             show: false, // Hide the axis
+            axisPointer: {
+              show: false, // Hide the axis pointer on this y-axis
+            },
             axisLabel: {
               formatter: '{value} %',
             },
@@ -165,7 +164,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
           axisLabel: { rotate: 45 },
           name: 'Fra og med - til og med',
         },
-        legend: { bottom: 60, selected: { Flyt: false, 'Flyt trend': false } },
+        legend: { bottom: 60, data: ['Mottatt', 'Ferdigstilt'] },
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'cross' },
@@ -180,8 +179,12 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             for (const param of params) {
               const { seriesId, marker, seriesName, value } = param;
 
+              if (seriesId === 'pressure') {
+                continue;
+              }
+
               // Add % for pressure series
-              const formattedValue = seriesId === 'pressure' ? `${value} % av mottatte` : `${value} saker`;
+              const formattedValue = seriesId === 'pressure' ? `${value} % ift. ferdigstilte` : `${value} saker`;
 
               result += `${marker} ${seriesName}: ${formattedValue}<br/>`;
             }
@@ -191,19 +194,14 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
         },
         visualMap: {
           show: false,
-          seriesIndex: 4, // Index of the Ratio series (5th series, 0-indexed)
+          seriesIndex: 2, // Index of the pressure series (3rd series, 0-indexed)
           pieces: [
             {
               gte: 100,
               color: 'var(--ax-danger-500)',
             },
             {
-              gte: 90,
               lt: 100,
-              color: 'var(--ax-warning-500)',
-            },
-            {
-              lt: 90,
               color: 'var(--ax-success-500)',
             },
           ],
@@ -216,7 +214,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             data: inn,
             name: 'Mottatt',
             color: 'var(--ax-accent-500)',
-            lineStyle: { type: 'solid', width: 1 },
+            lineStyle: { type: 'solid', width: 2 },
             areaStyle: {
               color: 'var(--ax-bg-accent-softA)',
             },
@@ -228,41 +226,20 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             data: ut,
             name: 'Ferdigstilt',
             color: 'var(--ax-success-500)',
-            lineStyle: { type: 'solid', width: 1 },
+            lineStyle: { type: 'solid', width: 2 },
             areaStyle: {
               color: 'var(--ax-bg-success-soft)',
             },
           },
           {
-            id: 'flow',
-            type: 'line',
-            smooth: true,
-            data: diff,
-            name: 'Flyt',
-            color: 'var(--ax-meta-purple-500)',
-            lineStyle: { type: 'solid', width: 1 },
-            areaStyle: {
-              color: 'var(--ax-bg-meta-purple-soft)',
-            },
-          },
-          {
-            id: 'flow-trend',
-            type: 'line',
-            smooth: false,
-            data: getTrend(diff),
-            name: 'Flyt trend',
-            color: 'var(--ax-meta-purple-500)',
-            lineStyle: { type: 'dashed', width: 1 },
-            symbol: 'none',
-          },
-          {
             id: 'pressure',
             type: 'bar',
-            data: ratio,
-            name: 'Ferdigstilt %',
+            data: pressure,
+            name: 'Trykk ift. ferdigstilte',
             yAxisIndex: 1,
             symbol: 'none',
-            barMaxWidth: 20,
+            barWidth: '100%',
+            barMinHeight: 2,
             label: {
               show: false,
               position: 'top',
@@ -271,62 +248,11 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             emphasis: {
               disabled: true,
             },
-            markLine: {
-              silent: true,
-              symbol: 'none',
-              z: -1,
-              lineStyle: {
-                color: 'var(--ax-text-neutral-decoration)',
-                type: 'dashed',
-                width: 1,
-              },
-              label: {
-                show: false,
-                position: 'end',
-                formatter: '100%',
-              },
-              data: [
-                {
-                  yAxis: 100,
-                },
-              ],
-            },
           },
         ],
       }}
     />
   );
-};
-
-const getTrend = (data: number[]): number[] => {
-  if (data.length === 0) {
-    return [];
-  }
-
-  // Calculate linear regression for trend line
-  const n = data.length;
-  let sumX = 0;
-  let sumY = 0;
-  let sumXY = 0;
-  let sumX2 = 0;
-
-  for (let i = 0; i < n; i++) {
-    const value = data[i];
-
-    if (value === undefined) {
-      continue;
-    }
-
-    sumX += i;
-    sumY += value;
-    sumXY += i * value;
-    sumX2 += i * i;
-  }
-
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
-
-  return data.map((_, i) => Math.round(slope * i + intercept));
 };
 
 const sign = (n: number): string => {
@@ -341,13 +267,13 @@ const sign = (n: number): string => {
   return '';
 };
 
-const getNiceMax = (data: number[]): number => {
+const getNiceMax = (data: number[], padding = 10): number => {
   const maxValue = Math.max(...data);
 
   // Calculate a "nice" max value for the y-axis.
   // E.g., if maxValue is 83, we want to return 90. If it is 2430, we want to return 2500.
-  // But we want to add 10% buffer to the max value to avoid the line touching the top of the chart.
-  const buffer = Math.ceil(maxValue * 0.1);
+  // But we want to add X% (padding) buffer to the max value to avoid the line touching the top of the chart.
+  const buffer = Math.ceil((maxValue * padding) / 100);
   const adjustedMax = maxValue + buffer;
   const magnitude = 10 ** Math.floor(Math.log10(adjustedMax));
   const niceMax = Math.ceil(adjustedMax / magnitude) * magnitude;
