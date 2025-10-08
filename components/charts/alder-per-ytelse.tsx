@@ -1,6 +1,7 @@
 'use client';
 
 import { VStack } from '@navikt/ds-react';
+import { differenceInDays, parse } from 'date-fns';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import {
@@ -10,23 +11,42 @@ import {
 import { DayPicker } from '@/components/charts/common/day-picker';
 import { Age, getAgeColor } from '@/components/charts/common/use-frist-color';
 import { NoData } from '@/components/no-data/no-data';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
+import { type Behandling, type IKodeverkSimpleValue, isFerdigstilt } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  behandlinger: BaseBehandling[];
+  behandlinger: Behandling[];
   relevantYtelser: IKodeverkSimpleValue[];
 }
 
 const TITLE = 'Alder per ytelse';
 
-const getData = (behandling: BaseBehandling, age: Age, maxAge: number): number => {
+const getData = (behandling: Behandling, age: Age, maxAge: number): number => {
   switch (age) {
     case Age.OLDER:
-      return behandling.ageKA !== null && behandling.ageKA >= maxAge ? 1 : 0;
+      return isFerdigstilt(behandling)
+        ? differenceInDays(
+            parse(behandling.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+            parse(behandling.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
+          ) > maxAge
+          ? 1
+          : 0
+        : behandling.ageKA !== null && behandling.ageKA > maxAge
+          ? 1
+          : 0;
     case Age.YOUNGER:
-      return behandling.ageKA !== null && behandling.ageKA < maxAge ? 1 : 0;
+      return isFerdigstilt(behandling)
+        ? differenceInDays(
+            parse(behandling.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+            parse(behandling.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
+          ) <= maxAge
+          ? 1
+          : 0
+        : behandling.ageKA !== null && behandling.ageKA <= maxAge
+          ? 1
+          : 0;
   }
 };
 

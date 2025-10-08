@@ -163,3 +163,5 @@ export const isFerdigstilt = (b: Ledig | Tildelt | Ferdigstilt | BaseBehandling)
   'avsluttetAvSaksbehandlerDate' in b && typeof b.avsluttetAvSaksbehandlerDate === 'string';
 
 export type FristBehandling = BaseBehandling & Frist & (Ferdigstilt | Ledig | Tildelt);
+export type FerdigstiltBehanding = BaseBehandling & Ferdigstilt;
+export type AktivBehandling = BaseBehandling & (Ledig | Tildelt);
