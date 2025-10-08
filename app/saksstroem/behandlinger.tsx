@@ -8,13 +8,16 @@ import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
+import { BelastningPerYtelse } from '@/components/charts/belastning-per-ytelse';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
+import { useDateFilter } from '@/components/charts/common/use-date-filter';
+import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
+import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT, TODAY } from '@/lib/date';
 import type {
   AnkerFerdigstilteResponse,
   AnkerLedigeResponse,
@@ -24,6 +27,7 @@ import type {
   BetongLedigeResponse,
   BetongTildelteResponse,
   Ferdigstilt,
+  IYtelse,
   KlagerFerdigstilteResponse,
   KlagerLedigeResponse,
   KlagerTildelteResponse,
@@ -35,8 +39,12 @@ import type {
 } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
+interface KodeverkProps {
+  ytelser: IYtelse[];
+}
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
-export const Behandlinger = () => {
+export const Behandlinger = (kodeverk: KodeverkProps) => {
   const {
     data: klagerLedige,
     error: klagerLedigeError,
@@ -170,19 +178,19 @@ export const Behandlinger = () => {
         ...betongFerdigstilte.behandlinger,
         ...omgjøringskravFerdigstilte.behandlinger,
       ]}
+      {...kodeverk}
     />
   );
 };
 
-const BehandlingerData = ({
-  ledige,
-  tildelte,
-  ferdigstilte,
-}: {
+interface DataProps extends KodeverkProps {
   ledige: (BaseBehandling & Ledig)[];
   tildelte: (BaseBehandling & Tildelt)[];
   ferdigstilte: (BaseBehandling & Ferdigstilt)[];
-}) => {
+}
+
+const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps) => {
+  const { toFilter } = useDateFilter();
   const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
 
   const uferdige = useMemo(() => {
@@ -200,8 +208,29 @@ const BehandlingerData = ({
   const ferdigstilteFiltered = useFerdigstiltSaksstrøm(ferdigstilte);
   const uferdigeFiltered = useUferdigeSaksstrøm(uferdige);
 
+  const relevantYtelser = useRelevantYtelser([...ferdigstilteFiltered, ...uferdigeFiltered], ytelser);
+
+  const toDate = toFilter ?? TODAY;
+
+  const restanse = useMemo(
+    () => [
+      ...uferdige.filter((u) => u.mottattKlageinstans <= toDate), // Alle uferdige saker mottatt før tildato.
+      ...ferdigstilte.filter((f) => f.mottattKlageinstans <= toDate && f.avsluttetAvSaksbehandlerDate > toDate), // Alle ferdigstilte saker mottatt før tildato og avsluttet etter tildato.
+    ],
+    [uferdige, ferdigstilte, toDate],
+  );
+
   return (
     <ChartsWrapper>
+      <Card fullWidth span={5}>
+        <BelastningPerYtelse
+          title="Belastning per ytelse"
+          ferdigstilte={ferdigstilteFiltered}
+          uferdige={uferdigeFiltered}
+          restanseList={restanse}
+          ytelser={relevantYtelser}
+        />
+      </Card>
       <Card fullWidth span={3}>
         <AntallSakerInnTilKabalFerdigstiltIKabal
           title="Antall saker inn til Kabal / ferdigstilt i Kabal per uke"
