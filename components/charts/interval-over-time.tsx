@@ -87,7 +87,7 @@ export const IntervalOverTime = <T extends Behandling>({
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Dager' }],
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: xAxisLabel },
-        tooltip: { trigger: 'axis' },
+        tooltip: { trigger: 'axis', valueFormatter: (p: number) => numberFormat.format(p) },
         series: [
           { type: 'line', smooth: true, data: avg, name: 'Gjennomsnitt' },
           { type: 'line', smooth: true, data: median, name: 'Median' },
@@ -140,3 +140,5 @@ const getMedian = (values: number[]): number | null => {
   }
   return (startValue + endValue) / 2;
 };
+
+const numberFormat = new Intl.NumberFormat('no-NO', { maximumFractionDigits: 2 });
