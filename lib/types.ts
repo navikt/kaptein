@@ -165,3 +165,4 @@ export const isFerdigstilt = (b: Ledig | Tildelt | Ferdigstilt | BaseBehandling)
 export type FristBehandling = BaseBehandling & Frist & (Ferdigstilt | Ledig | Tildelt);
 export type FerdigstiltBehanding = BaseBehandling & Ferdigstilt;
 export type AktivBehandling = BaseBehandling & (Ledig | Tildelt);
+export type Behandling = FerdigstiltBehanding | AktivBehandling;
