@@ -239,6 +239,7 @@ const BehandlingerData = ({
         <IntervalOverTime
           title="Alder over tid"
           xAxisLabel="Mottatt"
+          description={`Viser data for ${ferdigstilteFiltered.length + uferdigeFiltered.length} saker`}
           behandlinger={[...ferdigstilteFiltered, ...uferdigeFiltered]}
           getValue={getAge}
           getBucketKey={getAgeBucketKey}
