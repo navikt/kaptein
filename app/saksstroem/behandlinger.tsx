@@ -17,7 +17,6 @@ import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
-import { Aldersfordeling } from '@/components/charts/aldersfordeling';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
@@ -235,9 +234,6 @@ const BehandlingerData = ({
           getInBucketIndex={getMonthInBucketIndex}
           getOutBucketIndex={getMonthOutBucketIndex}
         />
-      </Card>
-      <Card fullWidth span={4}>
-        <Aldersfordeling uferdigeList={uferdigeFiltered} />
       </Card>
       <Card fullWidth span={3}>
         <IntervalOverTime

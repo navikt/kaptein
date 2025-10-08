@@ -8,6 +8,7 @@ import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { Alder } from '@/components/charts/alder';
 import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
+import { Aldersfordeling } from '@/components/charts/aldersfordeling';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonAktive } from '@/components/charts/common/skeleton-chart';
 import { useAktive, useTildelte } from '@/components/charts/common/use-data';
@@ -283,6 +284,10 @@ const BehandlingerData = ({
 
       <Card span={4}>
         <AlderPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+      </Card>
+
+      <Card fullWidth span={4}>
+        <Aldersfordeling uferdigeList={filteredBehandlinger} />
       </Card>
     </ChartsWrapper>
   );
