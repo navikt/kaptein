@@ -158,3 +158,8 @@ export enum PåVentReason {
 export interface SakstypeToUtfall extends IKodeverkSimpleValue<Sakstype> {
   utfall: IKodeverkSimpleValue[];
 }
+
+export const isFerdigstilt = (b: Ledig | Tildelt | Ferdigstilt | BaseBehandling): b is Ferdigstilt =>
+  'avsluttetAvSaksbehandlerDate' in b && typeof b.avsluttetAvSaksbehandlerDate === 'string';
+
+export type FristBehandling = BaseBehandling & Frist & (Ferdigstilt | Ledig | Tildelt);

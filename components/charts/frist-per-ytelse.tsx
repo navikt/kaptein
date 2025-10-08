@@ -1,5 +1,6 @@
 'use client';
 
+import { isAfter } from 'date-fns';
 import { useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
@@ -9,23 +10,35 @@ import { ExceededFrist, getFristColor } from '@/components/charts/common/use-fri
 import { NoData } from '@/components/no-data/no-data';
 import { TODAY } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, Frist, IKodeverkSimpleValue } from '@/lib/types';
+import { type FristBehandling, type IKodeverkSimpleValue, isFerdigstilt } from '@/lib/types';
 
 interface Props {
-  behandlinger: (BaseBehandling & Frist)[];
+  behandlinger: FristBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
 }
 
 const TITLE = 'Frist per ytelse';
 
-const getData = (behandling: Frist, exceeded: ExceededFrist): number => {
+const getData = (behandling: FristBehandling, exceeded: ExceededFrist): number => {
   switch (exceeded) {
     case ExceededFrist.NULL:
       return behandling.frist === null ? 1 : 0;
     case ExceededFrist.EXCEEDED:
-      return behandling.frist !== null && behandling.frist < TODAY ? 1 : 0;
+      return behandling.frist !== null &&
+        isAfter(
+          isFerdigstilt(behandling) ? new Date(behandling.avsluttetAvSaksbehandlerDate) : TODAY,
+          new Date(behandling.frist),
+        )
+        ? 1
+        : 0;
     case ExceededFrist.NOT_EXCEEDED:
-      return behandling.frist !== null && behandling.frist >= TODAY ? 1 : 0;
+      return behandling.frist !== null &&
+        !isAfter(
+          isFerdigstilt(behandling) ? new Date(behandling.avsluttetAvSaksbehandlerDate) : TODAY,
+          new Date(behandling.frist),
+        )
+        ? 1
+        : 0;
   }
 };
 
