@@ -233,7 +233,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
       </Card>
       <Card fullWidth span={3}>
         <AntallSakerInnTilKabalFerdigstiltIKabal
-          title="Antall saker inn til Kabal / ferdigstilt i Kabal per uke"
+          title="Antall saker mottatt / ferdigstilt i Kabal per uke"
           ferdigstilte={ferdigstilteFiltered}
           uferdigeList={uferdigeFiltered}
           createBuckets={createWeekBuckets}
@@ -243,7 +243,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
       </Card>
       <Card fullWidth span={3}>
         <AntallSakerInnTilKabalFerdigstiltIKabal
-          title="Antall saker inn til Kabal / ferdigstilt i Kabal per måned"
+          title="Antall saker mottatt / ferdigstilt i Kabal per måned"
           ferdigstilte={ferdigstilteFiltered}
           uferdigeList={uferdigeFiltered}
           createBuckets={createMonthBuckets}
