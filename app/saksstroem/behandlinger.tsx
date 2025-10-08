@@ -1,16 +1,7 @@
 'use client';
 
 import { BodyLong, List } from '@navikt/ds-react';
-import {
-  addDays,
-  differenceInDays,
-  differenceInMonths,
-  differenceInWeeks,
-  eachMonthOfInterval,
-  format,
-  isBefore,
-  parse,
-} from 'date-fns';
+import { addDays, differenceInMonths, differenceInWeeks, eachMonthOfInterval, format, parse } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
@@ -21,30 +12,26 @@ import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
-import { IntervalOverTime } from '@/components/charts/interval-over-time';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
-import {
-  type AnkerFerdigstilteResponse,
-  type AnkerLedigeResponse,
-  type AnkerTildelteResponse,
-  type BaseBehandling,
-  type Behandling,
-  type BetongFerdigstilteResponse,
-  type BetongLedigeResponse,
-  type BetongTildelteResponse,
-  type Ferdigstilt,
-  type FerdigstiltBehanding,
-  isFerdigstilt,
-  type KlagerFerdigstilteResponse,
-  type KlagerLedigeResponse,
-  type KlagerTildelteResponse,
-  type Ledig,
-  type OmgjøringskravFerdigstilteResponse,
-  type OmgjøringskravLedigeResponse,
-  type OmgjøringskravTildelteResponse,
-  type Tildelt,
+import type {
+  AnkerFerdigstilteResponse,
+  AnkerLedigeResponse,
+  AnkerTildelteResponse,
+  BaseBehandling,
+  BetongFerdigstilteResponse,
+  BetongLedigeResponse,
+  BetongTildelteResponse,
+  Ferdigstilt,
+  KlagerFerdigstilteResponse,
+  KlagerLedigeResponse,
+  KlagerTildelteResponse,
+  Ledig,
+  OmgjøringskravFerdigstilteResponse,
+  OmgjøringskravLedigeResponse,
+  OmgjøringskravTildelteResponse,
+  Tildelt,
 } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -235,16 +222,6 @@ const BehandlingerData = ({
           getOutBucketIndex={getMonthOutBucketIndex}
         />
       </Card>
-      <Card fullWidth span={3}>
-        <IntervalOverTime
-          title="Alder over tid"
-          xAxisLabel="Mottatt"
-          description={`Viser data for ${ferdigstilteFiltered.length + uferdigeFiltered.length} saker`}
-          behandlinger={[...ferdigstilteFiltered, ...uferdigeFiltered]}
-          getValue={getAge}
-          getBucketKey={getAgeBucketKey}
-        />
-      </Card>
     </ChartsWrapper>
   );
 };
@@ -321,21 +298,3 @@ const getMonthOutBucketIndex = (b: Ferdigstilt, from: string) =>
     parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
     parse(from, ISO_DATE_FORMAT, new Date()),
   );
-
-const getBehandlingstid = (b: FerdigstiltBehanding) =>
-  differenceInDays(
-    parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
-    parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
-  );
-
-const getAge = (b: Behandling) => (isFerdigstilt(b) ? getBehandlingstid(b) : b.ageKA);
-
-const getAgeBucketKey = (b: Behandling, from: Date, to: Date) => {
-  const received = parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date());
-
-  if (isBefore(received, from) || !isBefore(received, to)) {
-    return null;
-  }
-
-  return differenceInWeeks(received, from);
-};
