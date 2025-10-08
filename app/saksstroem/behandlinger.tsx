@@ -237,15 +237,6 @@ const BehandlingerData = ({
       </Card>
       <Card fullWidth span={3}>
         <IntervalOverTime
-          title="Behandlingstid over tid"
-          xAxisLabel="Ferdigstilt"
-          behandlinger={ferdigstilteFiltered}
-          getValue={getBehandlingstid}
-          getBucketKey={getBehandlingstidBucketKey}
-        />
-      </Card>
-      <Card fullWidth span={3}>
-        <IntervalOverTime
           title="Alder over tid"
           xAxisLabel="Mottatt"
           behandlinger={[...ferdigstilteFiltered, ...uferdigeFiltered]}
@@ -335,16 +326,6 @@ const getBehandlingstid = (b: FerdigstiltBehanding) =>
     parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
     parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
   );
-
-const getBehandlingstidBucketKey = (b: FerdigstiltBehanding, from: Date, to: Date) => {
-  const finished = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());
-
-  if (isBefore(finished, from) || !isBefore(finished, to)) {
-    return null;
-  }
-
-  return differenceInWeeks(finished, from);
-};
 
 const getAge = (b: Behandling) => (isFerdigstilt(b) ? getBehandlingstid(b) : b.ageKA);
 

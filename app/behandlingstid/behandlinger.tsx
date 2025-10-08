@@ -1,16 +1,20 @@
 'use client';
 
+import { differenceInDays, differenceInWeeks, isBefore, parse } from 'date-fns';
 import { Card } from '@/components/cards';
 import { BehandlingstidIKlageinstans } from '@/components/charts/behandlingstid-i-klageinstans';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonBehandlingstid } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstilte } from '@/components/charts/common/use-data';
+import { IntervalOverTime } from '@/components/charts/interval-over-time';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 import type {
   AnkeFerdigstilt,
   BetongFerdigstilt,
   BetongFerdigstilteResponse,
+  FerdigstiltBehanding,
   KapteinApiResponse,
   KlageFerdigstilt,
   OmgjøringskravFerdigstilt,
@@ -91,6 +95,31 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps)
       <Card fullWidth span={3}>
         <BehandlingstidIKlageinstans ferdigstilte={behandlinger} />
       </Card>
+      <Card fullWidth span={3}>
+        <IntervalOverTime
+          title="Behandlingstid over tid"
+          xAxisLabel="Ferdigstilt"
+          behandlinger={behandlinger}
+          getValue={getBehandlingstid}
+          getBucketKey={getBehandlingstidBucketKey}
+        />
+      </Card>
     </ChartsWrapper>
   );
 };
+
+const getBehandlingstidBucketKey = (b: FerdigstiltBehanding, from: Date, to: Date) => {
+  const finished = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());
+
+  if (isBefore(finished, from) || !isBefore(finished, to)) {
+    return null;
+  }
+
+  return differenceInWeeks(finished, from);
+};
+
+const getBehandlingstid = (b: FerdigstiltBehanding) =>
+  differenceInDays(
+    parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
+    parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
+  );
