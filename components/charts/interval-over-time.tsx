@@ -1,6 +1,6 @@
 'use client';
 
-import { format, fromUnixTime, parse, subDays } from 'date-fns';
+import { format, fromUnixTime, min, parse, subDays } from 'date-fns';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
@@ -42,10 +42,8 @@ export const IntervalOverTime = <T extends Behandling>({
 
     const buckets = createBuckets(from, to);
 
-    const maxDate = fromUnixTime(from.getTime() / 1000 + Object.keys(buckets).length * SECONDS_IN_A_WEEK);
-
     for (const b of behandlinger) {
-      const key = getBucketKey(b, from, maxDate);
+      const key = getBucketKey(b, from, to);
 
       if (key === null) {
         continue;
@@ -54,9 +52,7 @@ export const IntervalOverTime = <T extends Behandling>({
       const bucket = buckets[key];
 
       if (bucket === undefined) {
-        browserLog.warn(
-          `No bucket found for key ${key} (maxDate: ${maxDate.toISOString()}, behandling: ${JSON.stringify(b)})`,
-        );
+        browserLog.warn(`No bucket found for key ${key}. Behandling: ${JSON.stringify(b)}`);
         continue;
       }
 
@@ -100,17 +96,17 @@ export const IntervalOverTime = <T extends Behandling>({
 const createBuckets = (from: Date, to: Date) => {
   const buckets: Buckets = {};
 
-  for (let i = 0, t = from.getTime(); t + MS_IN_A_WEEK <= to.getTime(); t += MS_IN_A_WEEK, i++) {
-    buckets[i] = { label: getWeekLabel(new Date(t)), values: [] };
+  for (let i = 0, t = from.getTime(); t <= to.getTime(); t += MS_IN_A_WEEK, i++) {
+    buckets[i] = { label: getWeekLabel(fromUnixTime(t / 1000), to), values: [] };
   }
 
   return buckets;
 };
 
-const getWeekLabel = (date: Date) => {
+const getWeekLabel = (date: Date, maxDate: Date) => {
   const from = format(date, PRETTY_DATE_FORMAT);
   const weekEnd = subDays(date.getTime() + MS_IN_A_WEEK, 1);
-  const to = format(weekEnd, PRETTY_DATE_FORMAT);
+  const to = format(min([weekEnd, maxDate]), PRETTY_DATE_FORMAT);
 
   return `${from} - ${to}`;
 };
@@ -120,24 +116,20 @@ const MS_IN_A_WEEK = SECONDS_IN_A_WEEK * 1000;
 
 const getMedian = (values: number[]): number | null => {
   const sorted = values.toSorted((a, b) => a - b);
+
   if (sorted.length === 0) return null;
   if (sorted.length === 1) return sorted.at(0) ?? null;
   if (sorted.length % 2 === 1) return sorted.at(Math.floor(sorted.length / 2)) ?? null;
 
   const middle = sorted.length / 2;
-  const start = Math.floor(middle);
-  const end = Math.ceil(middle);
 
-  if (start === undefined || end === undefined) {
-    return null;
-  }
-
-  const startValue = sorted.at(start);
-  const endValue = sorted.at(end);
+  const startValue = sorted.at(Math.floor(middle));
+  const endValue = sorted.at(Math.ceil(middle));
 
   if (startValue === undefined || endValue === undefined) {
     return null;
   }
+
   return (startValue + endValue) / 2;
 };
 

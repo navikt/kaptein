@@ -1,6 +1,6 @@
 'use client';
 
-import { differenceInDays, differenceInWeeks, isBefore, parse } from 'date-fns';
+import { differenceInDays, differenceInWeeks, endOfDay, isAfter, isBefore, parse } from 'date-fns';
 import { Card } from '@/components/cards';
 import { BehandlingstidIKlageinstans } from '@/components/charts/behandlingstid-i-klageinstans';
 import { LoadingError } from '@/components/charts/common/loading-error';
@@ -112,7 +112,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps)
 const getBehandlingstidBucketKey = (b: FerdigstiltBehanding, from: Date, to: Date) => {
   const finished = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());
 
-  if (isBefore(finished, from) || !isBefore(finished, to)) {
+  if (isBefore(finished, from) || isAfter(finished, endOfDay(to))) {
     return null;
   }
 
