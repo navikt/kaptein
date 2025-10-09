@@ -2,6 +2,7 @@
 
 import { format, fromUnixTime, min, parse, subDays } from 'date-fns';
 import { useMemo } from 'react';
+import { getAvg, getMedian, NUBMER_FORMAT } from '@/components/charts/common/calculations';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
@@ -63,7 +64,7 @@ export const IntervalOverTime = <T extends Behandling>({
 
     return {
       labels: values.map((b) => b.label),
-      avg: values.map((b) => b.values.reduce((a, c) => a + c, 0) / b.values.length),
+      avg: values.map((b) => getAvg(b.values)),
       median: values.map((b) => getMedian(b.values)),
     };
   }, [behandlinger, fromFilter, toFilter, getValue, getBucketKey]);
@@ -83,7 +84,7 @@ export const IntervalOverTime = <T extends Behandling>({
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Dager' }],
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: xAxisLabel },
-        tooltip: { trigger: 'axis', valueFormatter: (p: number) => numberFormat.format(p) },
+        tooltip: { trigger: 'axis', valueFormatter: (p: number) => NUBMER_FORMAT.format(p) },
         series: [
           { type: 'line', smooth: true, data: avg, name: 'Gjennomsnitt' },
           { type: 'line', smooth: true, data: median, name: 'Median' },
@@ -113,24 +114,3 @@ const getWeekLabel = (date: Date, maxDate: Date) => {
 
 const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
 const MS_IN_A_WEEK = SECONDS_IN_A_WEEK * 1000;
-
-const getMedian = (values: number[]): number | null => {
-  const sorted = values.toSorted((a, b) => a - b);
-
-  if (sorted.length === 0) return null;
-  if (sorted.length === 1) return sorted.at(0) ?? null;
-  if (sorted.length % 2 === 1) return sorted.at(Math.floor(sorted.length / 2)) ?? null;
-
-  const middle = sorted.length / 2;
-
-  const startValue = sorted.at(Math.floor(middle));
-  const endValue = sorted.at(Math.ceil(middle));
-
-  if (startValue === undefined || endValue === undefined) {
-    return null;
-  }
-
-  return (startValue + endValue) / 2;
-};
-
-const numberFormat = new Intl.NumberFormat('no-NO', { maximumFractionDigits: 2 });

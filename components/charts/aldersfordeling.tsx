@@ -1,12 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
+import { getAvg, getMedian, NUBMER_FORMAT } from '@/components/charts/common/calculations';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { NoData } from '@/components/no-data/no-data';
+import { browserLog } from '@/lib/browser-log';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, Ledig, Tildelt } from '@/lib/types';
 
-type Bucket = { aktive: number; label: string };
+type Bucket = { count: number; label: string };
 type Buckets = Record<number, Bucket>;
 
 interface Props {
@@ -15,17 +17,19 @@ interface Props {
 
 interface Data {
   labels: string[];
-  aktive: number[];
+  data: number[];
+  median: number | null;
+  avg: number | null;
 }
 
 const TITLE = 'Aldersfordeling';
 
 export const Aldersfordeling = ({ uferdigeList }: Props) => {
-  const { labels, aktive } = useMemo<Data>(() => {
+  const { labels, data, median, avg } = useMemo<Data>(() => {
     const maxAge = uferdigeList.reduce((max, b) => (b.ageKA > max ? b.ageKA : max), 0);
 
     const buckets: Buckets = new Array(Math.floor(maxAge / 7) + 1).fill(null).reduce<Buckets>((acc, _, i) => {
-      acc[i] = { aktive: 0, label: `${i}-${i + 1} uker` };
+      acc[i] = { count: 0, label: `${i}-${i + 1} uker` };
 
       return acc;
     }, {});
@@ -36,18 +40,21 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
       const bucket = buckets[index];
 
       if (bucket === undefined) {
-        // This should never happen
+        browserLog.warn(`No bucket found for key ${index}. Behandling: ${JSON.stringify(b)}`);
         continue;
       }
 
-      bucket.aktive += 1;
+      bucket.count += 1;
     }
 
     const values = Object.values(buckets);
+    const ages = uferdigeList.map((b) => b.ageKA);
 
     return {
       labels: values.map((b) => b.label),
-      aktive: values.map((b) => b.aktive),
+      data: values.map((b) => b.count),
+      median: getMedian(ages),
+      avg: getAvg(ages),
     };
   }, [uferdigeList]);
 
@@ -58,7 +65,9 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Viser data for ${uferdigeList.length} aktive saker`}
+      description={`Totalt ${uferdigeList.length} aktive saker. Gj.snitt: ${getStatText(
+        avg,
+      )}, median: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 150 },
@@ -66,8 +75,16 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
         yAxis: [{ type: 'value', name: 'Antall' }],
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: 'Alder' },
         tooltip: { trigger: 'axis' },
-        series: [{ type: 'bar', data: aktive, name: 'Aktive' }],
+        series: [{ type: 'bar', data: data, name: 'Aktive' }],
       }}
     />
   );
+};
+
+const getStatText = (stat: number | null) => {
+  if (stat === null) {
+    return '-';
+  }
+
+  return `${NUBMER_FORMAT.format(stat / 7)} uker / ${NUBMER_FORMAT.format(stat)} dager`;
 };

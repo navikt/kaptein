@@ -2,6 +2,7 @@
 
 import { differenceInDays, parse } from 'date-fns';
 import { useMemo } from 'react';
+import { getAvg, getMedian, NUBMER_FORMAT } from '@/components/charts/common/calculations';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { NoData } from '@/components/no-data/no-data';
 import { ISO_DATE_FORMAT } from '@/lib/date';
@@ -18,15 +19,21 @@ interface Props {
 const TITLE = 'Behandlingstid i klageinstans';
 
 export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
-  const { labels, data } = useMemo(() => {
-    const max = ferdigstilte.reduce((max, b) => {
+  const { labels, data, median, avg } = useMemo(() => {
+    let max = 0;
+
+    const withBehandlingstid = ferdigstilte.map((b) => {
       const behandlingstid = differenceInDays(
         parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
         parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
       );
 
-      return behandlingstid > max ? behandlingstid : max;
-    }, 0);
+      if (behandlingstid > max) {
+        max = behandlingstid;
+      }
+
+      return { ...b, behandlingstid };
+    });
 
     const buckets: Buckets = new Array(Math.ceil(max / 7)).fill(null).reduce<Buckets>((acc, _, i) => {
       acc[i] = { count: 0, label: `${i}-${i + 1} uker` };
@@ -34,13 +41,8 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
       return acc;
     }, {});
 
-    for (const b of ferdigstilte) {
-      const index = Math.floor(
-        differenceInDays(
-          parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
-          parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
-        ) / 7,
-      );
+    for (const b of withBehandlingstid) {
+      const index = Math.floor(b.behandlingstid / 7);
 
       const bucket = buckets[index];
 
@@ -53,9 +55,13 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
 
     const values = Object.values(buckets);
 
+    const behandlingstider = withBehandlingstid.map((b) => b.behandlingstid);
+
     return {
       labels: values.map((b) => b.label),
       data: values.map((b) => b.count),
+      median: getMedian(behandlingstider),
+      avg: getAvg(behandlingstider),
     };
   }, [ferdigstilte]);
 
@@ -66,7 +72,9 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Viser data for ${ferdigstilte.length} ferdigstilte saker`}
+      description={`Totalt ${ferdigstilte.length} ferdigstilte saker. Gj.snitt: ${getStatText(
+        avg,
+      )}, median: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 150 },
@@ -78,4 +86,12 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
       }}
     />
   );
+};
+
+const getStatText = (stat: number | null) => {
+  if (stat === null) {
+    return '-';
+  }
+
+  return `${NUBMER_FORMAT.format(stat / 7)} uker / ${NUBMER_FORMAT.format(stat)} dager`;
 };
