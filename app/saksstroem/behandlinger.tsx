@@ -1,7 +1,17 @@
 'use client';
 
 import { BodyLong, List } from '@navikt/ds-react';
-import { addDays, differenceInMonths, differenceInWeeks, eachMonthOfInterval, format, parse } from 'date-fns';
+import {
+  addDays,
+  differenceInCalendarMonths,
+  differenceInWeeks,
+  eachMonthOfInterval,
+  endOfDay,
+  format,
+  min,
+  parse,
+  startOfDay,
+} from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
@@ -17,7 +27,7 @@ import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytel
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT, TODAY } from '@/lib/date';
+import { ISO_DATE_FORMAT, ISO_DATE_TIME_FORMAT, PRETTY_DATE_FORMAT, TODAY } from '@/lib/date';
 import type {
   AnkerFerdigstilteResponse,
   AnkerLedigeResponse,
@@ -258,21 +268,19 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
 const createWeekBuckets = (from: string, to: string) => {
   const buckets: Buckets = {};
 
-  let currentDate = from;
+  let currentDateTime = format(startOfDay(from), ISO_DATE_TIME_FORMAT);
   let weekNumber = 0;
 
-  while (currentDate < to) {
-    const endOfWeek = format(addDays(currentDate, 6), ISO_DATE_FORMAT);
+  const endDateTime = format(endOfDay(to), ISO_DATE_TIME_FORMAT);
 
-    if (endOfWeek >= to) {
-      break;
-    }
+  while (currentDateTime <= endDateTime) {
+    const endOfWeek = format(min([addDays(currentDateTime, 6), endDateTime]), ISO_DATE_TIME_FORMAT);
 
+    buckets[weekNumber] = { inn: 0, ut: 0, label: getWeekLabel(currentDateTime, endOfWeek) };
     weekNumber += 1;
-    buckets[weekNumber] = { inn: 0, ut: 0, label: getWeekLabel(currentDate, endOfWeek) };
 
-    const firstDayInNextWeek = format(addDays(endOfWeek, 1), ISO_DATE_FORMAT);
-    currentDate = firstDayInNextWeek;
+    const firstDayInNextWeek = format(addDays(endOfWeek, 1), ISO_DATE_TIME_FORMAT);
+    currentDateTime = firstDayInNextWeek;
   }
 
   return buckets;
@@ -291,12 +299,7 @@ const createMonthBuckets = (from: string, to: string) => {
   const buckets: Buckets = {};
 
   for (const monthStart of monthStarts) {
-    const relativeMonthNumber = differenceInMonths(monthStart, from);
-
-    if (relativeMonthNumber === 0 || differenceInMonths(monthStart, to) === 0) {
-      // Skip first and/or last month if it is not full
-      continue;
-    }
+    const relativeMonthNumber = differenceInCalendarMonths(monthStart, parse(from, ISO_DATE_FORMAT, new Date()));
 
     buckets[relativeMonthNumber] = { inn: 0, ut: 0, label: format(monthStart, 'LLL yy', { locale: nb }) };
   }
@@ -317,13 +320,13 @@ const getWeekOutBucketIndex = (b: Ferdigstilt, from: string): number =>
   );
 
 const getMonthInBucketIndex = (b: BaseBehandling, from: string) =>
-  differenceInMonths(
+  differenceInCalendarMonths(
     parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),
     parse(from, ISO_DATE_FORMAT, new Date()),
   );
 
 const getMonthOutBucketIndex = (b: Ferdigstilt, from: string) =>
-  differenceInMonths(
+  differenceInCalendarMonths(
     parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
     parse(from, ISO_DATE_FORMAT, new Date()),
   );
