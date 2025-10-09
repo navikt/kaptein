@@ -155,5 +155,5 @@ export const EChart = ({
     };
   }, []);
 
-  return <div style={{ width, height }} ref={ref} className={className} />;
+  return <div style={{ width, height }} ref={ref} className={`${className} [&_svg]:select-text!`} />;
 };
