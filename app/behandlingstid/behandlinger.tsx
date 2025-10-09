@@ -19,7 +19,7 @@ import { Card } from '@/components/cards';
 import { BehandlingstidIKlageinstans } from '@/components/charts/behandlingstid-i-klageinstans';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonBehandlingstid } from '@/components/charts/common/skeleton-chart';
-import { useFerdigstilte } from '@/components/charts/common/use-data';
+import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
 import { type Buckets, IntervalOverTime } from '@/components/charts/interval-over-time';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
@@ -98,10 +98,10 @@ interface DataProps {
 }
 
 const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps) => {
-  const filteredKlager = useFerdigstilte(klager);
-  const filteredAnker = useFerdigstilte(anker);
-  const filteredBetong = useFerdigstilte(betong);
-  const filteredOmgjøringskrav = useFerdigstilte(omgjøringskrav);
+  const filteredKlager = useFerdigstilteInPeriod(klager);
+  const filteredAnker = useFerdigstilteInPeriod(anker);
+  const filteredBetong = useFerdigstilteInPeriod(betong);
+  const filteredOmgjøringskrav = useFerdigstilteInPeriod(omgjøringskrav);
   const behandlinger = [...filteredKlager, ...filteredAnker, ...filteredBetong, ...filteredOmgjøringskrav];
 
   return (

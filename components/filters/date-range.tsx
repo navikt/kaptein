@@ -6,12 +6,10 @@ import { endOfMonth, endOfYear, format, parse, startOfMonth, startOfYear, subMon
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsDateString } from '@/app/custom-query-parsers';
-import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
+import { ISO_DATE_FORMAT, NOW, START_OF_KABAL_DATE, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
 const LAST_MONTH = subMonths(NOW, 1);
-
-const START_OF_KABAL = new Date('2021-01-01');
 
 const START_OF_LAST_MONTH = format(startOfMonth(LAST_MONTH), ISO_DATE_FORMAT);
 const END_OF_LAST_MONTH = format(endOfMonth(LAST_MONTH), ISO_DATE_FORMAT);
@@ -35,7 +33,7 @@ export const DateRange = () => {
     inputProps: fromInputProps,
     setSelected: setFromSelected,
   } = useDatepicker({
-    fromDate: START_OF_KABAL,
+    fromDate: START_OF_KABAL_DATE,
     toDate: NOW,
     defaultSelected: parsedFrom ?? NOW,
     allowTwoDigitYear: true,
@@ -59,7 +57,7 @@ export const DateRange = () => {
     inputProps: toInputProps,
     setSelected: setToSelected,
   } = useDatepicker({
-    fromDate: START_OF_KABAL,
+    fromDate: START_OF_KABAL_DATE,
     toDate: NOW,
     defaultSelected: parsedTo ?? NOW,
     allowTwoDigitYear: true,

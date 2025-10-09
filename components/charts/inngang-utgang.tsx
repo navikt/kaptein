@@ -43,20 +43,6 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
   const { labels, inn, ut, pressure, innTotal, utTotal, diffTotal } = useMemo<Data>(() => {
-    if (fromFilter === null || toFilter === null) {
-      return {
-        labels: [],
-        inn: [],
-        ut: [],
-        pressure: [],
-        innTotal: 0,
-        utTotal: 0,
-        diffTotal: 0,
-        innAverage: 0,
-        utAverage: 0,
-      } satisfies Data;
-    }
-
     const buckets = createBuckets(fromFilter, toFilter);
 
     for (const b of ferdigstilte) {

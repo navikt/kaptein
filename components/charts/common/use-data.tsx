@@ -8,99 +8,90 @@ import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import type { BaseBehandling, Ferdigstilt, Frist, Ledig, Tildelt } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const useFerdigstilte = (behandlinger: (BaseBehandling & Ferdigstilt & Frist)[]) => {
-  const { fromFilter, toFilter } = useDateFilter();
-  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
-  const registreringshjemler = registreringshjemlerFilter ?? [];
-  const utfall = utfallFilter ?? [];
+export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Ferdigstilt & Frist)[]) => {
+  const baseFiltered = useBaseFiltered(behandlinger);
+  const ferdigstiltInPeriod = useFerdigstiltInPeriod(baseFiltered);
+  const resultatFiltered = useResultatFiltered(ferdigstiltInPeriod);
 
-  const baseFiltered = useFiltered(behandlinger);
-
-  return useMemo(() => {
-    const filteredForUtfall =
-      utfall.length === 0 ? baseFiltered : baseFiltered.filter((b) => utfall.includes(b.resultat.utfallId));
-
-    const filteredForFrom =
-      fromFilter === null
-        ? filteredForUtfall
-        : filteredForUtfall.filter((b) => b.avsluttetAvSaksbehandlerDate >= fromFilter);
-
-    const filteredForTo =
-      toFilter === null ? filteredForFrom : filteredForFrom.filter((b) => b.avsluttetAvSaksbehandlerDate <= toFilter);
-
-    const filteredForRegistreringshjemler =
-      registreringshjemler.length === 0
-        ? filteredForTo
-        : filteredForTo.filter((b) =>
-            registreringshjemler.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
-          );
-
-    return filteredForRegistreringshjemler;
-  }, [baseFiltered, fromFilter, toFilter, registreringshjemler, utfall]);
+  return resultatFiltered;
 };
 
-export const useFerdigstiltSaksstrøm = (ferdigstilteBehandlinger: (BaseBehandling & Ferdigstilt)[]) => {
+export const useFerdigstiltInPeriod = <T extends Ferdigstilt>(ferdigstilteBehandlinger: T[]) => {
   const { fromFilter, toFilter } = useDateFilter();
-  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
-  const registreringshjemler = registreringshjemlerFilter ?? [];
-  const utfall = utfallFilter ?? [];
-
-  const ferdigstilteFilteredBase = useFiltered(ferdigstilteBehandlinger);
 
   return useMemo(() => {
-    const filteredForFrom =
-      fromFilter === null
-        ? ferdigstilteFilteredBase
-        : ferdigstilteFilteredBase.filter(
-            (b) => b.mottattKlageinstans >= fromFilter || b.avsluttetAvSaksbehandlerDate >= fromFilter,
-          );
+    const filteredForPeriod: T[] = [];
 
-    const filteredForTo =
-      toFilter === null
-        ? filteredForFrom
-        : filteredForFrom.filter(
-            (b) => b.mottattKlageinstans <= toFilter || b.avsluttetAvSaksbehandlerDate <= toFilter,
-          );
+    for (const behandling of ferdigstilteBehandlinger) {
+      // If the case was finished before or after the period, it will be filtered out.
+      if (behandling.avsluttetAvSaksbehandlerDate < fromFilter || behandling.avsluttetAvSaksbehandlerDate > toFilter) {
+        continue;
+      }
 
+      filteredForPeriod.push(behandling);
+    }
+
+    return filteredForPeriod;
+  }, [ferdigstilteBehandlinger, fromFilter, toFilter]);
+};
+
+export const getRestanseAfterDate = (
+  uferdige: (BaseBehandling & (Tildelt | Ledig))[],
+  ferdigstilte: (BaseBehandling & Ferdigstilt)[],
+  date: string,
+) => {
+  const restanse: BaseBehandling[] = [];
+
+  for (const b of uferdige) {
+    if (b.mottattKlageinstans <= date) {
+      restanse.push(b);
+    }
+  }
+
+  for (const b of ferdigstilte) {
+    if (b.mottattKlageinstans <= date && b.avsluttetAvSaksbehandlerDate > date) {
+      restanse.push(b);
+    }
+  }
+
+  return restanse;
+};
+
+export const useMottattInPeriod = <T extends BaseBehandling>(behandlinger: T[]) => {
+  const { fromFilter, toFilter } = useDateFilter();
+
+  return useMemo(
+    () => behandlinger.filter((b) => b.mottattKlageinstans <= toFilter && b.mottattKlageinstans >= fromFilter),
+    [behandlinger, fromFilter, toFilter],
+  );
+};
+
+export const useResultatFiltered = <T extends Ferdigstilt>(ferdigstilteBehandlinger: T[]) => {
+  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
+
+  return useMemo(() => {
     const filteredForRegistreringshjemler =
-      registreringshjemler.length === 0
-        ? filteredForTo
-        : filteredForTo.filter((b) =>
-            registreringshjemler.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
+      registreringshjemlerFilter === null || registreringshjemlerFilter.length === 0
+        ? ferdigstilteBehandlinger
+        : ferdigstilteBehandlinger.filter((b) =>
+            registreringshjemlerFilter.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
           );
 
     const filteredForUtfall =
-      utfall.length === 0
+      utfallFilter === null || utfallFilter.length === 0
         ? filteredForRegistreringshjemler
-        : filteredForRegistreringshjemler.filter((b) => utfall.includes(b.resultat.utfallId));
+        : filteredForRegistreringshjemler.filter((b) => utfallFilter.includes(b.resultat.utfallId));
 
     return filteredForUtfall;
-  }, [ferdigstilteFilteredBase, fromFilter, toFilter, registreringshjemler, utfall]);
+  }, [ferdigstilteBehandlinger, registreringshjemlerFilter, utfallFilter]);
 };
 
-export const useUferdigeSaksstrøm = (behandlinger: (BaseBehandling & (Ledig | Tildelt))[]) => {
-  const { fromFilter, toFilter } = useDateFilter();
+export const useAktive = <T extends BaseBehandling>(behandlinger: T[]) => useBaseFiltered<T>(behandlinger);
 
-  const filteredBase = useFiltered(behandlinger);
+export const useTildelte = <T extends BaseBehandling & Tildelt>(behandlinger: T[]) => useBaseFiltered<T>(behandlinger);
 
-  return useMemo(() => {
-    const filteredForFrom =
-      fromFilter === null ? filteredBase : filteredBase.filter((b) => b.mottattKlageinstans >= fromFilter);
-
-    const filteredForTo =
-      toFilter === null ? filteredForFrom : filteredForFrom.filter((b) => b.mottattKlageinstans <= toFilter);
-
-    return filteredForTo;
-  }, [filteredBase, fromFilter, toFilter]);
-};
-
-export const useAktive = <T extends BaseBehandling>(behandlinger: T[]) => useFiltered<T>(behandlinger);
-
-export const useTildelte = <T extends BaseBehandling & Tildelt>(behandlinger: T[]) => useFiltered<T>(behandlinger);
-
-const useFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
   const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
   const [innsendingshjemlerFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
