@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import { useSakstypeColor } from '@/lib/echarts/use-colors';
+import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import type { BaseBehandling, IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 
 interface Props {
@@ -14,9 +14,11 @@ interface Props {
 
 const TITLE = 'Saker per sakstype';
 
+type Data = { value: number; name: string; itemStyle: { color: string } };
+
 export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
   const data = useMemo(() => {
-    const map = behandlinger.reduce<Map<Sakstype, { value: number; name: string }>>((acc, curr) => {
+    const map = behandlinger.reduce<Map<Sakstype, Data>>((acc, curr) => {
       const existing = acc.get(curr.typeId);
 
       if (existing) {
@@ -25,6 +27,7 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
         acc.set(curr.typeId, {
           name: sakstyper.find((s) => s.id === curr.typeId)?.navn ?? (curr.typeId || curr.typeId),
           value: 1,
+          itemStyle: { color: getSakstypeColor(curr.typeId) },
         });
       }
 
@@ -33,8 +36,6 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
 
     return Object.values(Object.fromEntries(map));
   }, [behandlinger, sakstyper]);
-
-  const color = useSakstypeColor(behandlinger);
 
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;
@@ -49,7 +50,6 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
         series: [
           {
             ...COMMON_PIE_CHART_SERIES_PROPS,
-            color,
             data,
             label: {
               formatter: ({ name, value }: { name: string; value: number }) => `${name}: ${value}`,
