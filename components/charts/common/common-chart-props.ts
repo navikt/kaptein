@@ -17,7 +17,7 @@ export const COMMMON_STACKED_BAR_CHART_SERIES_PROPS = {
 
 export const COMMON_PIE_CHART_PROPS = {
   tooltip: { trigger: 'item' },
-  legend: { orient: 'vertical', left: 'left' },
+  legend: {},
 };
 
 export const COMMON_PIE_CHART_SERIES_PROPS = {

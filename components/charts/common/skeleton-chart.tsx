@@ -23,7 +23,7 @@ const BarChart = ({ bars = 24 }: { bars?: number }) => (
         </Fragment>
       ))}
     </div>
-    <BarChartLegend />
+    <Legend />
   </VStack>
 );
 
@@ -49,7 +49,7 @@ const Histogram = ({ bars = 50 }: { bars?: number }) => (
         <Skeleton key={i} variant="rectangle" width="25px" height={`${height}%`} />
       ))}
     </div>
-    <BarChartLegend />
+    <Legend />
   </VStack>
 );
 
@@ -66,11 +66,11 @@ const PieChart = () => (
       <Title />
       <Skeleton variant="circle" width="250px" height="250px" />
     </VStack>
-    <PieChartLegend />
+    <Legend />
   </VStack>
 );
 
-const BarChartLegend = () => (
+const Legend = () => (
   <div className="w-full">
     <HStack justify="center" align="start" gap="2">
       {new Array(4).fill(null).map((_, i) => (
@@ -80,19 +80,6 @@ const BarChartLegend = () => (
         </HStack>
       ))}
     </HStack>
-  </div>
-);
-
-const PieChartLegend = () => (
-  <div className="w-full">
-    <VStack justify="start" align="start" gap="2">
-      {new Array(4).fill(null).map((_, i) => (
-        <HStack key={i} gap="1" justify="start" align="center" wrap={false} className="w-full">
-          <Skeleton variant="rectangle" width="30px" height="20px" />
-          <Skeleton variant="text" width={`${randomLegendTextWidth()}px`} height="20px" />
-        </HStack>
-      ))}
-    </VStack>
   </div>
 );
 
@@ -211,6 +198,9 @@ export const SkeletonSaksstrøm = memo(() => (
 
 export const SkeletonBehandlingstid = memo(() => (
   <ChartsWrapper>
+    <Card fullWidth span={3}>
+      <Histogram />
+    </Card>
     <Card fullWidth span={3}>
       <Histogram />
     </Card>
