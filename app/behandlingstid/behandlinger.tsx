@@ -99,7 +99,6 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps)
         <IntervalOverTime
           title="Behandlingstid over tid"
           xAxisLabel="Ferdigstilt"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
           behandlinger={behandlinger}
           getValue={getBehandlingstid}
           getBucketKey={getBehandlingstidBucketKey}

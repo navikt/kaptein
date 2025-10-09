@@ -20,7 +20,6 @@ interface Props<T extends Behandling> {
   getBucketKey: (b: T, from: Date, to: Date) => number | null;
   title: string;
   xAxisLabel: string;
-  description: string;
 }
 
 export const IntervalOverTime = <T extends Behandling>({
@@ -29,13 +28,12 @@ export const IntervalOverTime = <T extends Behandling>({
   getValue,
   title,
   xAxisLabel,
-  description,
 }: Props<T>) => {
   const { fromFilter, toFilter } = useDateFilter();
 
-  const { labels, avg, median } = useMemo(() => {
+  const { labels, avg, median, globalAvg, globalMedian } = useMemo(() => {
     if (fromFilter === null || toFilter === null) {
-      return { labels: [], avg: [], median: [] };
+      return { labels: [], avg: [], median: [], globalAvg: null, globalMedian: null };
     }
 
     const from = parse(fromFilter, ISO_DATE_FORMAT, new Date());
@@ -61,11 +59,14 @@ export const IntervalOverTime = <T extends Behandling>({
     }
 
     const values = Object.values(buckets);
+    const allValues = values.flatMap((b) => b.values);
 
     return {
       labels: values.map((b) => b.label),
       avg: values.map((b) => getAvg(b.values)),
       median: values.map((b) => getMedian(b.values)),
+      globalAvg: getAvg(allValues),
+      globalMedian: getMedian(allValues),
     };
   }, [behandlinger, fromFilter, toFilter, getValue, getBucketKey]);
 
@@ -76,9 +77,12 @@ export const IntervalOverTime = <T extends Behandling>({
   return (
     <EChart
       title={title}
-      description={description}
+      description={`{bold|Totalt} ${behandlinger.length} ferdigstilte saker. {bold|Gjennomsnitt}: ${getStatText(
+        globalAvg,
+      )}. {bold|Median}: ${getStatText(globalMedian)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
+        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 225 },
         legend: { bottom: 60 },
         dataZoom: [{ type: 'slider' }],
@@ -114,3 +118,11 @@ const getWeekLabel = (date: Date, maxDate: Date) => {
 
 const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
 const MS_IN_A_WEEK = SECONDS_IN_A_WEEK * 1000;
+
+const getStatText = (stat: number | null) => {
+  if (stat === null) {
+    return '-';
+  }
+
+  return `${NUBMER_FORMAT.format(stat / 7)} uker / ${NUBMER_FORMAT.format(stat)} dager`;
+};

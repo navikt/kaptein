@@ -129,7 +129,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   return (
     <EChart
       title={title}
-      description={`{bold|Mottatt}: ${innTotal}. {bold|Ferdigstilt}: ${utTotal}. {bold|Endring i restanse}: ${sign(diffTotal)}${Math.abs(diffTotal)}`}
+      description={`{bold|Mottatt}: ${innTotal}. {bold|Ferdigstilt}: ${utTotal}. {bold|Endring i restanse}: ${sign(diffTotal)}${Math.abs(diffTotal)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
         title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
