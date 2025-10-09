@@ -1,4 +1,4 @@
-import { Filters } from '@/app/ferdigstilte/filters';
+import { Filters } from '@/app/behandlingstid/filters';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   return (

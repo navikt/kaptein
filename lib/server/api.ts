@@ -12,6 +12,7 @@ import {
   type IUserData,
   type IYtelse,
   type PåVentReason,
+  type RegistreringshjemlerMap,
   Sakstype,
   type SakstypeToUtfall,
 } from '@/lib/types';
@@ -152,6 +153,9 @@ export const getSakstyperToUtfall = async () => {
 
 export const getInnsendingshjemlerMap = () =>
   getData<Record<string, string>>(AppName.KLAGE_KODEVERK, '/kodeverk/hjemlermap');
+
+export const getRegistreringshjemlerMap = () =>
+  getData<RegistreringshjemlerMap>(AppName.KLAGE_KODEVERK, '/kodeverk/registreringshjemlermap');
 
 export const getPåVentReasons = () =>
   getData<IKodeverkValue<PåVentReason>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/satt-paa-vent-reasons');

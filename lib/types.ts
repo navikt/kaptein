@@ -56,6 +56,8 @@ export interface IYtelse extends IKodeverkSimpleValue {
   klageenheter: IKodeverkSimpleValue[];
 }
 
+export type RegistreringshjemlerMap = Record<string, { lovkilde: IKodeverkValue; hjemmelnavn: string }>;
+
 export interface BaseBehandling<T extends Sakstype = Sakstype> {
   id: string;
   mottattKlageinstans: string;

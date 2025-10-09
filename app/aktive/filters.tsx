@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { Reset } from '@/app/aktive/reset';
+import { ActiveFilters } from '@/components/filters/active-filters';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { Sakstyper } from '@/components/filters/sakstyper';
@@ -46,5 +47,11 @@ const RenderFilters = ({ ytelser = [], innsendingshjemlerMap = {}, klageenheter 
     <YtelserAndInnsendingshjemler ytelser={ytelser} />
     <Tildeling />
     <Tilbakekreving help={<HelpForAktive innsendingshjemlerMap={innsendingshjemlerMap} />} />
+    <ActiveFilters
+      ytelser={ytelser}
+      klageenheter={klageenheter}
+      sakstyper={sakstyper}
+      innsendingshjemler={innsendingshjemlerMap}
+    />
   </FilterWrapper>
 );
