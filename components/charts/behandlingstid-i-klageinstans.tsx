@@ -72,11 +72,12 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Totalt ${ferdigstilte.length} ferdigstilte saker. Gj.snitt: ${getStatText(
+      description={`{bold|Totalt} ${ferdigstilte.length} ferdigstilte saker. {bold|Gjennomsnitt}: ${getStatText(
         avg,
-      )}, median: ${getStatText(median)}.`}
+      )}. {bold|Median}: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
+        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Antall' }],

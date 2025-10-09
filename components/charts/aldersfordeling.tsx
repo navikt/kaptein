@@ -65,11 +65,12 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Totalt ${uferdigeList.length} aktive saker. Gj.snitt: ${getStatText(
+      description={`{bold|Totalt} ${uferdigeList.length} aktive saker. {bold|Gjennomsnitt}: ${getStatText(
         avg,
-      )}, median: ${getStatText(median)}.`}
+      )}. {bold|Median}: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
+        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Antall' }],

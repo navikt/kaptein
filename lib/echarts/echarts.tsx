@@ -23,8 +23,8 @@ import { LabelLayout, UniversalTransition } from 'echarts/features';
 // @ts-expect-error - No types available
 import nbNO from 'echarts/lib/i18n/langnb-NO.js';
 import { SVGRenderer } from 'echarts/renderers';
-import type { EChartsOption } from 'echarts/types/dist/shared';
-import { useEffect, useRef, useState } from 'react';
+import type { ECBasicOption, TitleOption } from 'echarts/types/dist/shared';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
@@ -64,7 +64,7 @@ export interface CommonChartProps {
 }
 
 interface EChartProps extends CommonChartProps {
-  option: Omit<EChartsOption, 'title'>;
+  option: ECBasicOption & { title?: Omit<TitleOption, 'text' | 'subtext'> };
 }
 
 export const EChart = ({
@@ -80,6 +80,13 @@ export const EChart = ({
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+
+  option.tit;
+
+  const optionWithTitle = useMemo(
+    () => ({ ...option, title: { ...option.title, text: title, subtext: description }, aria: { show: true } }),
+    [option, title, description],
+  );
 
   // Create ResizeObserver to update chart size when container size changes
   useEffect(() => {
@@ -115,8 +122,8 @@ export const EChart = ({
       return;
     }
 
-    eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
-  }, [option, description, title]);
+    eChartsRef.current.setOption(optionWithTitle);
+  }, [optionWithTitle]);
 
   // Initialize ECharts instance
   useEffect(() => {
@@ -126,12 +133,12 @@ export const EChart = ({
 
     eChartsRef.current = echarts.init(ref.current, theme, { locale: 'nb-NO' });
 
-    eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
+    eChartsRef.current.setOption(optionWithTitle);
 
     if (getInstance !== undefined) {
       getInstance(eChartsRef.current);
     }
-  }, [option, theme, getInstance, description, title]);
+  }, [optionWithTitle, theme, getInstance]);
 
   // Update theme when it changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: setOption(option) is a workaround for a bug in ECharts
@@ -142,7 +149,7 @@ export const EChart = ({
 
     eChartsRef.current.setTheme(theme);
     // Without this eChart would show data from previous filtering after changing theme
-    eChartsRef.current.setOption({ aria: { show: true }, title: { text: title, subtext: description }, ...option });
+    eChartsRef.current.setOption(optionWithTitle);
   }, [theme]);
 
   // Dispose ECharts instance on unmount
