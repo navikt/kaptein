@@ -7,6 +7,7 @@ import {
 } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
+import { getPåVentReasonColor } from '@/lib/echarts/get-colors';
 import {
   type BaseBehandling,
   type IKodeverkSimpleValue,
@@ -35,6 +36,7 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
       Object.values(PåVentReason).map((reason) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: påVentReasons.find((r) => r.id === reason)?.beskrivelse ?? reason,
+        color: getPåVentReasonColor(reason),
         data: relevantYtelser
           .map(({ id }) =>
             påVentBehandlinger.reduce(

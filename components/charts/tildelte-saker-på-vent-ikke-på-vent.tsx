@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
+import { getPåVentReasonColor } from '@/lib/echarts/get-colors';
 import { percent } from '@/lib/percent';
 import type { BaseBehandling, IKodeverkValue, PåVentReason, Tildelt } from '@/lib/types';
 
@@ -22,6 +23,7 @@ interface Data {
   id: Key;
   value: number;
   name: string;
+  itemStyle: { color: string };
 }
 
 export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }: Props) => {
@@ -34,6 +36,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
           id: IKKE_PÅ_VENT_KEY,
           name: IKKE_PÅ_VENT_DESCRIPTION,
           value: 0,
+          itemStyle: { color: 'var(--ax-success-500)' },
         },
       ],
       ...påVentReasons.map<Entry>((reason) => [
@@ -42,6 +45,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
           id: reason.id,
           name: reason.beskrivelse,
           value: 0,
+          itemStyle: { color: getPåVentReasonColor(reason.id) },
         },
       ]),
     ]);
@@ -57,13 +61,23 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
       }
 
       if (value === IKKE_PÅ_VENT_KEY) {
-        map.set(value, { name: IKKE_PÅ_VENT_DESCRIPTION, value: 1, id: value });
+        map.set(value, {
+          name: IKKE_PÅ_VENT_DESCRIPTION,
+          value: 1,
+          id: value,
+          itemStyle: { color: 'var(--ax-success-500)' },
+        });
         continue;
       }
 
       const reason = påVentReasons.find((r) => r.id === value);
 
-      map.set(value, { name: reason?.beskrivelse ?? 'Ukjent', value: 1, id: value });
+      map.set(value, {
+        name: reason?.beskrivelse ?? 'Ukjent',
+        value: 1,
+        id: value,
+        itemStyle: { color: reason === undefined ? 'red' : getPåVentReasonColor(reason?.id) },
+      });
     }
 
     return Array.from(map.values());
