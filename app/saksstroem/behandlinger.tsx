@@ -21,13 +21,18 @@ import { Card } from '@/components/cards';
 import { BelastningPerYtelse } from '@/components/charts/belastning-per-ytelse';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
-import { useFerdigstiltSaksstrøm, useUferdigeSaksstrøm } from '@/components/charts/common/use-data';
+import {
+  getRestanseAfterDate,
+  useBaseFiltered,
+  useFerdigstiltInPeriod,
+  useMottattInPeriod,
+} from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
-import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
+import { RestanseOverTid } from '@/components/charts/restanse-over-tid';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { ISO_DATE_FORMAT, ISO_DATE_TIME_FORMAT, PRETTY_DATE_FORMAT, TODAY } from '@/lib/date';
+import { ISO_DATE_FORMAT, ISO_DATE_TIME_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
 import type {
   AnkerFerdigstilteResponse,
   AnkerLedigeResponse,
@@ -215,37 +220,38 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
     return [...ledige, ...tildelte];
   }, [tildelingFilter, ledige, tildelte]);
 
-  const ferdigstilteFiltered = useFerdigstiltSaksstrøm(ferdigstilte);
-  const uferdigeFiltered = useUferdigeSaksstrøm(uferdige);
+  const ferdigstilteBaseFiltered = useBaseFiltered(ferdigstilte);
+  const uferdigeBaseFiltered = useBaseFiltered(uferdige);
 
-  const relevantYtelser = useRelevantYtelser([...ferdigstilteFiltered, ...uferdigeFiltered], ytelser);
+  const ferdigstilteInPeriod = useFerdigstiltInPeriod(ferdigstilteBaseFiltered);
+  const mottattInPeriod = useMottattInPeriod(uferdigeBaseFiltered);
 
-  const toDate = toFilter ?? TODAY;
-
-  const restanse = useMemo(
-    () => [
-      ...uferdige.filter((u) => u.mottattKlageinstans <= toDate), // Alle uferdige saker mottatt før tildato.
-      ...ferdigstilte.filter((f) => f.mottattKlageinstans <= toDate && f.avsluttetAvSaksbehandlerDate > toDate), // Alle ferdigstilte saker mottatt før tildato og avsluttet etter tildato.
-    ],
-    [uferdige, ferdigstilte, toDate],
-  );
+  const restanseAfterToDate = getRestanseAfterDate(uferdigeBaseFiltered, ferdigstilteBaseFiltered, toFilter);
 
   return (
     <ChartsWrapper>
       <Card fullWidth span={5}>
         <BelastningPerYtelse
           title="Belastning per ytelse"
-          ferdigstilte={ferdigstilteFiltered}
-          uferdige={uferdigeFiltered}
-          restanseList={restanse}
-          ytelser={relevantYtelser}
+          ferdigstilteInPeriod={ferdigstilteInPeriod}
+          mottattInPeriod={mottattInPeriod}
+          outgoingRestanse={restanseAfterToDate}
+          ytelser={ytelser}
+        />
+      </Card>
+      <Card fullWidth span={3}>
+        <RestanseOverTid
+          title="Restanse over tid"
+          ferdigstilte={ferdigstilteBaseFiltered}
+          uferdige={uferdigeBaseFiltered}
+          ytelser={ytelser}
         />
       </Card>
       <Card fullWidth span={3}>
         <AntallSakerInnTilKabalFerdigstiltIKabal
           title="Antall saker mottatt / ferdigstilt i Kabal per uke"
-          ferdigstilte={ferdigstilteFiltered}
-          uferdigeList={uferdigeFiltered}
+          ferdigstilte={ferdigstilteInPeriod}
+          uferdigeList={mottattInPeriod}
           createBuckets={createWeekBuckets}
           getInBucketIndex={getWeekInBucketIndex}
           getOutBucketIndex={getWeekOutBucketIndex}
@@ -254,8 +260,8 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
       <Card fullWidth span={3}>
         <AntallSakerInnTilKabalFerdigstiltIKabal
           title="Antall saker mottatt / ferdigstilt i Kabal per måned"
-          ferdigstilte={ferdigstilteFiltered}
-          uferdigeList={uferdigeFiltered}
+          ferdigstilte={ferdigstilteInPeriod}
+          uferdigeList={mottattInPeriod}
           createBuckets={createMonthBuckets}
           getInBucketIndex={getMonthInBucketIndex}
           getOutBucketIndex={getMonthOutBucketIndex}

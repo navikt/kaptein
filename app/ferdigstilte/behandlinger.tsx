@@ -5,7 +5,7 @@ import { Alder } from '@/components/charts/alder';
 import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
-import { useFerdigstilte } from '@/components/charts/common/use-data';
+import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
@@ -100,10 +100,10 @@ interface DataProps extends KodeverkProps {
 }
 
 const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, ytelser, klageenheter }: DataProps) => {
-  const filteredKlager = useFerdigstilte(klager);
-  const filteredAnker = useFerdigstilte(anker);
-  const filteredBetong = useFerdigstilte(betong);
-  const filteredOmgjøringskrav = useFerdigstilte(omgjøringskrav);
+  const filteredKlager = useFerdigstilteInPeriod(klager);
+  const filteredAnker = useFerdigstilteInPeriod(anker);
+  const filteredBetong = useFerdigstilteInPeriod(betong);
+  const filteredOmgjøringskrav = useFerdigstilteInPeriod(omgjøringskrav);
   const behandlinger = [...filteredKlager, ...filteredAnker, ...filteredBetong, ...filteredOmgjøringskrav];
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelser);
 

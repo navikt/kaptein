@@ -34,10 +34,6 @@ export const IntervalOverTime = <T extends Behandling>({
   const { fromFilter, toFilter } = useDateFilter();
 
   const { labels, avg, median, globalAvg, globalMedian } = useMemo(() => {
-    if (fromFilter === null || toFilter === null) {
-      return { labels: [], avg: [], median: [], globalAvg: null, globalMedian: null };
-    }
-
     const from = parse(fromFilter, ISO_DATE_FORMAT, new Date());
     const to = parse(toFilter, ISO_DATE_FORMAT, new Date());
 

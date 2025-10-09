@@ -2,6 +2,7 @@
 
 import { useQueryState } from 'nuqs';
 import { parseAsDateString } from '@/app/custom-query-parsers';
+import { TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const useDateFilter = () => {
@@ -9,7 +10,7 @@ export const useDateFilter = () => {
   const [toFilter] = useQueryState(QueryParam.TO, parseAsDateString);
 
   return {
-    fromFilter: fromFilter === null ? null : fromFilter,
-    toFilter: toFilter === null ? null : toFilter,
+    fromFilter: fromFilter === null ? TODAY : fromFilter,
+    toFilter: toFilter === null ? TODAY : toFilter,
   };
 };

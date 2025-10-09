@@ -11,9 +11,9 @@ export type Buckets = Record<number, Bucket>;
 
 interface Props {
   title: string;
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[];
-  uferdige: (BaseBehandling & (Ledig | Tildelt))[];
-  restanseList: (BaseBehandling & (Ledig | Tildelt))[];
+  ferdigstilteInPeriod: (BaseBehandling & Ferdigstilt)[];
+  mottattInPeriod: (BaseBehandling & (Ledig | Tildelt))[];
+  outgoingRestanse: BaseBehandling[];
   ytelser: IKodeverkSimpleValue[];
 }
 
@@ -26,28 +26,30 @@ interface YtelseData {
   restanse: number;
 }
 
-export const BelastningPerYtelse = ({ title, ferdigstilte, uferdige, restanseList, ytelser }: Props) => {
+export const BelastningPerYtelse = ({
+  title,
+  ferdigstilteInPeriod,
+  mottattInPeriod,
+  outgoingRestanse,
+  ytelser,
+}: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
   const ytelseData = useMemo<YtelseData[]>(() => {
-    if (fromFilter === null || toFilter === null) {
-      return [];
-    }
-
     // Create a map to count mottatt and ferdigstilt per ytelse
     const ytelseMap = new Map<string, { mottatt: number; ferdigstilt: number }>();
 
     // Count incoming cases
-    countMottattInPeriod(uferdige, fromFilter, toFilter, ytelseMap);
-    countMottattInPeriod(ferdigstilte, fromFilter, toFilter, ytelseMap);
+    countMottattInPeriod(mottattInPeriod, fromFilter, toFilter, ytelseMap);
+    countMottattInPeriod(ferdigstilteInPeriod, fromFilter, toFilter, ytelseMap);
 
     // Count completed cases
-    countFerdigstiltInPeriod(ferdigstilte, fromFilter, toFilter, ytelseMap);
+    countFerdigstiltInPeriod(ferdigstilteInPeriod, fromFilter, toFilter, ytelseMap);
 
     // Count unfinished cases per ytelse (outgoing)
     const restanseMap = new Map<string, number>();
 
-    for (const behandling of restanseList) {
+    for (const behandling of outgoingRestanse) {
       const count = restanseMap.get(behandling.ytelseId) ?? 0;
       restanseMap.set(behandling.ytelseId, count + 1);
     }
@@ -76,7 +78,7 @@ export const BelastningPerYtelse = ({ title, ferdigstilte, uferdige, restanseLis
     }
 
     return data;
-  }, [ferdigstilte, uferdige, ytelser, fromFilter, toFilter, restanseList]);
+  }, [ferdigstilteInPeriod, mottattInPeriod, ytelser, fromFilter, toFilter, outgoingRestanse]);
 
   const labels = useMemo(() => ytelseData.map((d) => d.ytelseNavn), [ytelseData]);
   const mottattData = useMemo(() => ytelseData.map(({ mottatt }) => mottatt), [ytelseData]);
