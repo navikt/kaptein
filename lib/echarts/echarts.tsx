@@ -120,7 +120,7 @@ export const EChart = ({
       return;
     }
 
-    eChartsRef.current.setOption(optionWithTitle);
+    eChartsRef.current.setOption(optionWithTitle, { notMerge: true, lazyUpdate: true });
   }, [optionWithTitle]);
 
   // Initialize ECharts instance
