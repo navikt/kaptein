@@ -1,8 +1,10 @@
+import { HStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
 import { Reset } from '@/app/aktive/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
+import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { Sakstyper } from '@/components/filters/sakstyper';
 import { HelpForAktive, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { Tildeling } from '@/components/filters/tildeling';
@@ -41,7 +43,10 @@ interface Props {
 
 const RenderFilters = ({ ytelser = [], innsendingshjemlerMap = {}, klageenheter = [], sakstyper = [] }: Props) => (
   <FilterWrapper>
-    <Reset />
+    <HStack justify="space-between">
+      <Reset />
+      <ResetCacheButton />
+    </HStack>
     <Klageenheter klageenheter={klageenheter} />
     <Sakstyper sakstyper={sakstyper} />
     <YtelserAndInnsendingshjemler ytelser={ytelser} />

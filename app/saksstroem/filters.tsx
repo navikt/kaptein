@@ -1,9 +1,11 @@
+import { HStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
 import { Reset } from '@/app/ferdigstilte/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
 import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
+import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { Tildeling } from '@/components/filters/tildeling';
@@ -73,7 +75,10 @@ const RenderFilters = ({
   innsendingshjemlerMap = {},
 }: Props) => (
   <FilterWrapper>
-    <Reset />
+    <HStack justify="space-between">
+      <Reset />
+      <ResetCacheButton />
+    </HStack>
     <DateRange />
     <Klageenheter klageenheter={klageenheter} />
     <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
