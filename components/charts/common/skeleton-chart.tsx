@@ -204,5 +204,8 @@ export const SkeletonBehandlingstid = memo(() => (
     <Card fullWidth span={3}>
       <Histogram />
     </Card>
+    <Card fullWidth span={3}>
+      <Histogram />
+    </Card>
   </ChartsWrapper>
 ));

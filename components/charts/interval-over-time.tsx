@@ -1,23 +1,24 @@
 'use client';
 
-import { format, fromUnixTime, min, parse, subDays } from 'date-fns';
+import { parse } from 'date-fns';
 import { useMemo } from 'react';
 import { getAvg, getMedian, NUBMER_FORMAT } from '@/components/charts/common/calculations';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { browserLog } from '@/lib/browser-log';
-import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
+import { ISO_DATE_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Behandling } from '@/lib/types';
 
 type Bucket = { label: string; values: number[] };
-type Buckets = Record<number, Bucket>;
+export type Buckets = Record<number, Bucket>;
 
 interface Props<T extends Behandling> {
   behandlinger: T[];
   getValue: (b: T) => number;
   getBucketKey: (b: T, from: Date, to: Date) => number | null;
+  createBuckets: (from: Date, to: Date) => Buckets;
   title: string;
   xAxisLabel: string;
 }
@@ -28,6 +29,7 @@ export const IntervalOverTime = <T extends Behandling>({
   getValue,
   title,
   xAxisLabel,
+  createBuckets,
 }: Props<T>) => {
   const { fromFilter, toFilter } = useDateFilter();
 
@@ -68,7 +70,7 @@ export const IntervalOverTime = <T extends Behandling>({
       globalAvg: getAvg(allValues),
       globalMedian: getMedian(allValues),
     };
-  }, [behandlinger, fromFilter, toFilter, getValue, getBucketKey]);
+  }, [behandlinger, fromFilter, toFilter, getValue, getBucketKey, createBuckets]);
 
   if (behandlinger.length === 0 || labels.length === 0) {
     return <NoData title={title} />;
@@ -97,27 +99,6 @@ export const IntervalOverTime = <T extends Behandling>({
     />
   );
 };
-
-const createBuckets = (from: Date, to: Date) => {
-  const buckets: Buckets = {};
-
-  for (let i = 0, t = from.getTime(); t <= to.getTime(); t += MS_IN_A_WEEK, i++) {
-    buckets[i] = { label: getWeekLabel(fromUnixTime(t / 1000), to), values: [] };
-  }
-
-  return buckets;
-};
-
-const getWeekLabel = (date: Date, maxDate: Date) => {
-  const from = format(date, PRETTY_DATE_FORMAT);
-  const weekEnd = subDays(date.getTime() + MS_IN_A_WEEK, 1);
-  const to = format(min([weekEnd, maxDate]), PRETTY_DATE_FORMAT);
-
-  return `${from} - ${to}`;
-};
-
-const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
-const MS_IN_A_WEEK = SECONDS_IN_A_WEEK * 1000;
 
 const getStatText = (stat: number | null) => {
   if (stat === null) {
