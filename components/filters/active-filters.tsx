@@ -14,51 +14,84 @@ interface Props {
   innsendingshjemler?: Record<string, string>;
 }
 
+const parseQuery = parseAsArrayOf(parseAsString).withDefault([]);
+
 export const ActiveFilters = ({
-  ytelser,
-  klageenheter,
-  sakstyper,
-  utfall,
-  registreringshjemler,
-  innsendingshjemler,
-}: Props) => (
-  <VStack gap="2">
-    {klageenheter === undefined ? null : (
-      <Group param={QueryParam.KLAGEENHETER} getName={getKodeverkName(klageenheter)} color="meta-purple" />
-    )}
-    {sakstyper === undefined ? null : (
-      <Group param={QueryParam.SAKSTYPER} getName={getKodeverkName(sakstyper)} color="success" />
-    )}
-    {utfall === undefined ? null : <Group param={QueryParam.UTFALL} getName={getKodeverkName(utfall)} color="danger" />}
-    {ytelser === undefined ? null : (
-      <Group param={QueryParam.YTELSER} getName={getKodeverkName(ytelser)} color="accent" />
-    )}
-    {innsendingshjemler === undefined ? null : (
-      <Group
-        param={QueryParam.INNSENDINGSHJEMLER}
-        getName={getInnsendingshjemmelnavn(innsendingshjemler)}
-        color="meta-lime"
-      />
-    )}
-    {registreringshjemler === undefined ? null : (
-      <Group
-        param={QueryParam.REGISTRERINGSHJEMLER}
-        getName={getRegistreringshjemmelnavn(registreringshjemler)}
-        color="warning"
-      />
-    )}
-  </VStack>
-);
+  ytelser: ytelserKodeverk,
+  klageenheter: klageenheterKodeverk,
+  sakstyper: sakstyperKodeverk,
+  utfall: utfallKodeverk,
+  registreringshjemler: registreringshjemlerKodeverk,
+  innsendingshjemler: innsendingshjemlerKodeverk,
+}: Props) => {
+  const [klageenheter, setKlageenheter] = useQueryState(QueryParam.KLAGEENHETER, parseQuery);
+  const [sakstyper, setSakstyper] = useQueryState(QueryParam.SAKSTYPER, parseQuery);
+  const [utfall, setUtfall] = useQueryState(QueryParam.UTFALL, parseQuery);
+  const [ytelser, setYtelser] = useQueryState(QueryParam.YTELSER, parseQuery);
+  const [innsendingshjemler, setInnsendingshjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseQuery);
+  const [registreringshjemler, setRegistreringshjemler] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseQuery);
+
+  return (
+    <VStack gap="2">
+      {klageenheterKodeverk === undefined ? null : (
+        <Group
+          values={klageenheter}
+          setValues={setKlageenheter}
+          getName={getKodeverkName(klageenheterKodeverk)}
+          color="meta-purple"
+        />
+      )}
+      {sakstyperKodeverk === undefined ? null : (
+        <Group
+          values={sakstyper}
+          setValues={setSakstyper}
+          getName={getKodeverkName(sakstyperKodeverk)}
+          color="success"
+        />
+      )}
+      {utfallKodeverk === undefined ? null : (
+        <Group values={utfall} setValues={setUtfall} getName={getKodeverkName(utfallKodeverk)} color="danger" />
+      )}
+      {ytelserKodeverk === undefined ? null : (
+        <Group
+          values={ytelser}
+          setValues={(v) => {
+            setYtelser(v);
+            setInnsendingshjemler(null);
+            setRegistreringshjemler(null);
+          }}
+          getName={getKodeverkName(ytelserKodeverk)}
+          color="accent"
+        />
+      )}
+      {innsendingshjemlerKodeverk === undefined ? null : (
+        <Group
+          values={innsendingshjemler}
+          setValues={setInnsendingshjemler}
+          getName={getInnsendingshjemmelnavn(innsendingshjemlerKodeverk)}
+          color="meta-lime"
+        />
+      )}
+      {registreringshjemlerKodeverk === undefined ? null : (
+        <Group
+          values={registreringshjemler}
+          setValues={setRegistreringshjemler}
+          getName={getRegistreringshjemmelnavn(registreringshjemlerKodeverk)}
+          color="warning"
+        />
+      )}
+    </VStack>
+  );
+};
 
 interface GroupProps {
-  param: QueryParam;
   getName: (id: string) => string;
   color: ChipsProps['data-color'];
+  values: string[];
+  setValues: (values: string[] | null) => void;
 }
 
-const Group = ({ param, getName, color }: GroupProps) => {
-  const [values, setValues] = useQueryState(param, parseAsArrayOf(parseAsString).withDefault([]));
-
+const Group = ({ getName, color, values, setValues }: GroupProps) => {
   const children = useMemo(
     () =>
       values.map((v) => (
