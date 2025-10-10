@@ -53,7 +53,7 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Prop
   return (
     <EChart
       title={title}
-      description={`{bold|Total restanse}: ${totalRestanse}`}
+      description={`{bold|Restanse ved periodeslutt}: ${totalRestanse}`}
       getInstance={resetDataZoomOnDblClick}
       option={{
         title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
