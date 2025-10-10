@@ -14,6 +14,7 @@ export enum ColorToken {
   Neutral200A = 'neutral-200A',
   Neutral300A = 'neutral-300A',
   Neutral400A = 'neutral-400A',
+
   Accent100 = 'accent-100',
   Accent200 = 'accent-200',
   Accent300 = 'accent-300',
@@ -28,6 +29,7 @@ export enum ColorToken {
   Accent200A = 'accent-200A',
   Accent300A = 'accent-300A',
   Accent400A = 'accent-400A',
+
   Success100 = 'success-100',
   Success200 = 'success-200',
   Success300 = 'success-300',
@@ -42,6 +44,7 @@ export enum ColorToken {
   Success200A = 'success-200A',
   Success300A = 'success-300A',
   Success400A = 'success-400A',
+
   Warning100 = 'warning-100',
   Warning200 = 'warning-200',
   Warning300 = 'warning-300',
@@ -56,6 +59,7 @@ export enum ColorToken {
   Warning200A = 'warning-200A',
   Warning300A = 'warning-300A',
   Warning400A = 'warning-400A',
+
   Danger100 = 'danger-100',
   Danger200 = 'danger-200',
   Danger300 = 'danger-300',
@@ -70,6 +74,7 @@ export enum ColorToken {
   Danger200A = 'danger-200A',
   Danger300A = 'danger-300A',
   Danger400A = 'danger-400A',
+
   Info100 = 'info-100',
   Info200 = 'info-200',
   Info300 = 'info-300',
@@ -84,6 +89,7 @@ export enum ColorToken {
   Info200A = 'info-200A',
   Info300A = 'info-300A',
   Info400A = 'info-400A',
+
   Magenta100 = 'brand-magenta-100',
   Magenta200 = 'brand-magenta-200',
   Magenta300 = 'brand-magenta-300',
@@ -98,6 +104,7 @@ export enum ColorToken {
   Magenta200A = 'brand-magenta-200A',
   Magenta300A = 'brand-magenta-300A',
   Magenta400A = 'brand-magenta-400A',
+
   Beige100 = 'brand-beige-100',
   Beige200 = 'brand-beige-200',
   Beige300 = 'brand-beige-300',
@@ -112,6 +119,7 @@ export enum ColorToken {
   Beige200A = 'brand-beige-200A',
   Beige300A = 'brand-beige-300A',
   Beige400A = 'brand-beige-400A',
+
   BrandBlue100 = 'brand-blue-100',
   BrandBlue200 = 'brand-blue-200',
   BrandBlue300 = 'brand-blue-300',
@@ -126,6 +134,7 @@ export enum ColorToken {
   BrandBlue200A = 'brand-blue-200A',
   BrandBlue300A = 'brand-blue-300A',
   BrandBlue400A = 'brand-blue-400A',
+
   Purple100 = 'meta-purple-100',
   Purple200 = 'meta-purple-200',
   Purple300 = 'meta-purple-300',
@@ -140,6 +149,7 @@ export enum ColorToken {
   Purple200A = 'meta-purple-200A',
   Purple300A = 'meta-purple-300A',
   Purple400A = 'meta-purple-400A',
+
   Lime100 = 'meta-lime-100',
   Lime200 = 'meta-lime-200',
   Lime300 = 'meta-lime-300',
@@ -159,3 +169,59 @@ export enum ColorToken {
 const tokenNames = Object.values(ColorToken);
 
 export const isToken = (token: string): token is ColorToken => tokenNames.some((name) => name === token);
+
+// Ytelse IDs are sorted by ytelse name.
+export const YTELSE_COLOR_MAP: Record<string, string> = {
+  '25': ColorToken.Accent500,
+  '9': ColorToken.Warning500,
+  '27': ColorToken.Success500,
+  '26': ColorToken.Danger500,
+  '10': ColorToken.Info500,
+  '11': ColorToken.Magenta500,
+  '46': ColorToken.Lime500,
+  '12': ColorToken.Purple500,
+  '15': ColorToken.Beige500,
+  '14': ColorToken.Neutral500,
+  '45': ColorToken.Accent800,
+  '13': ColorToken.Warning800,
+  '16': ColorToken.Success800,
+  '17': ColorToken.Danger800,
+  '7': ColorToken.Info800,
+  '6': ColorToken.Magenta800,
+  '8': ColorToken.Lime800,
+  '51': ColorToken.Purple800,
+  '48': ColorToken.Beige800,
+  '30': ColorToken.Neutral800,
+  '52': ColorToken.Accent500,
+  '19': ColorToken.Warning500,
+  '21': ColorToken.Success500,
+  '20': ColorToken.Danger500,
+  '49': ColorToken.Info500,
+  '50': ColorToken.Magenta500,
+  '22': ColorToken.Lime500,
+  '43': ColorToken.Purple500,
+  '23': ColorToken.Beige500,
+  '29': ColorToken.Neutral500,
+  '18': ColorToken.Accent800,
+  '47': ColorToken.Warning800,
+  '24': ColorToken.Success800,
+  '40': ColorToken.Danger800,
+  '34': ColorToken.Info800,
+  '53': ColorToken.Magenta800,
+  '42': ColorToken.Lime800,
+  '31': ColorToken.Purple800,
+  '32': ColorToken.Beige800,
+  '1': ColorToken.Neutral800,
+  '2': ColorToken.Accent500,
+  '4': ColorToken.Warning500,
+  '3': ColorToken.Success500,
+  '5': ColorToken.Danger500,
+  '44': ColorToken.Info500,
+  '33': ColorToken.Magenta500,
+  '39': ColorToken.Lime500,
+  '35': ColorToken.Purple500,
+  '37': ColorToken.Beige500,
+  '36': ColorToken.Neutral500,
+  '38': ColorToken.Accent800,
+  '41': ColorToken.Warning800,
+};

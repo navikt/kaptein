@@ -7,6 +7,7 @@ import { getRestanseAfterDate } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { ISO_DATE_FORMAT } from '@/lib/date';
+import { YTELSE_COLOR_MAP } from '@/lib/echarts/color-token';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, Ferdigstilt, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
@@ -82,17 +83,25 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Prop
           data: labels,
           axisLabel: { rotate: 45 },
         },
-        series: ytelseSeriesData.map(({ ytelseNavn, restanseOverTime }) => ({
+        series: ytelseSeriesData.map(({ ytelseId, ytelseNavn, restanseOverTime }) => ({
+          id: ytelseId,
           name: ytelseNavn,
           type: 'line',
           smooth: false,
           stack: 'total',
+          stackOrder: 'seriesDesc',
           symbol: 'none',
           data: restanseOverTime,
+          itemStyle: {
+            color: `var(--ax-${YTELSE_COLOR_MAP[ytelseId]})`, // Must be set for the tooltip colors to match area color
+          },
           lineStyle: {
             width: 0,
           },
-          areaStyle: {},
+          areaStyle: {
+            color: `var(--ax-${YTELSE_COLOR_MAP[ytelseId]})`,
+            opacity: 1,
+          },
           emphasis: {
             focus: 'series',
           },
