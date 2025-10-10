@@ -6,5 +6,5 @@ export const PRETTY_DATE_FORMAT = 'dd.MM.yyyy';
 
 export const NOW = new Date();
 export const TODAY = format(NOW, ISO_DATE_FORMAT);
-export const START_OF_KABAL_DATE = new Date('2021-01-01');
+export const START_OF_KABAL_DATE = new Date('2015-01-01');
 export const START_OF_KABAL = format(START_OF_KABAL_DATE, ISO_DATE_FORMAT);
