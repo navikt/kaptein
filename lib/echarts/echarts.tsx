@@ -81,8 +81,6 @@ export const EChart = ({
   const eChartsRef = useRef<ECharts | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
-  option.tit;
-
   const optionWithTitle = useMemo(
     () => ({ ...option, title: { ...option.title, text: title, subtext: description }, aria: { show: true } }),
     [option, title, description],
