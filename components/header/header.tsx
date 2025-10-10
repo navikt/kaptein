@@ -3,6 +3,7 @@
 import { LeaveIcon } from '@navikt/aksel-icons';
 import { ActionMenu, Spacer } from '@navikt/ds-react';
 import { InternalHeader } from '@navikt/ds-react/InternalHeader';
+import Link from 'next/link';
 import { AppThemeSwitcher } from '@/components/header/app-theme';
 import { Nav } from '@/components/header/nav';
 import type { IUserData } from '@/lib/types';
@@ -10,7 +11,9 @@ import type { IUserData } from '@/lib/types';
 export const Header = ({ user }: { user: IUserData }) => {
   return (
     <InternalHeader>
-      <InternalHeader.Title href="/">Kaptein</InternalHeader.Title>
+      <InternalHeader.Title href="/" as={Link}>
+        Kaptein
+      </InternalHeader.Title>
 
       <Nav />
 
