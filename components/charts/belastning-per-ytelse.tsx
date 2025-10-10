@@ -103,7 +103,6 @@ export const BelastningPerYtelse = ({
       title={title}
       description={`{bold|Mottatt}: ${totalMottatt}. {bold|Ferdigstilt}: ${totalFerdigstilt}. {bold|Endring i restanse}: ${numberWithSign(totalDiff)}.`}
       option={{
-        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { left: 200, right: 100 },
         tooltip: {
           trigger: 'axis',

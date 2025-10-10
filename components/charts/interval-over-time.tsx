@@ -80,7 +80,6 @@ export const IntervalOverTime = <T extends Behandling>({
       )}. {bold|Median}: ${getStatText(globalMedian)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
-        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 225 },
         legend: { bottom: 60 },
         dataZoom: [{ type: 'slider' }],

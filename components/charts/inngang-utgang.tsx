@@ -118,7 +118,6 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       description={`{bold|Mottatt}: ${innTotal}. {bold|Ferdigstilt}: ${utTotal}. {bold|Endring i restanse}: ${sign(diffTotal)}${Math.abs(diffTotal)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
-        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 225 },
         dataZoom: [{ type: 'slider' }],
         yAxis: [

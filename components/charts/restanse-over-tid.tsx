@@ -56,7 +56,6 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Prop
       description={`{bold|Restanse ved periodeslutt}: ${totalRestanse}`}
       getInstance={resetDataZoomOnDblClick}
       option={{
-        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 225 },
         dataZoom: [{ type: 'slider' }],
         legend: {

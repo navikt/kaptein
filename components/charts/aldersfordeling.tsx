@@ -70,7 +70,6 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
       )}. {bold|Median}: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
       option={{
-        title: { subtextStyle: { rich: { bold: { fontWeight: 'bold' } } } },
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Antall' }],

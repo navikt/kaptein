@@ -82,7 +82,16 @@ export const EChart = ({
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const optionWithTitle = useMemo(
-    () => ({ ...option, title: { ...option.title, text: title, subtext: description }, aria: { show: true } }),
+    () => ({
+      ...option,
+      title: {
+        ...option.title,
+        text: title,
+        subtext: description,
+        subtextStyle: { rich: { bold: { fontWeight: 'bold' } } },
+      },
+      aria: { show: true },
+    }),
     [option, title, description],
   );
 
