@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart, LineChart, PieChart } from 'echarts/charts';
+import { BarChart, CustomChart, LineChart, PieChart } from 'echarts/charts';
 import {
   AriaComponent,
   DatasetComponent,
@@ -45,6 +45,7 @@ echarts.use([
   SVGRenderer,
   LineChart,
   PieChart,
+  CustomChart,
   DataZoomComponent,
   DataZoomSliderComponent,
   VisualMapComponent,

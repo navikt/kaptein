@@ -131,16 +131,12 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
           },
           {
             type: 'value',
-            name: 'Trykk %',
+            name: 'Inn ift. ferdigstilte',
             inverse: true, // This makes the axis grow downwards
             position: 'right',
-            max: 100_000,
             show: false, // Hide the axis
             axisPointer: {
               show: false, // Hide the axis pointer on this y-axis
-            },
-            axisLabel: {
-              formatter: '{value} %',
             },
           },
         ],
@@ -219,20 +215,39 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
           },
           {
             id: 'pressure',
-            type: 'bar',
+            type: 'custom',
             data: pressure,
             name: 'Trykk ift. ferdigstilte',
             yAxisIndex: 1,
-            symbol: 'none',
-            barWidth: '100%',
-            barMinHeight: 2,
-            label: {
-              show: false,
-              position: 'top',
-              formatter: '{c} %',
-            },
             emphasis: {
               disabled: true,
+            },
+            renderItem: (
+              _params: { dataIndex: number },
+              api: {
+                value: (dimension: number) => number;
+                coord: (values: number[]) => [number, number]; // [x, y]
+                size: (dims: number[]) => [number, number]; // [width, height]
+              },
+            ) => {
+              const categoryIndex = api.value(0);
+              const value = api.value(1);
+              const [width] = api.size([1, 1]);
+              const [x, y] = api.coord([categoryIndex, 0]);
+
+              return {
+                type: 'rect',
+                shape: {
+                  x: x - width / 2,
+                  y: y,
+                  width: width,
+                  height: 4,
+                },
+                style: {
+                  fill: value > 100 ? 'var(--ax-danger-400A)' : 'var(--ax-success-400A)',
+                },
+                emphasisDisabled: true,
+              };
             },
           },
         ],
