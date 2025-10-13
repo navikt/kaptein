@@ -3,8 +3,9 @@
 import { useMemo } from 'react';
 import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
+import { useAppTheme } from '@/lib/app-theme';
 import { EChart } from '@/lib/echarts/echarts';
-import { getSakstypeColor } from '@/lib/echarts/get-colors';
+import { getSakstypePieChartColor } from '@/lib/echarts/get-colors';
 import type { BaseBehandling, IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 
 interface Props {
@@ -17,6 +18,8 @@ const TITLE = 'Saker per sakstype';
 type Data = { value: number; name: string; itemStyle: { color: string } };
 
 export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
+  const theme = useAppTheme();
+
   const data = useMemo(() => {
     const map = behandlinger.reduce<Map<Sakstype, Data>>((acc, curr) => {
       const existing = acc.get(curr.typeId);
@@ -27,7 +30,7 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
         acc.set(curr.typeId, {
           name: sakstyper.find((s) => s.id === curr.typeId)?.navn ?? (curr.typeId || curr.typeId),
           value: 1,
-          itemStyle: { color: getSakstypeColor(curr.typeId) },
+          itemStyle: { color: getSakstypePieChartColor(curr.typeId, theme) },
         });
       }
 
@@ -35,7 +38,7 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
     }, new Map());
 
     return Object.values(Object.fromEntries(map));
-  }, [behandlinger, sakstyper]);
+  }, [behandlinger, sakstyper, theme]);
 
   if (behandlinger.length === 0) {
     return <NoData title={TITLE} />;

@@ -3,8 +3,13 @@
 import { useMemo } from 'react';
 import { COMMON_PIE_CHART_PROPS, COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
+import { AppTheme, useAppTheme } from '@/lib/app-theme';
+import { browserLog } from '@/lib/browser-log';
+import { ColorToken } from '@/lib/echarts/color-token';
+import { DARK } from '@/lib/echarts/dark';
 import { EChart } from '@/lib/echarts/echarts';
-import { getPåVentReasonColor } from '@/lib/echarts/get-colors';
+import { getPåVentReasonPieChartColor } from '@/lib/echarts/get-colors';
+import { LIGHT } from '@/lib/echarts/light';
 import { percent } from '@/lib/percent';
 import type { BaseBehandling, IKodeverkValue, PåVentReason, Tildelt } from '@/lib/types';
 
@@ -26,8 +31,11 @@ interface Data {
   itemStyle: { color: string };
 }
 
+type Entry = [Key, Data];
+
 export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }: Props) => {
-  type Entry = [Key, Data];
+  const theme = useAppTheme();
+
   const data = useMemo(() => {
     const map: Map<Key, Data> = new Map([
       [
@@ -36,7 +44,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
           id: IKKE_PÅ_VENT_KEY,
           name: IKKE_PÅ_VENT_DESCRIPTION,
           value: 0,
-          itemStyle: { color: 'var(--ax-success-500)' },
+          itemStyle: { color: getNotPåVentColor(theme) },
         },
       ],
       ...påVentReasons.map<Entry>((reason) => [
@@ -45,7 +53,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
           id: reason.id,
           name: reason.beskrivelse,
           value: 0,
-          itemStyle: { color: getPåVentReasonColor(reason.id) },
+          itemStyle: { color: getPåVentReasonPieChartColor(reason.id, theme) },
         },
       ]),
     ]);
@@ -55,33 +63,15 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
       const value = sattPaaVentReasonId ?? IKKE_PÅ_VENT_KEY;
       const existing = map.get(value);
 
-      if (existing !== undefined) {
+      if (existing === undefined) {
+        browserLog.warn(`Could not find på vent reason with id: ${value}`);
+      } else {
         existing.value += 1;
-        continue;
       }
-
-      if (value === IKKE_PÅ_VENT_KEY) {
-        map.set(value, {
-          name: IKKE_PÅ_VENT_DESCRIPTION,
-          value: 1,
-          id: value,
-          itemStyle: { color: 'var(--ax-success-500)' },
-        });
-        continue;
-      }
-
-      const reason = påVentReasons.find((r) => r.id === value);
-
-      map.set(value, {
-        name: reason?.beskrivelse ?? 'Ukjent',
-        value: 1,
-        id: value,
-        itemStyle: { color: reason === undefined ? 'red' : getPåVentReasonColor(reason?.id) },
-      });
     }
 
     return Array.from(map.values());
-  }, [behandlinger, påVentReasons]);
+  }, [behandlinger, påVentReasons, theme]);
 
   const total = behandlinger.length;
 
@@ -111,4 +101,13 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
       }}
     />
   );
+};
+
+const getNotPåVentColor = (theme: AppTheme): string => {
+  switch (theme) {
+    case AppTheme.LIGHT:
+      return LIGHT[ColorToken.Success500];
+    case AppTheme.DARK:
+      return DARK[ColorToken.Success500];
+  }
 };
