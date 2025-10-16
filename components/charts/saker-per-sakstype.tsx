@@ -9,15 +9,15 @@ import { getSakstypePieChartColor } from '@/lib/echarts/get-colors';
 import type { BaseBehandling, IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 
 interface Props {
+  title: string;
+  description: string;
   behandlinger: BaseBehandling[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
-const TITLE = 'Saker per sakstype';
-
 type Data = { value: number; name: string; itemStyle: { color: string } };
 
-export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
+export const SakerPerSakstype = ({ title, description, behandlinger, sakstyper }: Props) => {
   const theme = useAppTheme();
 
   const data = useMemo(() => {
@@ -41,13 +41,13 @@ export const SakerPerSakstype = ({ behandlinger, sakstyper }: Props) => {
   }, [behandlinger, sakstyper, theme]);
 
   if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`Viser data for ${behandlinger.length} saker`}
+      title={title}
+      description={description}
       option={{
         ...COMMON_PIE_CHART_PROPS,
         series: [

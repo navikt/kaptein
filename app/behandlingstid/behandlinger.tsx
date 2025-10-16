@@ -26,9 +26,10 @@ import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { ISO_DATE_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
 import type {
   AnkeFerdigstilt,
+  Avsluttet,
+  BaseBehandling,
   BetongFerdigstilt,
   BetongFerdigstilteResponse,
-  FerdigstiltBehanding,
   KapteinApiResponse,
   KlageFerdigstilt,
   OmgjøringskravFerdigstilt,
@@ -168,7 +169,7 @@ const createMonthBuckets = (from: Date, to: Date): Buckets => {
   return buckets;
 };
 
-const getBehandlingstidWeekBucketKey = (b: FerdigstiltBehanding, from: Date, to: Date) => {
+const getBehandlingstidWeekBucketKey = (b: Avsluttet, from: Date, to: Date) => {
   const finished = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());
 
   if (isBefore(finished, from) || isAfter(finished, endOfDay(to))) {
@@ -178,7 +179,7 @@ const getBehandlingstidWeekBucketKey = (b: FerdigstiltBehanding, from: Date, to:
   return differenceInWeeks(finished, from);
 };
 
-const getBehandlingstidMonthBucketKey = (b: FerdigstiltBehanding, from: Date, to: Date) => {
+const getBehandlingstidMonthBucketKey = (b: Avsluttet, from: Date, to: Date) => {
   const finished = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());
 
   if (isBefore(finished, from) || isAfter(finished, endOfDay(to))) {
@@ -188,7 +189,7 @@ const getBehandlingstidMonthBucketKey = (b: FerdigstiltBehanding, from: Date, to
   return differenceInCalendarMonths(finished, from);
 };
 
-const getBehandlingstid = (b: FerdigstiltBehanding) =>
+const getBehandlingstid = (b: BaseBehandling & Avsluttet) =>
   differenceInDays(
     parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
     parse(b.mottattKlageinstans, ISO_DATE_FORMAT, new Date()),

@@ -17,7 +17,6 @@ const SAKSSTRØM_DEFAULT_FROM = format(startOfMonth(subMonths(NOW, 4)), ISO_DATE
 const SAKSSTRØM_DEFAULT_TO = format(endOfMonth(subMonths(NOW, 1)), ISO_DATE_FORMAT);
 
 export const Nav = () => {
-  const pathname = usePathname();
   const params = useSearchParams();
 
   const setDefaultParams = useCallback((searchParams: URLSearchParams) => {
@@ -73,38 +72,46 @@ export const Nav = () => {
 
   return (
     <>
-      <InternalHeader.Button
-        as={Link}
-        className={pathname === '/aktive' ? ACTIVE_CLASS : ''}
-        href={`/aktive?${aktiveParams}`}
-      >
+      <NavLink path="/aktive" params={aktiveParams}>
         Aktive saker
-      </InternalHeader.Button>
+      </NavLink>
 
-      <InternalHeader.Button
-        as={Link}
-        className={pathname === '/ferdigstilte' ? ACTIVE_CLASS : ''}
-        href={`/ferdigstilte?${ferdigstilteParams}`}
-      >
+      <NavLink path="/ferdigstilte" params={ferdigstilteParams}>
         Ferdigstilte saker
-      </InternalHeader.Button>
+      </NavLink>
 
-      <InternalHeader.Button
-        as={Link}
-        className={pathname === '/saksstroem' ? ACTIVE_CLASS : ''}
-        href={`/saksstroem?${saksstrømParams}`}
-      >
+      <NavLink path="/saksstroem" params={saksstrømParams}>
         Saksstrøm
-      </InternalHeader.Button>
+      </NavLink>
 
-      <InternalHeader.Button
-        as={Link}
-        className={pathname === '/behandlingstid' ? ACTIVE_CLASS : ''}
-        // Same as ferdigstilteParams for now
-        href={`/behandlingstid?${ferdigstilteParams}`}
-      >
+      {/* Same as ferdigstilteParams for now */}
+      <NavLink path="/behandlingstid" params={ferdigstilteParams}>
         Behandlingstid
-      </InternalHeader.Button>
+      </NavLink>
+
+      <NavLink path="/aktive-anker-i-tr" params={aktiveParams}>
+        Aktive anker i TR
+      </NavLink>
+
+      <NavLink path="/ferdigstilte-anker-i-tr" params={ferdigstilteParams}>
+        Ferdigstilte anker i TR
+      </NavLink>
     </>
+  );
+};
+
+interface Props {
+  path: string;
+  params: string;
+  children: React.ReactNode;
+}
+
+const NavLink = ({ path, params, children }: Props) => {
+  const pathname = usePathname();
+
+  return (
+    <InternalHeader.Button as={Link} className={pathname === path ? ACTIVE_CLASS : ''} href={`${path}?${params}`}>
+      {children}
+    </InternalHeader.Button>
   );
 };

@@ -4,14 +4,14 @@ import { useMemo } from 'react';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, Ferdigstilt, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
+import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
 export type Bucket = { inn: number; ut: number; label: string };
 export type Buckets = Record<number, Bucket>;
 
 interface Props {
   title: string;
-  ferdigstilteInPeriod: (BaseBehandling & Ferdigstilt)[];
+  ferdigstilteInPeriod: (BaseBehandling & Avsluttet)[];
   mottattInPeriod: (BaseBehandling & (Ledig | Tildelt))[];
   outgoingRestanse: BaseBehandling[];
   ytelser: IKodeverkSimpleValue[];
@@ -245,7 +245,7 @@ const countMottattInPeriod = (
 };
 
 const countFerdigstiltInPeriod = (
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[],
+  ferdigstilte: (BaseBehandling & Avsluttet)[],
   fromFilter: string,
   toFilter: string,
   ytelseMap: Map<string, { mottatt: number; ferdigstilt: number }>,

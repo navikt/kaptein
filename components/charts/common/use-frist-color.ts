@@ -47,33 +47,3 @@ export const getFristColor = (exceededFrist: ExceededFrist) => {
       return 'var(--ax-neutral-400)';
   }
 };
-
-export enum Age {
-  OLDER = 'Eldre',
-  YOUNGER = 'Yngre',
-}
-
-export const useAgePieChartColors = (data: { name: string }[]) => {
-  const themeName = useAppTheme();
-  const theme = getTheme(themeName);
-
-  return data.map(({ name }) => {
-    switch (name) {
-      case Age.OLDER:
-        return theme[ColorToken.Danger600];
-      case Age.YOUNGER:
-        return theme[ColorToken.Accent500];
-      default:
-        return theme[ColorToken.Neutral400];
-    }
-  });
-};
-
-export const getAgeColor = (age: Age) => {
-  switch (age) {
-    case Age.OLDER:
-      return 'var(--ax-danger-600)';
-    case Age.YOUNGER:
-      return 'var(--ax-accent-500)';
-  }
-};

@@ -1,12 +1,12 @@
 'use client';
 
 import { Card } from '@/components/cards';
-import { Alder } from '@/components/charts/alder';
-import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
+import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
+import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
 import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
 import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
@@ -110,16 +110,28 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
   return (
     <ChartsWrapper>
       <Card span={4}>
-        <SakerPerYtelseOgSakstype behandlinger={behandlinger} sakstyper={sakstyper} relevantYtelser={relevantYtelser} />
+        <SakerPerYtelseOgSakstype
+          title="Ferdigstilte saker per ytelse og sakstype"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+          sakstyper={sakstyper}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card>
-        <SakerPerSakstype behandlinger={behandlinger} sakstyper={sakstyper} />
+        <SakerPerSakstype
+          title="Ferdigstilte saker per sakstype"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+          sakstyper={sakstyper}
+        />
       </Card>
 
       <Card>
         <TildelteSakerPerKlageenhet
-          title="Saker per klageenhet"
+          title="Ferdigstilte saker per klageenhet"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
           behandlinger={behandlinger}
           klageenheter={klageenheter}
         />
@@ -127,7 +139,8 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
 
       <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
-          title="Saker per ytelse og klageenhet"
+          title="Ferdigstilte saker per ytelse og klageenhet"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
           behandlinger={behandlinger}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
@@ -135,27 +148,56 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
       </Card>
 
       <Card>
-        <VarsletFrist behandlinger={behandlinger} />
+        <VarsletFrist
+          title="Varslet frist"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+        />
       </Card>
 
       <Card>
-        <FristIKabal behandlinger={behandlinger} />
+        <FristIKabal
+          title="Frist i Kabal"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+        />
       </Card>
 
       <Card span={4}>
-        <VarsletFristPerYtelse behandlinger={behandlinger} relevantYtelser={relevantYtelser} />
+        <VarsletFristPerYtelse
+          title="Varslet frist per ytelse"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card span={4}>
-        <FristPerYtelse behandlinger={behandlinger} relevantYtelser={relevantYtelser} />
+        <FristPerYtelse
+          title="Frist per ytelse"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card span={2}>
-        <Alder behandlinger={behandlinger} />
+        <DaysThresholdPieChart
+          title="Behandlingstid"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+          getDays={(b) => b.behandlingstid}
+        />
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse behandlinger={behandlinger} relevantYtelser={relevantYtelser} />
+        <DaysThresholdPerYtelse
+          title="Behandlingstid per ytelse"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          behandlinger={behandlinger}
+          relevantYtelser={relevantYtelser}
+          getDays={(b) => b.behandlingstid}
+        />
       </Card>
     </ChartsWrapper>
   );

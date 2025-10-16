@@ -10,12 +10,12 @@ import { EChart } from '@/lib/echarts/echarts';
 import { type FristBehandling, isFerdigstilt } from '@/lib/types';
 
 interface Props {
+  title: string;
+  description: string;
   behandlinger: FristBehandling[];
 }
 
-const TITLE = 'Frist i Kabal';
-
-export const FristIKabal = ({ behandlinger }: Props) => {
+export const FristIKabal = ({ title, description, behandlinger }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Record<ExceededFrist, number>>(
       (acc, curr) => {
@@ -40,13 +40,13 @@ export const FristIKabal = ({ behandlinger }: Props) => {
   const color = useFristPieChartColors(data);
 
   if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`Viser data for ${behandlinger.length} saker`}
+      title={title}
+      description={description}
       option={{
         ...COMMON_PIE_CHART_PROPS,
         series: [

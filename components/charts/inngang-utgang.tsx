@@ -5,16 +5,17 @@ import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-z
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, Ferdigstilt, Ledig, Tildelt } from '@/lib/types';
+import { sign } from '@/lib/sign';
+import type { Avsluttet, BaseBehandling, Ledig, Tildelt } from '@/lib/types';
 
 export type Bucket = { inn: number; ut: number; label: string };
 export type Buckets = Record<number, Bucket>;
 
 interface Props {
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[];
+  ferdigstilte: (BaseBehandling & Avsluttet)[];
   uferdigeList: (BaseBehandling & (Ledig | Tildelt))[];
   getInBucketIndex: (b: BaseBehandling, from: string) => number;
-  getOutBucketIndex: (b: Ferdigstilt, from: string) => number;
+  getOutBucketIndex: (b: Avsluttet, from: string) => number;
   createBuckets: (from: string, to: string) => Buckets;
   title: string;
 }
@@ -254,18 +255,6 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       }}
     />
   );
-};
-
-const sign = (n: number): string => {
-  if (n > 0) {
-    return '+';
-  }
-
-  if (n < 0) {
-    return '-';
-  }
-
-  return '';
 };
 
 const getNiceMax = (data: number[], padding = 10): number => {

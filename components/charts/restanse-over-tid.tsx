@@ -9,11 +9,12 @@ import { NoData } from '@/components/no-data/no-data';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { YTELSE_COLOR_MAP } from '@/lib/echarts/color-token';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, Ferdigstilt, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
+import { sign } from '@/lib/sign';
+import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
 interface Props {
   title: string;
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[];
+  ferdigstilte: (BaseBehandling & Avsluttet)[];
   uferdige: (BaseBehandling & (Ledig | Tildelt))[];
   ytelser: IKodeverkSimpleValue[];
 }
@@ -39,22 +40,33 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Prop
     };
   }, [ferdigstilte, uferdige, fromFilter, toFilter, ytelser]);
 
-  const totalRestanse = useMemo(() => {
+  const { startRestanse, endRestanse } = useMemo(() => {
     if (ytelseSeriesData.length === 0) {
-      return 0;
+      return { startRestanse: 0, endRestanse: 0 };
     }
+
+    let endRestanse = 0;
+    let startRestanse = 0;
+
     // Sum up the latest restanse value for each ytelse
-    return ytelseSeriesData.reduce((sum, { restanseOverTime }) => sum + (restanseOverTime.at(-1) ?? 0), 0);
+    for (const { restanseOverTime } of ytelseSeriesData) {
+      endRestanse += restanseOverTime.at(-1) ?? 0;
+      startRestanse += restanseOverTime[0] ?? 0;
+    }
+
+    return { startRestanse, endRestanse };
   }, [ytelseSeriesData]);
 
   if (labels.length === 0 || ytelseSeriesData.length === 0) {
     return <NoData title={title} />;
   }
 
+  const diff = endRestanse - startRestanse;
+
   return (
     <EChart
       title={title}
-      description={`{bold|Restanse ved periodeslutt}: ${totalRestanse}`}
+      description={`{bold|Restanse ved periodestart}: ${startRestanse} {bold|Restanse ved periodeslutt}: ${endRestanse} {bold|Endring}: ${sign(diff)}${Math.abs(diff)}`}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 225 },
@@ -114,7 +126,7 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Prop
 const calculateRestansePerDayPerYtelse = (
   days: string[],
   uferdige: (BaseBehandling & (Ledig | Tildelt))[],
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[],
+  ferdigstilte: (BaseBehandling & Avsluttet)[],
   ytelser: IKodeverkSimpleValue[],
 ) => {
   const restanseMap = new Map<string, Map<string, number>>();

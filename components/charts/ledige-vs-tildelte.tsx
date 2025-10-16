@@ -39,7 +39,7 @@ export const LedigeVsTildelte = ({ behandlinger }: Props) => {
   return (
     <EChart
       title={TITLE}
-      description={`Viser data for ${behandlinger.length} saker`}
+      description={`Viser data for ${behandlinger.length} aktive saker`}
       option={{
         ...COMMON_PIE_CHART_PROPS,
         series: [

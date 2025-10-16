@@ -5,10 +5,10 @@ import { useMemo } from 'react';
 import { parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
-import type { BaseBehandling, Ferdigstilt, Frist, Ledig, Tildelt } from '@/lib/types';
+import type { Avsluttet, BaseBehandling, Ferdigstilt, Frist } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
-export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Ferdigstilt & Frist)[]) => {
+export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Avsluttet & Ferdigstilt & Frist)[]) => {
   const baseFiltered = useBaseFiltered(behandlinger);
   const ferdigstiltInPeriod = useFerdigstiltInPeriod(baseFiltered);
   const resultatFiltered = useResultatFiltered(ferdigstiltInPeriod);
@@ -16,7 +16,7 @@ export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Ferdigst
   return resultatFiltered;
 };
 
-export const useFerdigstiltInPeriod = <T extends Ferdigstilt>(ferdigstilteBehandlinger: T[]) => {
+export const useFerdigstiltInPeriod = <T extends Avsluttet>(ferdigstilteBehandlinger: T[]) => {
   const { fromFilter, toFilter } = useDateFilter();
 
   return useMemo(() => {
@@ -36,8 +36,8 @@ export const useFerdigstiltInPeriod = <T extends Ferdigstilt>(ferdigstilteBehand
 };
 
 export const getRestanseAfterDate = (
-  uferdige: (BaseBehandling & (Tildelt | Ledig))[],
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[],
+  uferdige: BaseBehandling[],
+  ferdigstilte: (BaseBehandling & Avsluttet)[],
   date: string,
 ) => {
   const restanse: BaseBehandling[] = [];
@@ -66,7 +66,7 @@ export const useMottattInPeriod = <T extends BaseBehandling>(behandlinger: T[]) 
   );
 };
 
-export const useResultatFiltered = <T extends Ferdigstilt>(ferdigstilteBehandlinger: T[]) => {
+export const useResultatFiltered = <T extends Ferdigstilt & Avsluttet>(ferdigstilteBehandlinger: T[]) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
 
@@ -86,10 +86,6 @@ export const useResultatFiltered = <T extends Ferdigstilt>(ferdigstilteBehandlin
     return filteredForUtfall;
   }, [ferdigstilteBehandlinger, registreringshjemlerFilter, utfallFilter]);
 };
-
-export const useAktive = <T extends BaseBehandling>(behandlinger: T[]) => useBaseFiltered<T>(behandlinger);
-
-export const useTildelte = <T extends BaseBehandling & Tildelt>(behandlinger: T[]) => useBaseFiltered<T>(behandlinger);
 
 export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
