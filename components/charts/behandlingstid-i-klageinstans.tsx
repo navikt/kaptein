@@ -7,13 +7,13 @@ import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-z
 import { NoData } from '@/components/no-data/no-data';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, Ferdigstilt } from '@/lib/types';
+import type { Avsluttet, BaseBehandling } from '@/lib/types';
 
 type Bucket = { count: number; label: string };
 type Buckets = Record<number, Bucket>;
 
 interface Props {
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[];
+  ferdigstilte: (BaseBehandling & Avsluttet)[];
 }
 
 const TITLE = 'Behandlingstid i klageinstans';

@@ -78,6 +78,41 @@ export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }
   );
 };
 
+export const YtelserAndInnsendingsAndRegistreringshjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
+  const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
+  const [, setSelectedInnsendingsHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [, setSelectedRegistreringsHjemler] = useQueryState(
+    QueryParam.REGISTRERINGSHJEMLER,
+    parseAsArrayOf(parseAsString),
+  );
+
+  return (
+    <>
+      <MultiselectFilter
+        label="Ytelser"
+        selected={selectedYtelser}
+        setSelected={(v) => {
+          setSelectedYtelser(v);
+          setSelectedInnsendingsHjemler(null);
+          setSelectedRegistreringsHjemler(null);
+        }}
+        options={ytelserOptions}
+      />
+
+      <SubFilter>
+        <Innsendingshjemler relevantYtelser={relevantKodeverk} />
+      </SubFilter>
+
+      <SubFilter>
+        <Registreringshjemler
+          relevantYtelser={relevantKodeverk}
+          lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
+        />
+      </SubFilter>
+    </>
+  );
+};
+
 export const YtelserAndAllHjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));

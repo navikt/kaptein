@@ -6,18 +6,18 @@ import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
-import { Alder } from '@/components/charts/alder';
-import { AlderPerYtelse } from '@/components/charts/alder-per-ytelse';
-import { Aldersfordeling } from '@/components/charts/aldersfordeling';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonAktive } from '@/components/charts/common/skeleton-chart';
-import { useAktive, useTildelte } from '@/components/charts/common/use-data';
+import { useBaseFiltered } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
+import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
+import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
 import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
 import { LedigeVsTildelte } from '@/components/charts/ledige-vs-tildelte';
 import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/charts/saker-per-ytelse-og-sakstype';
+import { Tidsfordeling } from '@/components/charts/tidsfordeling';
 import { TildelteSakerPerKlageenhet } from '@/components/charts/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
 import { TildelteSakerPåVentIkkePåVent } from '@/components/charts/tildelte-saker-på-vent-ikke-på-vent';
@@ -201,14 +201,16 @@ const BehandlingerData = ({
     return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige, ...tildelte];
   }, [tildelingFilter, klagerLedige, ankerLedige, betongLedige, omgjøringskravLedige, tildelte]);
 
-  const filteredBehandlinger = useAktive(behandlinger);
-  const filteredTildelte = useTildelte(tildelte);
+  const filteredBehandlinger = useBaseFiltered(behandlinger);
+  const filteredTildelte = useBaseFiltered(tildelte);
   const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
 
   return (
     <ChartsWrapper>
       <Card span={4}>
         <SakerPerYtelseOgSakstype
+          title="Aktive saker per ytelse og sakstype"
+          description={`Viser data for ${behandlinger.length} aktive saker`}
           behandlinger={filteredBehandlinger}
           sakstyper={sakstyper}
           relevantYtelser={relevantYtelser}
@@ -216,7 +218,12 @@ const BehandlingerData = ({
       </Card>
 
       <Card>
-        <SakerPerSakstype behandlinger={filteredBehandlinger} sakstyper={sakstyper} />
+        <SakerPerSakstype
+          title="Aktive saker per sakstype"
+          description={`Viser data for ${behandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+          sakstyper={sakstyper}
+        />
       </Card>
 
       {showsAlle ? (
@@ -234,6 +241,8 @@ const BehandlingerData = ({
       {showsLedige ? null : (
         <Card span={4}>
           <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
+            title="Årsaker for saker på vent gruppert etter ytelse"
+            description={`Antall aktive saker på vent: ${filteredTildelte.length}`}
             behandlinger={filteredTildelte}
             relevantYtelser={relevantYtelser}
             påVentReasons={påVentReasons}
@@ -244,9 +253,10 @@ const BehandlingerData = ({
       {showsLedige ? null : (
         <Card>
           <TildelteSakerPerKlageenhet
+            title="Tildelte saker per klageenhet"
+            description={`Viser data for ${behandlinger.length} tildelte saker`}
             behandlinger={filteredTildelte}
             klageenheter={klageenheter}
-            title="Tildelte saker per klageenhet"
           />
         </Card>
       )}
@@ -255,6 +265,7 @@ const BehandlingerData = ({
         <Card span={4}>
           <TildelteSakerPerYtelseOgKlageenhet
             title="Tildelte saker per ytelse og klageenhet"
+            description={`Viser data for ${filteredTildelte.length} tildelte saker`}
             behandlinger={filteredTildelte}
             klageenheter={klageenheter}
             relevantYtelser={relevantYtelser}
@@ -263,31 +274,58 @@ const BehandlingerData = ({
       )}
 
       <Card>
-        <VarsletFrist behandlinger={filteredBehandlinger} />
+        <VarsletFrist
+          title="Varslet frist"
+          description={`Viser data for ${behandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+        />
       </Card>
 
       <Card>
-        <FristIKabal behandlinger={filteredBehandlinger} />
+        <FristIKabal
+          title="Frist i Kabal"
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+        />
       </Card>
 
       <Card span={4}>
-        <VarsletFristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+        <VarsletFristPerYtelse
+          title="Varslet frist per ytelse"
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card span={4}>
-        <FristPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+        <FristPerYtelse
+          title="Frist per ytelse"
+          description={`Viser data for ${behandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card span={2}>
-        <Alder behandlinger={filteredBehandlinger} />
+        <DaysThresholdPieChart
+          title="Alder"
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+        />
       </Card>
 
       <Card span={4}>
-        <AlderPerYtelse behandlinger={filteredBehandlinger} relevantYtelser={relevantYtelser} />
+        <DaysThresholdPerYtelse
+          title="Alder"
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          behandlinger={filteredBehandlinger}
+          relevantYtelser={relevantYtelser}
+        />
       </Card>
 
       <Card fullWidth span={4}>
-        <Aldersfordeling uferdigeList={filteredBehandlinger} />
+        <Tidsfordeling title="Aldersfordeling" behandlinger={filteredBehandlinger} getDays={(b) => b.ageKA} />
       </Card>
     </ChartsWrapper>
   );

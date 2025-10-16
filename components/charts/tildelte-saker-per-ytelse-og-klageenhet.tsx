@@ -7,11 +7,12 @@ import {
 } from '@/components/charts/common/common-chart-props';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, IKodeverkSimpleValue, Tildelt } from '@/lib/types';
+import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
 
 interface Props {
   title: string;
-  behandlinger: (BaseBehandling & Tildelt)[];
+  description: string;
+  behandlinger: (BaseBehandling & { tildeltEnhet: string })[];
   relevantYtelser: IKodeverkSimpleValue[];
   klageenheter: IKodeverkSimpleValue[];
 }
@@ -19,12 +20,13 @@ interface Props {
 export const TildelteSakerPerYtelseOgKlageenhet = ({
   behandlinger,
   relevantYtelser,
-  klageenheter: klageenheterkodeverk,
+  klageenheter,
   title,
+  description,
 }: Props) => {
   const series = useMemo(
     () =>
-      [...klageenheterkodeverk].map((enhet) => ({
+      klageenheter.map((enhet) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: enhet.navn,
         data: relevantYtelser
@@ -36,7 +38,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
           )
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, relevantYtelser, klageenheterkodeverk],
+    [behandlinger, relevantYtelser, klageenheter],
   );
 
   const labels = useMemo(
@@ -51,7 +53,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
   return (
     <EChart
       title={title}
-      description={`Viser data for ${behandlinger.length} tildelte saker`}
+      description={description}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },

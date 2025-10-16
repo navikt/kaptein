@@ -37,11 +37,11 @@ import type {
   AnkerFerdigstilteResponse,
   AnkerLedigeResponse,
   AnkerTildelteResponse,
+  Avsluttet,
   BaseBehandling,
   BetongFerdigstilteResponse,
   BetongLedigeResponse,
   BetongTildelteResponse,
-  Ferdigstilt,
   IYtelse,
   KlagerFerdigstilteResponse,
   KlagerLedigeResponse,
@@ -201,7 +201,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
 interface DataProps extends KodeverkProps {
   ledige: (BaseBehandling & Ledig)[];
   tildelte: (BaseBehandling & Tildelt)[];
-  ferdigstilte: (BaseBehandling & Ferdigstilt)[];
+  ferdigstilte: (BaseBehandling & Avsluttet)[];
 }
 
 const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps) => {
@@ -319,7 +319,7 @@ const getWeekInBucketIndex = (b: BaseBehandling, from: string): number =>
     parse(from, ISO_DATE_FORMAT, new Date()),
   );
 
-const getWeekOutBucketIndex = (b: Ferdigstilt, from: string): number =>
+const getWeekOutBucketIndex = (b: Avsluttet, from: string): number =>
   differenceInWeeks(
     parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
     parse(from, ISO_DATE_FORMAT, new Date()),
@@ -331,7 +331,7 @@ const getMonthInBucketIndex = (b: BaseBehandling, from: string) =>
     parse(from, ISO_DATE_FORMAT, new Date()),
   );
 
-const getMonthOutBucketIndex = (b: Ferdigstilt, from: string) =>
+const getMonthOutBucketIndex = (b: Avsluttet, from: string) =>
   differenceInCalendarMonths(
     parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date()),
     parse(from, ISO_DATE_FORMAT, new Date()),

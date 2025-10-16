@@ -11,14 +11,14 @@ import { getSakstypeColor } from '@/lib/echarts/get-colors';
 import type { BaseBehandling, IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 
 interface Props {
+  title: string;
+  description: string;
   behandlinger: BaseBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 
-const TITLE = 'Saker per ytelse og sakstype';
-
-export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, sakstyper }: Props) => {
+export const SakerPerYtelseOgSakstype = ({ title, description, behandlinger, relevantYtelser, sakstyper }: Props) => {
   const series = useMemo(
     () =>
       sakstyper.map((type) => ({
@@ -46,13 +46,13 @@ export const SakerPerYtelseOgSakstype = ({ behandlinger, relevantYtelser, saksty
   );
 
   if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`Viser data for ${behandlinger.length} saker`}
+      title={title}
+      description={description}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },
