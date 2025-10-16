@@ -82,15 +82,22 @@ export interface Tildelt {
   tildeltEnhet: string;
 }
 
-export interface Ferdigstilt {
+interface Resultat {
+  utfallId: string;
+  registreringshjemmelIdList: string[];
+}
+
+export interface Avsluttet {
   avsluttetAvSaksbehandlerDate: string;
+  /** Days */
+  behandlingstid: number;
+}
+
+export interface Ferdigstilt {
   tildeltEnhet: string;
   isTildelt: true;
   sattPaaVentReasonId: never;
-  resultat: {
-    utfallId: string;
-    registreringshjemmelIdList: string[];
-  };
+  resultat: Resultat;
 }
 
 export interface Frist {
@@ -101,7 +108,7 @@ export interface Frist {
 // Klage
 export type KlageLedig = BaseBehandling<Sakstype.KLAGE> & Ledig & Frist;
 export type KlageTildelt = BaseBehandling<Sakstype.KLAGE> & Tildelt & Frist;
-export type KlageFerdigstilt = BaseBehandling<Sakstype.KLAGE> & Ferdigstilt & Frist;
+export type KlageFerdigstilt = BaseBehandling<Sakstype.KLAGE> & Ferdigstilt & Avsluttet & Frist;
 
 export type KlagerLedigeResponse = KapteinApiResponse<KlageLedig>;
 export type KlagerTildelteResponse = KapteinApiResponse<KlageTildelt>;
@@ -110,7 +117,7 @@ export type KlagerFerdigstilteResponse = KapteinApiResponse<KlageFerdigstilt>;
 // Anke
 export type AnkeLedig = BaseBehandling<Sakstype.ANKE> & Ledig & Frist;
 export type AnkeTildelt = BaseBehandling<Sakstype.ANKE> & Tildelt & Frist;
-export type AnkeFerdigstilt = BaseBehandling<Sakstype.ANKE> & Ferdigstilt & Frist;
+export type AnkeFerdigstilt = BaseBehandling<Sakstype.ANKE> & Ferdigstilt & Avsluttet & Frist;
 
 export type AnkerLedigeResponse = KapteinApiResponse<AnkeLedig>;
 export type AnkerTildelteResponse = KapteinApiResponse<AnkeTildelt>;
@@ -119,7 +126,7 @@ export type AnkerFerdigstilteResponse = KapteinApiResponse<AnkeFerdigstilt>;
 // Behandling etter TR opphevet
 export type BetongLedig = BaseBehandling<Sakstype.BEHANDLING_ETTER_TR_OPPHEVET> & Ledig & Frist;
 export type BetongTildelt = BaseBehandling<Sakstype.BEHANDLING_ETTER_TR_OPPHEVET> & Tildelt & Frist;
-export type BetongFerdigstilt = BaseBehandling<Sakstype.BEHANDLING_ETTER_TR_OPPHEVET> & Ferdigstilt & Frist;
+export type BetongFerdigstilt = BaseBehandling<Sakstype.BEHANDLING_ETTER_TR_OPPHEVET> & Ferdigstilt & Avsluttet & Frist;
 
 export type BetongLedigeResponse = KapteinApiResponse<BetongLedig>;
 export type BetongTildelteResponse = KapteinApiResponse<BetongTildelt>;
@@ -128,11 +135,39 @@ export type BetongFerdigstilteResponse = KapteinApiResponse<BetongFerdigstilt>;
 // Omgjøringskrav
 export type OmgjøringskravLedig = BaseBehandling<Sakstype.OMGJØRINGSKRAV> & Ledig & Frist;
 export type OmgjøringskravTildelt = BaseBehandling<Sakstype.OMGJØRINGSKRAV> & Tildelt & Frist;
-export type OmgjøringskravFerdigstilt = BaseBehandling<Sakstype.OMGJØRINGSKRAV> & Ferdigstilt & Frist;
+export type OmgjøringskravFerdigstilt = BaseBehandling<Sakstype.OMGJØRINGSKRAV> & Ferdigstilt & Avsluttet & Frist;
 
 export type OmgjøringskravLedigeResponse = KapteinApiResponse<OmgjøringskravLedig>;
 export type OmgjøringskravTildelteResponse = KapteinApiResponse<OmgjøringskravTildelt>;
 export type OmgjøringskravFerdigstilteResponse = KapteinApiResponse<OmgjøringskravFerdigstilt>;
+
+// Anke i Trygderetten
+export interface BaseAnkeITR extends BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN> {
+  previousRegistreringshjemmelIdList: string[] | null;
+  sendtTilTR: string;
+  isTildelt: boolean;
+  tildeltEnhet: string | null;
+  avsluttetAvSaksbehandlerDate?: string;
+}
+
+export type AnkeITRLedig = BaseAnkeITR & {
+  isTildelt: false;
+  tildeltEnhet: string | null; // Is null for old migrated cases where the previous case is not known or possible to deduct.
+};
+export type AnkeITRTildelt = BaseAnkeITR & {
+  isTildelt: true;
+  tildeltEnhet: string;
+};
+export type AnkeITRFerdigstilt = BaseAnkeITR &
+  Avsluttet & {
+    isTildelt: true;
+    tildeltEnhet: string;
+    resultat: Resultat | null;
+  };
+
+export type AnkerITRLedigeResponse = KapteinApiResponse<AnkeITRLedig>;
+export type AnkerITRTildelteResponse = KapteinApiResponse<AnkeITRTildelt>;
+export type AnkerITRFerdigstilteResponse = KapteinApiResponse<AnkeITRFerdigstilt>;
 
 export interface KapteinApiResponse<T> {
   behandlinger: T[];
@@ -162,7 +197,7 @@ export interface SakstypeToUtfall extends IKodeverkSimpleValue<Sakstype> {
   utfall: IKodeverkSimpleValue[];
 }
 
-export const isFerdigstilt = (b: Ledig | Tildelt | Ferdigstilt | BaseBehandling): b is Ferdigstilt =>
+export const isFerdigstilt = (b: BaseBehandling | Avsluttet): b is Avsluttet =>
   'avsluttetAvSaksbehandlerDate' in b && typeof b.avsluttetAvSaksbehandlerDate === 'string';
 
 export type FristBehandling = BaseBehandling & Frist & (Ferdigstilt | Ledig | Tildelt);

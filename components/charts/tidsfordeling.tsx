@@ -6,13 +6,15 @@ import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-z
 import { NoData } from '@/components/no-data/no-data';
 import { browserLog } from '@/lib/browser-log';
 import { EChart } from '@/lib/echarts/echarts';
-import type { BaseBehandling, Ledig, Tildelt } from '@/lib/types';
+import type { BaseBehandling } from '@/lib/types';
 
 type Bucket = { count: number; label: string };
 type Buckets = Record<number, Bucket>;
 
-interface Props {
-  uferdigeList: (BaseBehandling & (Ledig | Tildelt))[];
+interface Props<T extends BaseBehandling> {
+  title: string;
+  behandlinger: T[];
+  getDays?: (b: T) => number;
 }
 
 interface Data {
@@ -22,20 +24,22 @@ interface Data {
   avg: number | null;
 }
 
-const TITLE = 'Aldersfordeling';
-
-export const Aldersfordeling = ({ uferdigeList }: Props) => {
+export const Tidsfordeling = <T extends BaseBehandling>({
+  title,
+  behandlinger,
+  getDays = (b) => b.ageKA,
+}: Props<T>) => {
   const { labels, data, median, avg } = useMemo<Data>(() => {
-    const maxAge = uferdigeList.reduce((max, b) => (b.ageKA > max ? b.ageKA : max), 0);
+    const maxDays = behandlinger.reduce((max, b) => Math.max(getDays(b), max), 0);
 
-    const buckets: Buckets = new Array(Math.floor(maxAge / 7) + 1).fill(null).reduce<Buckets>((acc, _, i) => {
+    const buckets: Buckets = new Array(Math.floor(maxDays / 7) + 1).fill(null).reduce<Buckets>((acc, _, i) => {
       acc[i] = { count: 0, label: `${i}-${i + 1} uker` };
 
       return acc;
     }, {});
 
-    for (const b of uferdigeList) {
-      const index = Math.floor(b.ageKA / 7);
+    for (const b of behandlinger) {
+      const index = Math.floor(getDays(b) / 7);
 
       const bucket = buckets[index];
 
@@ -48,24 +52,24 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
     }
 
     const values = Object.values(buckets);
-    const ages = uferdigeList.map((b) => b.ageKA);
+    const days = behandlinger.map((b) => getDays(b));
 
     return {
       labels: values.map((b) => b.label),
       data: values.map((b) => b.count),
-      median: getMedian(ages),
-      avg: getAvg(ages),
+      median: getMedian(days),
+      avg: getAvg(days),
     };
-  }, [uferdigeList]);
+  }, [behandlinger, getDays]);
 
-  if (uferdigeList.length === 0 || labels.length === 0) {
-    return <NoData title={TITLE} />;
+  if (behandlinger.length === 0 || labels.length === 0) {
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`{bold|Totalt} ${uferdigeList.length} aktive saker. {bold|Gjennomsnitt}: ${getStatText(
+      title={title}
+      description={`{bold|Totalt} ${behandlinger.length} aktive saker. {bold|Gjennomsnitt}: ${getStatText(
         avg,
       )}. {bold|Median}: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
@@ -73,7 +77,7 @@ export const Aldersfordeling = ({ uferdigeList }: Props) => {
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],
         yAxis: [{ type: 'value', name: 'Antall' }],
-        xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: 'Alder' },
+        xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 } },
         tooltip: { trigger: 'axis' },
         series: [{ type: 'bar', data: data, name: 'Aktive' }],
       }}

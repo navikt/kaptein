@@ -17,14 +17,16 @@ import {
 } from '@/lib/types';
 
 interface Props {
+  title: string;
+  description: string;
   behandlinger: (BaseBehandling & Tildelt)[];
   relevantYtelser: IKodeverkSimpleValue[];
   påVentReasons: IKodeverkValue<PåVentReason>[];
 }
 
-const TITLE = 'Årsaker for behandlinger på vent gruppert etter ytelse';
-
 export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
+  title,
+  description,
   behandlinger,
   relevantYtelser,
   påVentReasons,
@@ -55,13 +57,13 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
   );
 
   if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`Antall behandlinger på vent: ${påVentBehandlinger.length}`}
+      title={title}
+      description={description}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },

@@ -13,11 +13,11 @@ import { EChart } from '@/lib/echarts/echarts';
 import { type FristBehandling, type IKodeverkSimpleValue, isFerdigstilt } from '@/lib/types';
 
 interface Props {
+  title: string;
+  description: string;
   behandlinger: FristBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
 }
-
-const TITLE = 'Varslet frist per ytelse';
 
 const getData = (behandling: FristBehandling, exceeded: ExceededFrist): number => {
   switch (exceeded) {
@@ -42,7 +42,7 @@ const getData = (behandling: FristBehandling, exceeded: ExceededFrist): number =
   }
 };
 
-export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) => {
+export const VarsletFristPerYtelse = ({ title, description, behandlinger, relevantYtelser }: Props) => {
   const series = useMemo(
     () =>
       Object.values(ExceededFrist).map((type) => ({
@@ -66,13 +66,13 @@ export const VarsletFristPerYtelse = ({ behandlinger, relevantYtelser }: Props) 
   );
 
   if (behandlinger.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`Viser data for ${behandlinger.length} saker`}
+      title={title}
+      description={description}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },
