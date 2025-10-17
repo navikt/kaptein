@@ -22,6 +22,7 @@ import type {
   IKodeverkSimpleValue,
   IYtelse,
   RegistreringshjemlerMap,
+  Utfall,
 } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -29,6 +30,7 @@ interface KodeverkProps {
   ytelser: IYtelse[];
   klageenheter: IKodeverkSimpleValue[];
   registreringshjemlerMap: RegistreringshjemlerMap;
+  utfall: IKodeverkSimpleValue<Utfall>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -53,14 +55,14 @@ interface DataProps extends KodeverkProps {
   ferdigstilte: AnkeITRFerdigstilt[];
 }
 
-const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshjemlerMap }: DataProps) => {
+const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshjemlerMap, utfall }: DataProps) => {
   const ferdigstilteFiltered = useUtfallFilter(useAnkeITRFilter(useFerdigstiltInPeriod(useBaseFiltered(ferdigstilte))));
   const relevantYtelser = useRelevantYtelser(ferdigstilteFiltered, ytelser);
 
   return (
     <ChartsWrapper>
-      <Card span={2}>
-        <Omgjøringsprosent behandlinger={ferdigstilteFiltered} />
+      <Card span={3}>
+        <Omgjøringsprosent behandlinger={ferdigstilteFiltered} utfall={utfall} />
       </Card>
 
       <Card span={3}>

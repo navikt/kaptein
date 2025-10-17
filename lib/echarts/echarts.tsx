@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart, CustomChart, LineChart, PieChart, TreemapChart } from 'echarts/charts';
+import { BarChart, CustomChart, LineChart, PieChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
   AriaComponent,
   DatasetComponent,
@@ -46,6 +46,7 @@ echarts.use([
   LineChart,
   PieChart,
   TreemapChart,
+  SunburstChart,
   CustomChart,
   DataZoomComponent,
   DataZoomSliderComponent,

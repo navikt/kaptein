@@ -26,6 +26,7 @@ export enum Utfall {
 export const UTFALL = Object.values(Utfall);
 
 export const OMGJØRINGSUTFALL: Utfall[] = [Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD];
+export const IKKE_OMGJØRINGSUTFALL: Utfall[] = UTFALL.filter((u) => !OMGJØRINGSUTFALL.includes(u));
 
 // Employee from vedtaksinstans or KA.
 export interface INavEmployee {

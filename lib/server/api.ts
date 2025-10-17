@@ -135,7 +135,7 @@ export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/k
 
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/kodeverk/ytelser');
 
-export const getUtfall = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/kodeverk/utfall');
+export const getUtfall = () => getData<IKodeverkSimpleValue<Utfall>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/utfall');
 
 export const getKlageenheter = async () => {
   const enheter = await getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/kodeverk/klageenheter');
