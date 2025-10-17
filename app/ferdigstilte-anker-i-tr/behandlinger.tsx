@@ -9,17 +9,25 @@ import { useBaseFiltered, useFerdigstiltInPeriod } from '@/components/charts/com
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
+import { HjemlerMedhold } from '@/components/charts/hjemler-medhold';
 import { Tidsfordeling } from '@/components/charts/tidsfordeling';
 import { TildelteSakerPerKlageenhetOgYtelse } from '@/components/charts/tildelte-saker-per-klageenhet-og-ytelse';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import type { AnkeITRFerdigstilt, AnkerITRFerdigstilteResponse, IKodeverkSimpleValue, IYtelse } from '@/lib/types';
+import type {
+  AnkeITRFerdigstilt,
+  AnkerITRFerdigstilteResponse,
+  IKodeverkSimpleValue,
+  IYtelse,
+  RegistreringshjemlerMap,
+} from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
   klageenheter: IKodeverkSimpleValue[];
+  registreringshjemlerMap: RegistreringshjemlerMap;
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -44,13 +52,23 @@ interface DataProps extends KodeverkProps {
   ferdigstilte: AnkeITRFerdigstilt[];
 }
 
-const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter }: DataProps) => {
+const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshjemlerMap }: DataProps) => {
   const ferdigstilteFiltered = useUtfallFilter(useAnkeITRFilter(useFerdigstiltInPeriod(useBaseFiltered(ferdigstilte))));
-
   const relevantYtelser = useRelevantYtelser(ferdigstilteFiltered, ytelser);
 
   return (
     <ChartsWrapper>
+      <Card span={3}>
+        <HjemlerMedhold
+          title="Omgjorte hjemler"
+          description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
+          behandlinger={ferdigstilteFiltered}
+          klageenheter={klageenheter}
+          ytelser={ytelser}
+          registreringshjemlerMap={registreringshjemlerMap}
+        />
+      </Card>
+
       <Card span={3}>
         <TildelteSakerPerKlageenhetOgYtelse
           title="Ferdigstilte anker i TR per klageenhet og ytelse"
