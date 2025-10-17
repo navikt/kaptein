@@ -1,4 +1,4 @@
-import { HStack } from '@navikt/ds-react';
+import { HStack, VStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
 import { Reset } from '@/app/behandlingstid/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
@@ -69,21 +69,32 @@ const RenderFilters = ({
   registreringshjemlerMap = {},
 }: Props) => (
   <FilterWrapper>
-    <HStack justify="space-between">
-      <Reset />
-      <ResetCacheButton />
-    </HStack>
-    <DateRange />
-    <Klageenheter klageenheter={klageenheter} />
-    <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
-    <YtelserAndRegistreringshjemler ytelser={ytelser} lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler} />
-    <Tilbakekreving help={<HelpForFerdigstilte />} />
-    <ActiveFilters
-      ytelser={ytelser}
-      klageenheter={klageenheter}
-      sakstyper={sakstyperToUtfall}
-      utfall={utfall}
-      registreringshjemler={registreringshjemlerMap}
-    />
+    <VStack gap="4" flexGrow="1">
+      <HStack justify="space-between" gap="4" wrap={false}>
+        <Reset />
+        <ResetCacheButton />
+      </HStack>
+      <DateRange />
+    </VStack>
+
+    <VStack gap="4" flexGrow="1">
+      <Klageenheter klageenheter={klageenheter} />
+      <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
+      <YtelserAndRegistreringshjemler
+        ytelser={ytelser}
+        lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
+      />
+    </VStack>
+
+    <VStack gap="4" flexGrow="2" width="100%">
+      <Tilbakekreving help={<HelpForFerdigstilte />} />
+      <ActiveFilters
+        ytelser={ytelser}
+        klageenheter={klageenheter}
+        sakstyper={sakstyperToUtfall}
+        utfall={utfall}
+        registreringshjemler={registreringshjemlerMap}
+      />
+    </VStack>
   </FilterWrapper>
 );

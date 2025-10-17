@@ -325,7 +325,12 @@ const BehandlingerData = ({
       </Card>
 
       <Card fullWidth span={4}>
-        <Tidsfordeling title="Aldersfordeling" behandlinger={filteredBehandlinger} getDays={(b) => b.ageKA} />
+        <Tidsfordeling
+          title="Aldersfordeling"
+          caseType="Aktive"
+          behandlinger={filteredBehandlinger}
+          getDays={(b) => b.ageKA}
+        />
       </Card>
     </ChartsWrapper>
   );

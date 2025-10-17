@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart, CustomChart, LineChart, PieChart } from 'echarts/charts';
+import { BarChart, CustomChart, LineChart, PieChart, SankeyChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
   AriaComponent,
   DatasetComponent,
@@ -45,6 +45,9 @@ echarts.use([
   SVGRenderer,
   LineChart,
   PieChart,
+  TreemapChart,
+  SunburstChart,
+  SankeyChart,
   CustomChart,
   DataZoomComponent,
   DataZoomSliderComponent,
@@ -170,5 +173,5 @@ export const EChart = ({
     };
   }, []);
 
-  return <div style={{ width, height }} ref={ref} className={`${className} [&_svg]:select-text!`} />;
+  return <div style={{ width, height }} ref={ref} className={className} />;
 };

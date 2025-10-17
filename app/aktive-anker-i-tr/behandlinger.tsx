@@ -103,7 +103,7 @@ const BehandlingerData = ({ ledige, tildelte, ytelser, klageenheter }: DataProps
       </Card>
 
       <Card span={4}>
-        <Tidsfordeling title="Aldersfordeling" behandlinger={uferdige} getDays={(b) => b.ageKA} />
+        <Tidsfordeling title="Aldersfordeling" caseType="Aktive" behandlinger={uferdige} getDays={(b) => b.ageKA} />
       </Card>
 
       <Card span={2}>

@@ -25,6 +25,29 @@ export enum Utfall {
 
 export const UTFALL = Object.values(Utfall);
 
+export const OMGJØRINGSUTFALL: Utfall[] = [Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD];
+export const IKKE_OMGJØRINGSUTFALL: Utfall[] = UTFALL.filter((u) => !OMGJØRINGSUTFALL.includes(u));
+
+export enum AnkeITRUtfall {
+  OPPHEVET = '3',
+  MEDHOLD = '4',
+  DELVIS_MEDHOLD = '5',
+  STADFESTET = '6',
+  AVVIST = '8',
+  HEVET = '11',
+  HENVIST = '12',
+}
+
+export const ANKE_I_TR_UTFALL = Object.values(AnkeITRUtfall);
+export const ANKE_I_TR_OMGJØRINGSUTFALL: AnkeITRUtfall[] = [
+  AnkeITRUtfall.OPPHEVET,
+  AnkeITRUtfall.MEDHOLD,
+  AnkeITRUtfall.DELVIS_MEDHOLD,
+];
+export const ANKE_I_TR_IKKE_OMGJØRINGSUTFALL: AnkeITRUtfall[] = ANKE_I_TR_UTFALL.filter(
+  (u) => !ANKE_I_TR_OMGJØRINGSUTFALL.includes(u),
+);
+
 // Employee from vedtaksinstans or KA.
 export interface INavEmployee {
   navIdent: string;
@@ -109,8 +132,8 @@ export interface Tildelt {
   tildeltEnhet: string;
 }
 
-interface Resultat {
-  utfallId: string;
+export interface Resultat<U = Utfall> {
+  utfallId: U;
   registreringshjemmelIdList: string[];
 }
 
@@ -189,7 +212,7 @@ export type AnkeITRFerdigstilt = BaseAnkeITR &
   Avsluttet & {
     isTildelt: true;
     tildeltEnhet: string;
-    resultat: Resultat | null;
+    resultat: Resultat<AnkeITRUtfall> | null;
   };
 
 export type AnkerITRLedigeResponse = KapteinApiResponse<AnkeITRLedig>;

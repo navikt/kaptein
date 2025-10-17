@@ -6,7 +6,7 @@ import { parseAsHjemlerModeFilter, parseAsTilbakekrevingFilter } from '@/app/cus
 import { TilbakekrevingFilter } from '@/app/query-types';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
-import type { Avsluttet, BaseBehandling, Ferdigstilt, Frist } from '@/lib/types';
+import type { Avsluttet, BaseAnkeITR, BaseBehandling, Ferdigstilt, Frist } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Avsluttet & Ferdigstilt & Frist)[]) => {
@@ -26,6 +26,25 @@ export const useFerdigstiltInPeriod = <T extends Avsluttet>(ferdigstilteBehandli
     for (const behandling of ferdigstilteBehandlinger) {
       // If the case was finished before or after the period, it will be filtered out.
       if (behandling.avsluttetAvSaksbehandlerDate < fromFilter || behandling.avsluttetAvSaksbehandlerDate > toFilter) {
+        continue;
+      }
+
+      filteredForPeriod.push(behandling);
+    }
+
+    return filteredForPeriod;
+  }, [ferdigstilteBehandlinger, fromFilter, toFilter]);
+};
+
+export const useSentInPeriod = <T extends BaseAnkeITR>(ferdigstilteBehandlinger: T[]) => {
+  const { fromFilter, toFilter } = useDateFilter();
+
+  return useMemo(() => {
+    const filteredForPeriod: T[] = [];
+
+    for (const behandling of ferdigstilteBehandlinger) {
+      // If the case was finished before or after the period, it will be filtered out.
+      if (behandling.sendtTilTR < fromFilter || behandling.sendtTilTR > toFilter) {
         continue;
       }
 

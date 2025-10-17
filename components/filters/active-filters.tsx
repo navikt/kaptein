@@ -32,7 +32,7 @@ export const ActiveFilters = ({
   const [registreringshjemler, setRegistreringshjemler] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseQuery);
 
   return (
-    <VStack gap="2">
+    <VStack gap="2" width="100%">
       {klageenheterKodeverk === undefined ? null : (
         <Group
           values={klageenheter}

@@ -1,4 +1,4 @@
-import { HStack } from '@navikt/ds-react';
+import { HStack, VStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
 import { Reset } from '@/app/aktive-anker-i-tr/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
@@ -56,21 +56,27 @@ const RenderFilters = ({
   innsendingshjemler = {},
 }: Props) => (
   <FilterWrapper>
-    <HStack justify="space-between">
-      <Reset />
-      <ResetCacheButton />
-    </HStack>
-    <Klageenheter klageenheter={klageenheter} />
-    <YtelserAndInnsendingsAndRegistreringshjemler
-      ytelser={ytelser}
-      lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
-    />
-    <Tilbakekreving help={<HelpForFerdigstilte />} />
-    <ActiveFilters
-      ytelser={ytelser}
-      klageenheter={klageenheter}
-      registreringshjemler={registreringshjemler}
-      innsendingshjemler={innsendingshjemler}
-    />
+    <VStack gap="4" flexGrow="1">
+      <HStack justify="space-between" gap="4" wrap={false}>
+        <Reset />
+        <ResetCacheButton />
+      </HStack>
+
+      <Klageenheter klageenheter={klageenheter} />
+      <YtelserAndInnsendingsAndRegistreringshjemler
+        ytelser={ytelser}
+        lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
+      />
+    </VStack>
+
+    <VStack gap="4" flexGrow="1">
+      <Tilbakekreving help={<HelpForFerdigstilte />} />
+      <ActiveFilters
+        ytelser={ytelser}
+        klageenheter={klageenheter}
+        registreringshjemler={registreringshjemler}
+        innsendingshjemler={innsendingshjemler}
+      />
+    </VStack>
   </FilterWrapper>
 );

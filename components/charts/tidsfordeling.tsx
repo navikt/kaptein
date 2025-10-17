@@ -13,6 +13,7 @@ type Buckets = Record<number, Bucket>;
 
 interface Props<T extends BaseBehandling> {
   title: string;
+  caseType: string;
   behandlinger: T[];
   getDays?: (b: T) => number;
 }
@@ -26,6 +27,7 @@ interface Data {
 
 export const Tidsfordeling = <T extends BaseBehandling>({
   title,
+  caseType,
   behandlinger,
   getDays = (b) => b.ageKA,
 }: Props<T>) => {
@@ -69,7 +71,7 @@ export const Tidsfordeling = <T extends BaseBehandling>({
   return (
     <EChart
       title={title}
-      description={`{bold|Totalt} ${behandlinger.length} aktive saker. {bold|Gjennomsnitt}: ${getStatText(
+      description={`{bold|Totalt} ${behandlinger.length} ${caseType.toLowerCase()} saker. {bold|Gjennomsnitt}: ${getStatText(
         avg,
       )}. {bold|Median}: ${getStatText(median)}.`}
       getInstance={resetDataZoomOnDblClick}
@@ -79,7 +81,7 @@ export const Tidsfordeling = <T extends BaseBehandling>({
         yAxis: [{ type: 'value', name: 'Antall' }],
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 } },
         tooltip: { trigger: 'axis' },
-        series: [{ type: 'bar', data: data, name: 'Aktive' }],
+        series: [{ type: 'bar', data: data, name: 'Saker' }],
       }}
     />
   );

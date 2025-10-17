@@ -37,7 +37,7 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
           variant="secondary-neutral"
           icon={<ChevronDownIcon aria-hidden />}
           iconPosition="right"
-          className="!justify-between grow"
+          className="!justify-between"
         >
           {label} ({selectedOptions.length})
         </Button>
