@@ -109,7 +109,7 @@ export interface Tildelt {
   tildeltEnhet: string;
 }
 
-interface Resultat {
+export interface Resultat {
   utfallId: string;
   registreringshjemmelIdList: string[];
 }

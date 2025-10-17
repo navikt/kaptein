@@ -14,6 +14,7 @@ import { Tidsfordeling } from '@/components/charts/tidsfordeling';
 import { TildelteSakerPerKlageenhetOgYtelse } from '@/components/charts/tildelte-saker-per-klageenhet-og-ytelse';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
+import { Omgjøringsprosent } from '@/components/key-stats/omgjøringsprosent';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import type {
   AnkeITRFerdigstilt,
@@ -58,6 +59,10 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
 
   return (
     <ChartsWrapper>
+      <Card>
+        <Omgjøringsprosent behandlinger={ferdigstilteFiltered} />
+      </Card>
+
       <Card span={3}>
         <HjemlerMedhold
           title="Omgjorte hjemler"

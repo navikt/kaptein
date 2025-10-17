@@ -36,8 +36,6 @@ interface YtelseBranch {
 }
 
 export const HjemlerMedhold = ({ title, description, ytelser, registreringshjemlerMap, behandlinger }: Props) => {
-  console.log('HjemlerMedhold render', registreringshjemlerMap);
-
   const ytelserMap = useMemo(() => {
     const map = new Map<string, IKodeverkSimpleValue>();
     for (const ytelse of ytelser) {
