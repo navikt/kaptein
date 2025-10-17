@@ -5,24 +5,18 @@ import { ActiveFilters } from '@/components/filters/active-filters';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
-import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
+import { Sakstyper } from '@/components/filters/sakstyper';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
   getKlageenheter,
   getLovkildeToRegistreringshjemler,
   getRegistreringshjemlerMap,
-  getSakstyperToUtfall,
+  getSakstyper,
   getUtfall,
   getYtelser,
 } from '@/lib/server/api';
-import type {
-  IKodeverkSimpleValue,
-  IKodeverkValue,
-  IYtelse,
-  RegistreringshjemlerMap,
-  SakstypeToUtfall,
-} from '@/lib/types';
+import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse, RegistreringshjemlerMap, Sakstype } from '@/lib/types';
 
 export const Filters = async () => (
   <Suspense fallback={<RenderFilters />}>
@@ -33,7 +27,7 @@ export const Filters = async () => (
 const AsyncFilters = async () => {
   const ytelser = await getYtelser();
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
-  const sakstyperToUtfall = await getSakstyperToUtfall();
+  const sakstyper = await getSakstyper();
   const klageEnheter = await getKlageenheter();
   const utfall = await getUtfall();
   const registreringshjemler = await getRegistreringshjemlerMap();
@@ -42,7 +36,7 @@ const AsyncFilters = async () => {
     <RenderFilters
       ytelser={ytelser}
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
-      sakstyperToUtfall={sakstyperToUtfall}
+      sakstyper={sakstyper}
       klageenheter={klageEnheter}
       utfall={utfall}
       registreringshjemler={registreringshjemler}
@@ -53,7 +47,7 @@ const AsyncFilters = async () => {
 interface Props {
   ytelser?: IYtelse[];
   lovkildeToRegistreringshjemler?: IKodeverkValue<string>[];
-  sakstyperToUtfall?: SakstypeToUtfall[];
+  sakstyper?: IKodeverkSimpleValue<Sakstype>[];
   klageenheter?: IKodeverkSimpleValue<string>[];
   utfall?: IKodeverkSimpleValue<string>[];
   registreringshjemler?: RegistreringshjemlerMap;
@@ -62,7 +56,7 @@ interface Props {
 const RenderFilters = ({
   ytelser = [],
   lovkildeToRegistreringshjemler = [],
-  sakstyperToUtfall = [],
+  sakstyper = [],
   klageenheter = [],
   utfall = [],
   registreringshjemler = {},
@@ -73,7 +67,7 @@ const RenderFilters = ({
       <ResetCacheButton />
     </HStack>
     <Klageenheter klageenheter={klageenheter} />
-    <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
+    <Sakstyper sakstyper={sakstyper} />
     <YtelserAndInnsendingsAndRegistreringshjemler
       ytelser={ytelser}
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
@@ -82,7 +76,7 @@ const RenderFilters = ({
     <ActiveFilters
       ytelser={ytelser}
       klageenheter={klageenheter}
-      sakstyper={sakstyperToUtfall}
+      sakstyper={sakstyper}
       utfall={utfall}
       registreringshjemler={registreringshjemler}
     />
