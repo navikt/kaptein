@@ -15,7 +15,7 @@ import {
   getKlageenheter,
   getLovkildeToRegistreringshjemler,
   getRegistreringshjemlerMap,
-  getSakstyperToUtfall,
+  getRelevantSakstyperToUtfall,
   getUtfall,
   getYtelser,
 } from '@/lib/server/api';
@@ -36,7 +36,7 @@ export const Filters = async () => (
 const AsyncFilters = async () => {
   const ytelser = await getYtelser();
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
-  const sakstyperToUtfall = await getSakstyperToUtfall();
+  const sakstyperToUtfall = await getRelevantSakstyperToUtfall();
   const klageEnheter = await getKlageenheter();
   const utfall = await getUtfall();
   const registreringshjemler = await getRegistreringshjemlerMap();

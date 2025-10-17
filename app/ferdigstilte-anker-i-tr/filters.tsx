@@ -6,23 +6,24 @@ import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
-import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
+import { UtfallFilter } from '@/components/filters/utfall';
 import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
   getKlageenheter,
   getLovkildeToRegistreringshjemler,
   getRegistreringshjemlerMap,
   getSakstyperToUtfall,
-  getUtfall,
   getYtelser,
 } from '@/lib/server/api';
-import type {
-  IKodeverkSimpleValue,
-  IKodeverkValue,
-  IYtelse,
-  RegistreringshjemlerMap,
-  SakstypeToUtfall,
+import {
+  type IKodeverkSimpleValue,
+  type IKodeverkValue,
+  type IYtelse,
+  type RegistreringshjemlerMap,
+  Sakstype,
+  type SakstypeToUtfall,
+  type Utfall,
 } from '@/lib/types';
 
 export const Filters = async () => (
@@ -36,7 +37,6 @@ const AsyncFilters = async () => {
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
   const sakstyperToUtfall = await getSakstyperToUtfall();
   const klageEnheter = await getKlageenheter();
-  const utfall = await getUtfall();
   const registreringshjemler = await getRegistreringshjemlerMap();
 
   return (
@@ -45,7 +45,7 @@ const AsyncFilters = async () => {
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
       sakstyperToUtfall={sakstyperToUtfall}
       klageenheter={klageEnheter}
-      utfall={utfall}
+      utfall={sakstyperToUtfall.find((s) => s.id === Sakstype.ANKE_I_TRYGDERETTEN)?.utfall}
       registreringshjemler={registreringshjemler}
     />
   );
@@ -56,7 +56,7 @@ interface Props {
   lovkildeToRegistreringshjemler?: IKodeverkValue<string>[];
   sakstyperToUtfall?: SakstypeToUtfall[];
   klageenheter?: IKodeverkSimpleValue<string>[];
-  utfall?: IKodeverkSimpleValue<string>[];
+  utfall?: IKodeverkSimpleValue<Utfall>[];
   registreringshjemler?: RegistreringshjemlerMap;
 }
 
@@ -75,7 +75,7 @@ const RenderFilters = ({
     </HStack>
     <DateRange />
     <Klageenheter klageenheter={klageenheter} />
-    <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
+    <UtfallFilter utfall={utfall} />
     <YtelserAndInnsendingsAndRegistreringshjemler
       ytelser={ytelser}
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}

@@ -145,8 +145,11 @@ export const getKlageenheter = async () => {
 export const getLovkildeToRegistreringshjemler = () =>
   getData<IKodeverkValue[]>(AppName.KLAGE_KODEVERK, '/kodeverk/lovkildetoregistreringshjemler');
 
-export const getSakstyperToUtfall = async () => {
-  const sakstyper = await getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstypertoutfall');
+export const getSakstyperToUtfall = async () =>
+  getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstypertoutfall');
+
+export const getRelevantSakstyperToUtfall = async () => {
+  const sakstyper = await getSakstyperToUtfall();
 
   return sakstyper.filter(({ id }) => RELEVANT_SAKSTYPER.includes(id));
 };

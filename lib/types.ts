@@ -1,3 +1,30 @@
+export enum Utfall {
+  TRUKKET = '1',
+  RETUR = '2',
+  OPPHEVET = '3',
+  MEDHOLD = '4',
+  DELVIS_MEDHOLD = '5',
+  STADFESTET = '6',
+  UGUNST = '7',
+  AVVIST = '8',
+  INNSTILLING_STADFESTET = '9',
+  INNSTILLING_AVVIST = '10',
+  HEVET = '11',
+  HENVIST = '12',
+  MEDHOLD_FORVALTNINGSLOVEN_35 = '13',
+  BESLUTNING_IKKE_OMGJOERE = '14',
+  STADFESTET_ANNEN_BEGRENNELSE = '15',
+  HENLAGT = '16',
+  INNSTILLING_GJENOPPTAS_VEDTAK_STADFESTES = '17',
+  INNSTILLING_GJENOPPTAS_IKKE = '18',
+  GJENOPPTATT_DELVIS_FULLT_MEDHOLD = '19',
+  GJENOPPTATT_OPPHEVET = '20',
+  GJENOPPTATT_STADFESTET = '21',
+  IKKE_GJENOPPTATT = '22',
+}
+
+export const UTFALL = Object.values(Utfall);
+
 // Employee from vedtaksinstans or KA.
 export interface INavEmployee {
   navIdent: string;
@@ -194,7 +221,7 @@ export enum PåVentReason {
 }
 
 export interface SakstypeToUtfall extends IKodeverkSimpleValue<Sakstype> {
-  utfall: IKodeverkSimpleValue[];
+  utfall: IKodeverkSimpleValue<Utfall>[];
 }
 
 export const isFerdigstilt = (b: BaseBehandling | Avsluttet): b is Avsluttet =>
