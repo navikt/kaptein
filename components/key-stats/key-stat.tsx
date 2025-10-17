@@ -7,7 +7,7 @@ interface KeyStatProps {
 }
 
 export const KeyStat = ({ title, value, description }: KeyStatProps) => (
-  <BoxNew padding="4" borderRadius="large" background="raised" height="100%">
+  <BoxNew padding="4" shadow="dialog" background="neutral-soft" borderRadius="medium">
     <Heading level="3" size="medium" spacing>
       {title}
     </Heading>

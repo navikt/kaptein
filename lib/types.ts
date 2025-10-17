@@ -25,6 +25,8 @@ export enum Utfall {
 
 export const UTFALL = Object.values(Utfall);
 
+export const OMGJØRINGSUTFALL: Utfall[] = [Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD];
+
 // Employee from vedtaksinstans or KA.
 export interface INavEmployee {
   navIdent: string;
@@ -110,7 +112,7 @@ export interface Tildelt {
 }
 
 export interface Resultat {
-  utfallId: string;
+  utfallId: Utfall;
   registreringshjemmelIdList: string[];
 }
 

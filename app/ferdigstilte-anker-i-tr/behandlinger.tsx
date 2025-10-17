@@ -59,7 +59,7 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
 
   return (
     <ChartsWrapper>
-      <Card>
+      <Card span={2}>
         <Omgjøringsprosent behandlinger={ferdigstilteFiltered} />
       </Card>
 

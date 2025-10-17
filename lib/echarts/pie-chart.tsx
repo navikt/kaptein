@@ -8,7 +8,7 @@ interface Serie<D> {
   type: string;
   radius?: string;
   stack?: string;
-  label: {
+  label?: {
     show?: boolean;
     formatter?: (data: D) => string;
   };
