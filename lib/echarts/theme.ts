@@ -33,6 +33,8 @@ const theme: ThemeOption = {
   backgroundColor: 'var(--ax-bg-neutral-soft)',
   textStyle: {
     color: 'var(--ax-text-neutral)',
+    textBorderColor: 'transparent',
+    textShadowColor: 'transparent',
   },
   title: {
     textStyle: {
@@ -118,6 +120,11 @@ const theme: ThemeOption = {
     itemStyle: {
       borderWidth: 0,
       borderColor: 'var(--ax-border-neutral-subtle)',
+    },
+    label: {
+      color: 'var(--ax-text-neutral)',
+      textBorderColor: 'transparent',
+      textShadowColor: 'transparent',
     },
   },
   funnel: {

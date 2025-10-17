@@ -1,48 +1,33 @@
-import { COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { EChart } from '@/lib/echarts/echarts';
 import {
-  IKKE_OMGJØRINGSUTFALL,
+  ANKE_I_TR_IKKE_OMGJØRINGSUTFALL,
+  ANKE_I_TR_OMGJØRINGSUTFALL,
+  ANKE_I_TR_UTFALL,
+  AnkeITRUtfall,
   type IKodeverkSimpleValue,
-  OMGJØRINGSUTFALL,
   type Resultat,
-  UTFALL,
   Utfall,
 } from '@/lib/types';
 
 interface Result {
-  resultat: Resultat | null;
+  resultat: Resultat<AnkeITRUtfall> | null;
 }
 
 interface Props {
   behandlinger: Result[];
-  utfall: IKodeverkSimpleValue<Utfall>[];
+  utfall: IKodeverkSimpleValue<Utfall | AnkeITRUtfall>[];
 }
 
 export const Omgjøringsprosent = ({ behandlinger, utfall }: Props) => {
   const total = behandlinger.length;
-  const utfallCounts: Record<Utfall, number> = {
-    [Utfall.TRUKKET]: 0,
-    [Utfall.RETUR]: 0,
-    [Utfall.OPPHEVET]: 0,
-    [Utfall.MEDHOLD]: 0,
-    [Utfall.DELVIS_MEDHOLD]: 0,
-    [Utfall.STADFESTET]: 0,
-    [Utfall.UGUNST]: 0,
-    [Utfall.AVVIST]: 0,
-    [Utfall.INNSTILLING_STADFESTET]: 0,
-    [Utfall.INNSTILLING_AVVIST]: 0,
-    [Utfall.HEVET]: 0,
-    [Utfall.HENVIST]: 0,
-    [Utfall.MEDHOLD_FORVALTNINGSLOVEN_35]: 0,
-    [Utfall.BESLUTNING_IKKE_OMGJOERE]: 0,
-    [Utfall.STADFESTET_ANNEN_BEGRENNELSE]: 0,
-    [Utfall.HENLAGT]: 0,
-    [Utfall.INNSTILLING_GJENOPPTAS_VEDTAK_STADFESTES]: 0,
-    [Utfall.INNSTILLING_GJENOPPTAS_IKKE]: 0,
-    [Utfall.GJENOPPTATT_DELVIS_FULLT_MEDHOLD]: 0,
-    [Utfall.GJENOPPTATT_OPPHEVET]: 0,
-    [Utfall.GJENOPPTATT_STADFESTET]: 0,
-    [Utfall.IKKE_GJENOPPTATT]: 0,
+  const utfallCounts: Record<AnkeITRUtfall, number> = {
+    [AnkeITRUtfall.OPPHEVET]: 0,
+    [AnkeITRUtfall.MEDHOLD]: 0,
+    [AnkeITRUtfall.DELVIS_MEDHOLD]: 0,
+    [AnkeITRUtfall.STADFESTET]: 0,
+    [AnkeITRUtfall.AVVIST]: 0,
+    [AnkeITRUtfall.HEVET]: 0,
+    [AnkeITRUtfall.HENVIST]: 0,
   };
 
   for (const { resultat } of behandlinger) {
@@ -50,7 +35,7 @@ export const Omgjøringsprosent = ({ behandlinger, utfall }: Props) => {
       continue;
     }
 
-    for (const utfall of UTFALL) {
+    for (const utfall of ANKE_I_TR_UTFALL) {
       if (resultat.utfallId === utfall) {
         utfallCounts[utfall]++;
       }
@@ -61,47 +46,105 @@ export const Omgjøringsprosent = ({ behandlinger, utfall }: Props) => {
     return null;
   }
 
-  const getOmgjortProsent = getOmgjortProsentFn(utfall, utfallCounts, total);
+  // Count cases without utfall (resultat is null)
+  const utenUtfallCount = behandlinger.filter(({ resultat }) => resultat === null).length;
+
+  // Helper function to get utfall name
+  const getUtfallName = (utfallId: AnkeITRUtfall) => {
+    return utfall.find((o) => o.id === utfallId)?.navn ?? utfallId;
+  };
+
+  // Build Sankey data
+  const nodes = [
+    { name: 'Omgjort', depth: 0, itemStyle: { color: 'var(--ax-danger-500)' } },
+    { name: 'Ikke omgjort', depth: 0, itemStyle: { color: 'var(--ax-accent-500)' } },
+    ...(utenUtfallCount > 0
+      ? [{ name: 'Uten utfall', depth: 0, value: utenUtfallCount, itemStyle: { color: 'var(--ax-neutral-500)' } }]
+      : []),
+    ...ANKE_I_TR_OMGJØRINGSUTFALL.filter((u) => utfallCounts[u] > 0).map((u) => ({
+      name: getUtfallName(u),
+      depth: 1,
+      itemStyle: { color: UTFALL_COLORS[u] },
+    })),
+    ...ANKE_I_TR_IKKE_OMGJØRINGSUTFALL.filter((u) => utfallCounts[u] > 0).map((u) => ({
+      name: getUtfallName(u),
+      depth: 1,
+      itemStyle: { color: UTFALL_COLORS[u] },
+    })),
+  ];
+
+  const links = [
+    // Omgjort to individual utfall
+    ...ANKE_I_TR_OMGJØRINGSUTFALL.filter((u) => utfallCounts[u] > 0).map((u) => {
+      const name = getUtfallName(u);
+      return { source: 'Omgjort', target: name, value: utfallCounts[u] };
+    }),
+    // Ikke omgjort to individual utfall
+    ...ANKE_I_TR_IKKE_OMGJØRINGSUTFALL.filter((u) => utfallCounts[u] > 0).map((u) => {
+      const name = getUtfallName(u);
+      return { source: 'Ikke omgjort', target: name, value: utfallCounts[u] };
+    }),
+  ];
 
   return (
     <EChart
-      title="Omgjøringsprosent"
+      title="Utfallsfordeling"
       description={`Basert på ${total} ferdigstilte saker.`}
       option={{
         series: [
           {
-            ...COMMON_PIE_CHART_SERIES_PROPS,
-            type: 'sunburst',
-            name: 'Omgjøringsprosent',
-            // color: ['var(--ax-danger-500)', 'var(--ax-accent-500)'],
-            data: [
-              {
-                name: 'Omgjort',
-                // value: omgjøringsprosent,
-                children: OMGJØRINGSUTFALL.map(getOmgjortProsent),
+            type: 'sankey',
+            layout: 'none',
+            emphasis: {
+              focus: 'adjacency',
+            },
+            data: nodes,
+            links,
+            lineStyle: {
+              color: 'gradient',
+              curveness: 0.5,
+            },
+            label: {
+              formatter: (params: { dataType?: string; value?: number; name?: string }) => {
+                if (params.dataType === 'node' && params.value !== undefined && params.name !== undefined) {
+                  const percentage = ((params.value / total) * 100).toFixed(1);
+                  return `${params.name}\n${params.value} (${percentage}%)`;
+                }
+                return params.name ?? '';
               },
-              {
-                name: 'Ikke omgjort',
-                // value: notOmgjøringsprosent,
-                children: IKKE_OMGJØRINGSUTFALL.map(getOmgjortProsent),
-              },
-            ],
+            },
           },
         ],
+        tooltip: {
+          trigger: 'item',
+          formatter: (params: {
+            dataType?: string;
+            value?: number;
+            name?: string;
+            data?: { source?: string; target?: string };
+          }) => {
+            if (params.dataType === 'edge' && params.value !== undefined && params.data) {
+              const percentage = ((params.value / total) * 100).toFixed(1);
+              return `${params.data.source} → ${params.data.target}<br/>${params.value} (${percentage}%)`;
+            }
+            if (params.value !== undefined && params.name !== undefined) {
+              const percentage = ((params.value / total) * 100).toFixed(1);
+              return `${params.name}<br/>${params.value} (${percentage}%)`;
+            }
+            return params.name ?? '';
+          },
+        },
       }}
     />
   );
 };
 
-const getOmgjortProsentFn =
-  (utfallList: IKodeverkSimpleValue<Utfall>[], counts: Record<Utfall, number>, total: number) => (utfall: Utfall) => {
-    const name = utfallList.find((o) => o.id === utfall)?.navn || utfall;
-
-    if (total === 0) {
-      return { name: `${name} (0 %)`, value: 0 };
-    }
-
-    const value = Math.round((counts[utfall] / total) * 10000) / 100;
-
-    return { name: `${name} (${value} %)`, value };
-  };
+const UTFALL_COLORS: Record<AnkeITRUtfall, string> = {
+  [Utfall.OPPHEVET]: 'var(--ax-warning-500)',
+  [Utfall.MEDHOLD]: 'var(--ax-danger-500)',
+  [Utfall.DELVIS_MEDHOLD]: 'var(--ax-warning-500)',
+  [Utfall.STADFESTET]: 'var(--ax-success-500)',
+  [Utfall.AVVIST]: 'var(--ax-accent-500)',
+  [Utfall.HEVET]: 'var(--ax-meta-lime-500)',
+  [Utfall.HENVIST]: 'var(--ax-meta-purple-500)',
+};

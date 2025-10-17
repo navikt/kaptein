@@ -18,6 +18,7 @@ import { Omgjøringsprosent } from '@/components/key-stats/omgjøringsprosent';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import type {
   AnkeITRFerdigstilt,
+  AnkeITRUtfall,
   AnkerITRFerdigstilteResponse,
   IKodeverkSimpleValue,
   IYtelse,
@@ -30,7 +31,7 @@ interface KodeverkProps {
   ytelser: IYtelse[];
   klageenheter: IKodeverkSimpleValue[];
   registreringshjemlerMap: RegistreringshjemlerMap;
-  utfall: IKodeverkSimpleValue<Utfall>[];
+  utfall: IKodeverkSimpleValue<Utfall | AnkeITRUtfall>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -61,11 +62,11 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
 
   return (
     <ChartsWrapper>
-      <Card span={3}>
+      <Card span={4}>
         <Omgjøringsprosent behandlinger={ferdigstilteFiltered} utfall={utfall} />
       </Card>
 
-      <Card span={3}>
+      <Card span={4}>
         <HjemlerMedhold
           title="Omgjorte hjemler"
           description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
