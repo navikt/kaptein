@@ -140,7 +140,7 @@ export const getUtfall = () => getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KOD
 export const getKlageenheter = async () => {
   const enheter = await getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/kodeverk/klageenheter');
 
-  return [...enheter, STYRINGSENHETEN];
+  return [...enheter.filter((e) => e.id !== '2103'), STYRINGSENHETEN];
 };
 
 export const getLovkildeToRegistreringshjemler = () =>
