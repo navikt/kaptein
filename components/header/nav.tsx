@@ -29,6 +29,7 @@ export const Nav = () => {
     searchParams.delete(QueryParam.FROM);
     searchParams.delete(QueryParam.TO);
     searchParams.delete(QueryParam.REGISTRERINGSHJEMLER);
+    searchParams.delete(QueryParam.REGISTRERINGSHJEMLER_MODE);
 
     searchParams.get(QueryParam.ALDER_MAX_DAYS) ?? searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
     searchParams.get(QueryParam.ALDER_PER_YTELSE_MAX_DAYS) ??
@@ -44,6 +45,7 @@ export const Nav = () => {
 
     searchParams.delete(QueryParam.TILDELING);
     searchParams.delete(QueryParam.INNSENDINGSHJEMLER);
+    searchParams.delete(QueryParam.INNSENDINGSHJEMLER_MODE);
 
     searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
     searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);

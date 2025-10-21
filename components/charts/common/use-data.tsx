@@ -2,8 +2,9 @@
 
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
+import { parseAsHjemlerModeFilter, parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
+import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import type { Avsluttet, BaseBehandling, Ferdigstilt, Frist } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
@@ -66,17 +67,19 @@ export const useMottattInPeriod = <T extends BaseBehandling>(behandlinger: T[]) 
   );
 };
 
-export const useResultatFiltered = <T extends Ferdigstilt & Avsluttet>(ferdigstilteBehandlinger: T[]) => {
+export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>(
+  ferdigstilteBehandlinger: T[],
+) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
 
   return useMemo(() => {
-    const filteredForRegistreringshjemler =
-      registreringshjemlerFilter === null || registreringshjemlerFilter.length === 0
-        ? ferdigstilteBehandlinger
-        : ferdigstilteBehandlinger.filter((b) =>
-            registreringshjemlerFilter.some((h) => b.resultat.registreringshjemmelIdList.includes(h)),
-          );
+    const filteredForRegistreringshjemler = filterHjemler(
+      ferdigstilteBehandlinger,
+      registreringshjemlerFilter,
+      null,
+      (b) => b.resultat.registreringshjemmelIdList,
+    );
 
     const filteredForUtfall =
       utfallFilter === null || utfallFilter.length === 0
@@ -92,12 +95,11 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
   const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
   const [innsendingshjemlerFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [sakstyperFilter] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
-
+  const [hjemmelModeFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
   const [tilbakekrevingFilter] = useQueryState(QueryParam.TILBAKEKREVING, parseAsTilbakekrevingFilter);
 
   const ytelser = ytelseFilter ?? [];
   const klageenheter = klageenheterFilter ?? [];
-  const innsendingshjemler = innsendingshjemlerFilter ?? [];
   const sakstyper = sakstyperFilter ?? [];
   const tilbakekreving = tilbakekrevingFilter ?? TilbakekrevingFilter.MED;
 
@@ -120,11 +122,13 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
         ? filteredForYtelser
         : filteredForYtelser.filter((b) => b.tildeltEnhet !== null && klageenheter.includes(b.tildeltEnhet));
 
-    const filteredForInnsendingshjemler =
-      innsendingshjemler.length === 0
-        ? filteredForKlageenheter
-        : filteredForKlageenheter.filter((b) => innsendingshjemler.some((h) => b.innsendingshjemmelIdList.includes(h)));
+    const filteredForInnsendingshjemler = filterHjemler(
+      filteredForKlageenheter,
+      innsendingshjemlerFilter,
+      hjemmelModeFilter,
+      (b) => b.innsendingshjemmelIdList,
+    );
 
     return filteredForInnsendingshjemler;
-  }, [behandlinger, ytelser, klageenheter, innsendingshjemler, sakstyper, tilbakekreving]);
+  }, [behandlinger, ytelser, klageenheter, innsendingshjemlerFilter, sakstyper, tilbakekreving, hjemmelModeFilter]);
 };

@@ -1,5 +1,5 @@
 import { createParser } from 'nuqs';
-import { TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
+import { HjemlerModeFilter, TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
 
 const TILDELT_FILTER_VALUES = Object.values(TildelingFilter);
 const TILBAKEKREVING_FILTER_VALUES = Object.values(TilbakekrevingFilter);
@@ -22,6 +22,17 @@ export const parseAsLedigeFilter = createParser({
 
     return TildelingFilter.ALL;
   },
+
+  serialize(value) {
+    return value;
+  },
+});
+
+const HJEMLER_MODES = Object.values(HjemlerModeFilter);
+const isHjemlerMode = (value: string): value is HjemlerModeFilter => HJEMLER_MODES.some((v) => v === value);
+
+export const parseAsHjemlerModeFilter = createParser({
+  parse: (value): HjemlerModeFilter | null => (isHjemlerMode(value) ? value : HjemlerModeFilter.INCLUDE_FOR_SOME),
 
   serialize(value) {
     return value;

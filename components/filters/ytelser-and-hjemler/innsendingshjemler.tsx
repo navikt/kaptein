@@ -1,6 +1,8 @@
+import { VStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
+import { HjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
 import type { IYtelse } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
@@ -27,6 +29,9 @@ export const Innsendingshjemler = ({ relevantYtelser }: Props) => {
   }, [relevantYtelser]);
 
   return (
-    <MultiselectFilter label="Innsendingshjemler" selected={selected} setSelected={setSelected} options={options} />
+    <VStack gap="1" className="grow">
+      <HjemlerMode queryParam={QueryParam.INNSENDINGSHJEMLER_MODE} />
+      <MultiselectFilter label="Innsendingshjemler" selected={selected} setSelected={setSelected} options={options} />
+    </VStack>
   );
 };

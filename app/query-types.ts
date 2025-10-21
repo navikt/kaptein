@@ -9,3 +9,8 @@ export enum TilbakekrevingFilter {
   UTEN = 'uten',
   KUN = 'kun',
 }
+
+export enum HjemlerModeFilter {
+  INCLUDE_FOR_SOME = 'noen',
+  INCLUDE_FOR_ALL = 'alle',
+}

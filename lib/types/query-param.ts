@@ -11,6 +11,8 @@ export enum QueryParam {
   UTFALL = 'u',
   ALDER_MAX_DAYS = 'ma',
   ALDER_PER_YTELSE_MAX_DAYS = 'apyma',
+  INNSENDINGSHJEMLER_MODE = 'ihm',
+  REGISTRERINGSHJEMLER_MODE = 'rhm',
 }
 
 export const ALL_QUERY_PARAMS = Object.values(QueryParam);

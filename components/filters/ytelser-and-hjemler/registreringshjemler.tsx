@@ -1,9 +1,10 @@
 'use client';
 
 import { ChevronDownIcon } from '@navikt/aksel-icons';
-import { ActionMenu, Button, HStack, TextField } from '@navikt/ds-react';
+import { ActionMenu, Button, HStack, TextField, VStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
+import { HjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
 import type { IKodeverkSimpleValue, IYtelse } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
@@ -111,42 +112,45 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
   const all = useMemo(() => options.flatMap(({ hjemler }) => hjemler.map(({ value }) => value)), [options]);
 
   return (
-    <ActionMenu>
-      <ActionMenu.Trigger>
-        <Button
-          variant="secondary-neutral"
-          icon={<ChevronDownIcon aria-hidden />}
-          iconPosition="right"
-          className="!justify-between grow"
-        >
-          Registreringshjemler ({selectedOptions.length})
-        </Button>
-      </ActionMenu.Trigger>
-
-      <ActionMenu.Content className="relative">
-        <HStack wrap={false} className="sticky top-0 z-1 bg-ax-bg-default">
-          <TextField
-            className="grow"
-            placeholder="Filtrer"
-            label="Registreringshjemler"
-            hideLabel
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-
-          <Button onClick={() => setSelectedHjemler(all)} size="small" variant="secondary" style={{ marginLeft: 8 }}>
-            Velg alle
+    <VStack gap="1" className="grow">
+      <HjemlerMode queryParam={QueryParam.REGISTRERINGSHJEMLER_MODE} />
+      <ActionMenu>
+        <ActionMenu.Trigger>
+          <Button
+            variant="secondary-neutral"
+            icon={<ChevronDownIcon aria-hidden />}
+            iconPosition="right"
+            className="!justify-between grow"
+          >
+            Registreringshjemler ({selectedOptions.length})
           </Button>
+        </ActionMenu.Trigger>
 
-          <Button onClick={() => setSelectedHjemler(null)} size="small" variant="danger" style={{ marginLeft: 8 }}>
-            Fjern alle
-          </Button>
-        </HStack>
+        <ActionMenu.Content className="relative">
+          <HStack wrap={false} className="sticky top-0 z-1 bg-ax-bg-default">
+            <TextField
+              className="grow"
+              placeholder="Filtrer"
+              label="Registreringshjemler"
+              hideLabel
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
 
-        <ActionMenu.Divider />
+            <Button onClick={() => setSelectedHjemler(all)} size="small" variant="secondary" style={{ marginLeft: 8 }}>
+              Velg alle
+            </Button>
 
-        {filteredItems}
-      </ActionMenu.Content>
-    </ActionMenu>
+            <Button onClick={() => setSelectedHjemler(null)} size="small" variant="danger" style={{ marginLeft: 8 }}>
+              Fjern alle
+            </Button>
+          </HStack>
+
+          <ActionMenu.Divider />
+
+          {filteredItems}
+        </ActionMenu.Content>
+      </ActionMenu>
+    </VStack>
   );
 };
