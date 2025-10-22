@@ -18,7 +18,7 @@ export const HjemlerMode = ({ queryParam }: Props) => {
         size="small"
         label={
           <HStack gap="2" align="center">
-            Match
+            Treff
             <HelpText>
               <Heading level="1" size="xsmall">
                 Minst én
