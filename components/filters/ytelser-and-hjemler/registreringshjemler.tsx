@@ -129,6 +129,7 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
         <ActionMenu.Content className="relative">
           <HStack wrap={false} className="sticky top-0 z-1 bg-ax-bg-default">
             <TextField
+              autoFocus
               className="grow"
               placeholder="Filtrer"
               label="Registreringshjemler"

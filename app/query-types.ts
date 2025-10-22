@@ -12,5 +12,6 @@ export enum TilbakekrevingFilter {
 
 export enum HjemlerModeFilter {
   INCLUDE_FOR_SOME = 'noen',
-  INCLUDE_FOR_ALL = 'alle',
+  INCLUDE_ALL_SELECTED = 'filtrerte',
+  INCLUDE_ALL_IN_BEHANDLING = 'behandling',
 }

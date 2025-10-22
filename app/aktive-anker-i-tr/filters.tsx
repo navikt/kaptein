@@ -8,6 +8,7 @@ import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
+  getInnsendingshjemlerMap,
   getKlageenheter,
   getLovkildeToRegistreringshjemler,
   getRegistreringshjemlerMap,
@@ -26,6 +27,7 @@ const AsyncFilters = async () => {
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
   const klageEnheter = await getKlageenheter();
   const registreringshjemler = await getRegistreringshjemlerMap();
+  const innsendingshjemler = await getInnsendingshjemlerMap();
 
   return (
     <RenderFilters
@@ -33,6 +35,7 @@ const AsyncFilters = async () => {
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
       klageenheter={klageEnheter}
       registreringshjemler={registreringshjemler}
+      innsendingshjemler={innsendingshjemler}
     />
   );
 };
@@ -42,6 +45,7 @@ interface Props {
   lovkildeToRegistreringshjemler?: IKodeverkValue<string>[];
   klageenheter?: IKodeverkSimpleValue<string>[];
   registreringshjemler?: RegistreringshjemlerMap;
+  innsendingshjemler?: Record<string, string>;
 }
 
 const RenderFilters = ({
@@ -49,6 +53,7 @@ const RenderFilters = ({
   lovkildeToRegistreringshjemler = [],
   klageenheter = [],
   registreringshjemler = {},
+  innsendingshjemler = {},
 }: Props) => (
   <FilterWrapper>
     <HStack justify="space-between">
@@ -61,6 +66,11 @@ const RenderFilters = ({
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
     />
     <Tilbakekreving help={<HelpForFerdigstilte />} />
-    <ActiveFilters ytelser={ytelser} klageenheter={klageenheter} registreringshjemler={registreringshjemler} />
+    <ActiveFilters
+      ytelser={ytelser}
+      klageenheter={klageenheter}
+      registreringshjemler={registreringshjemler}
+      innsendingshjemler={innsendingshjemler}
+    />
   </FilterWrapper>
 );

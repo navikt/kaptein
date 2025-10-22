@@ -2,7 +2,9 @@
 
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
+import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { Card } from '@/components/cards';
+import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
 import { useBaseFiltered, useFerdigstiltInPeriod } from '@/components/charts/common/use-data';
@@ -99,14 +101,16 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter }: DataProps) =>
 
 const useAnkeITRFilter = <T extends AnkeITRFerdigstilt>(behandlinger: T[]) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
 
   return useMemo(() => {
-    return registreringshjemlerFilter === null || registreringshjemlerFilter.length === 0
-      ? behandlinger
-      : behandlinger.filter((b) =>
-          registreringshjemlerFilter.some((h) => b.resultat?.registreringshjemmelIdList.includes(h) ?? false),
-        );
-  }, [behandlinger, registreringshjemlerFilter]);
+    return filterHjemler(
+      behandlinger,
+      registreringshjemlerFilter,
+      hjemmelModeFilter,
+      (b) => b.previousRegistreringshjemmelIdList ?? [],
+    );
+  }, [behandlinger, registreringshjemlerFilter, hjemmelModeFilter]);
 };
 
 const useUtfallFilter = <T extends AnkeITRFerdigstilt>(behandlinger: T[]) => {

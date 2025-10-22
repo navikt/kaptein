@@ -72,12 +72,13 @@ export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avs
 ) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
+  const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
 
   return useMemo(() => {
     const filteredForRegistreringshjemler = filterHjemler(
       ferdigstilteBehandlinger,
       registreringshjemlerFilter,
-      null,
+      hjemmelModeFilter,
       (b) => b.resultat.registreringshjemmelIdList,
     );
 
@@ -87,7 +88,7 @@ export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avs
         : filteredForRegistreringshjemler.filter((b) => utfallFilter.includes(b.resultat.utfallId));
 
     return filteredForUtfall;
-  }, [ferdigstilteBehandlinger, registreringshjemlerFilter, utfallFilter]);
+  }, [ferdigstilteBehandlinger, registreringshjemlerFilter, utfallFilter, hjemmelModeFilter]);
 };
 
 export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {

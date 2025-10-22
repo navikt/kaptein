@@ -16,8 +16,9 @@ export const filterHjemler = <T extends BaseBehandling>(
     case null:
     case HjemlerModeFilter.INCLUDE_FOR_SOME:
       return behandlinger.filter((b) => hjemlerFilter.some((h) => getHjemler(b).includes(h)));
-    case HjemlerModeFilter.INCLUDE_FOR_ALL: {
+    case HjemlerModeFilter.INCLUDE_ALL_SELECTED:
       return behandlinger.filter((b) => hjemlerFilter.every((h) => getHjemler(b).includes(h)));
-    }
+    case HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING:
+      return behandlinger.filter((b) => getHjemler(b).every((h) => hjemlerFilter.includes(h)));
   }
 };

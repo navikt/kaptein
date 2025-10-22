@@ -9,19 +9,27 @@ const EF = { innsendingshjemmelIdList: ['E', 'F'] } as BaseBehandling;
 
 const getHjemler = (b: BaseBehandling) => b.innsendingshjemmelIdList;
 
-const BEHANDLINGER = [AB, CD, EF];
+const LIST = [AB, CD, EF];
 
 describe('filterHjemler', () => {
   test('Include some', () => {
-    const result = filterHjemler(BEHANDLINGER, ['A', 'B', 'C'], HjemlerModeFilter.INCLUDE_FOR_SOME, getHjemler);
+    const result = filterHjemler(LIST, ['A', 'B', 'C'], HjemlerModeFilter.INCLUDE_FOR_SOME, getHjemler);
 
     expect(result).toContain(AB);
     expect(result).toContain(CD);
     expect(result).not.toContain(EF);
   });
 
-  test('Include all', () => {
-    const result = filterHjemler(BEHANDLINGER, ['A', 'B'], HjemlerModeFilter.INCLUDE_FOR_ALL, getHjemler);
+  test('Include all selected', () => {
+    const result = filterHjemler(LIST, ['A', 'B'], HjemlerModeFilter.INCLUDE_ALL_SELECTED, getHjemler);
+
+    expect(result).toContain(AB);
+    expect(result).not.toContain(CD);
+    expect(result).not.toContain(EF);
+  });
+
+  test('Include all in behandling', () => {
+    const result = filterHjemler(LIST, ['A', 'B', 'C'], HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING, getHjemler);
 
     expect(result).toContain(AB);
     expect(result).not.toContain(CD);
@@ -29,7 +37,7 @@ describe('filterHjemler', () => {
   });
 
   test('null defaults to some', () => {
-    const result = filterHjemler(BEHANDLINGER, ['A', 'F'], null, getHjemler);
+    const result = filterHjemler(LIST, ['A', 'F'], null, getHjemler);
 
     expect(result).toContain(AB);
     expect(result).not.toContain(CD);
@@ -37,10 +45,10 @@ describe('filterHjemler', () => {
   });
 
   test('No hjemler selected', () => {
-    const result1 = filterHjemler(BEHANDLINGER, [], HjemlerModeFilter.INCLUDE_FOR_SOME, getHjemler);
-    const result2 = filterHjemler(BEHANDLINGER, [], HjemlerModeFilter.INCLUDE_FOR_ALL, getHjemler);
+    const result1 = filterHjemler(LIST, [], HjemlerModeFilter.INCLUDE_FOR_SOME, getHjemler);
+    const result2 = filterHjemler(LIST, [], HjemlerModeFilter.INCLUDE_ALL_SELECTED, getHjemler);
 
-    expect(result1).toEqual(BEHANDLINGER);
-    expect(result2).toEqual(BEHANDLINGER);
+    expect(result1).toEqual(LIST);
+    expect(result2).toEqual(LIST);
   });
 });
