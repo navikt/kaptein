@@ -58,6 +58,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },
         series,
+        legend: { type: 'scroll' },
       }}
     />
   );
