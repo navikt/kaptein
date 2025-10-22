@@ -24,28 +24,27 @@ export const HjemlerMode = ({ queryParam }: Props) => {
                 Minst én
               </Heading>
               <BodyLong spacing>
-                Minst én av hjemlene som er valgt i filteret må være i hjemmellisten til behandlingen for at den skal
-                tas med i statistikken.
+                Saken tas med i statistikken dersom minst én av hjemlene som er valgt i filteret er registrert på saken.
               </BodyLong>
 
               <Heading level="1" size="xsmall">
-                Alle filtrerte
+                Alle valgte
               </Heading>
               <BodyLong spacing>
-                Alle hjemlene som er valgt i filteret må være i hjemmellisten til behandlingen for at den skal tas med i
-                statistikken.
+                Saken tas med i statistikken dersom alle hjemlene som er valgt i filteret er registrert på saken.
               </BodyLong>
 
               <Heading level="1" size="xsmall">
-                Alle i behandling
+                Kun valgte
               </Heading>
               <BodyLong spacing>
-                Alle hjemlene i behandlingen må være blant de valgte hjemlene i filteret for at den skal tas med i
-                statistikken. Hvis behandlingen inneholder en hjemmel som ikke er valgt i filteret, blir den ikke tatt
-                med.
+                Saken tas med i statistikken dersom kun hjemmelen/hjemlene som er valgt i filteret er registrert på
+                saken. Hvis saken inneholder en hjemmel som ikke er valgt i filteret, blir den ikke tatt med.
               </BodyLong>
 
-              <BodyLong>Hvis det ikke er valgt noen hjemler i filteret vil behandlingen bli tatt med uansett.</BodyLong>
+              <BodyLong>
+                Hvis det ikke er valgt noen hjemler i filteret vil saken bli tatt med i statistikken uansett.
+              </BodyLong>
             </HelpText>
           </HStack>
         }
@@ -54,10 +53,10 @@ export const HjemlerMode = ({ queryParam }: Props) => {
           Minst én
         </ToggleGroup.Item>
         <ToggleGroup.Item className="whitespace-nowrap" value={HjemlerModeFilter.INCLUDE_ALL_SELECTED}>
-          Alle filtrerte
+          Alle valgte
         </ToggleGroup.Item>
         <ToggleGroup.Item className="whitespace-nowrap" value={HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING}>
-          Alle i behandling
+          Kun valgte
         </ToggleGroup.Item>
       </ToggleGroup>
     </HStack>
