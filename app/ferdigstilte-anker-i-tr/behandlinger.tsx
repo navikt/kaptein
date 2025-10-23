@@ -21,8 +21,13 @@ import { OmgjøringsprosentOverTid } from '@/components/key-stats/omgjøringspro
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import type {
   AnkeITRFerdigstilt,
+  AnkeITRLedig,
+  AnkeITRTildelt,
   AnkeITRUtfall,
   AnkerITRFerdigstilteResponse,
+  AnkerITRLedigeResponse,
+  AnkerITRTildelteResponse,
+  BaseAnkeITR,
   IKodeverkSimpleValue,
   IYtelse,
   RegistreringshjemlerMap,
@@ -39,30 +44,61 @@ interface KodeverkProps {
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
   const {
+    data: ledige,
+    isLoading: isLoadingLedige,
+    error: errorLedige,
+  } = useClientKapteinApiFetch<AnkerITRLedigeResponse>('/anker-i-tr/ledige');
+  const {
+    data: tildelte,
+    isLoading: isLoadingTildelte,
+    error: errorTildelte,
+  } = useClientKapteinApiFetch<AnkerITRTildelteResponse>('/anker-i-tr/tildelte');
+  const {
     data: ferdigstilte,
     isLoading: isLoadingFerdigstilte,
     error: errorFerdigstilte,
   } = useClientKapteinApiFetch<AnkerITRFerdigstilteResponse>('/anker-i-tr/ferdigstilte');
 
-  if (isLoadingFerdigstilte) {
+  if (isLoadingFerdigstilte || isLoadingLedige || isLoadingTildelte) {
     return <SkeletonFerdigstilte />;
   }
 
-  if (errorFerdigstilte !== null) {
+  if (errorFerdigstilte !== null || errorLedige !== null || errorTildelte !== null) {
     return <LoadingError>Feil ved lasting av data: {errorFerdigstilte}</LoadingError>;
   }
 
-  return <BehandlingerData {...kodeverk} ferdigstilte={ferdigstilte.behandlinger} />;
+  return (
+    <BehandlingerData
+      {...kodeverk}
+      ledige={ledige.behandlinger}
+      tildelte={tildelte.behandlinger}
+      ferdigstilte={ferdigstilte.behandlinger}
+    />
+  );
 };
 
 interface DataProps extends KodeverkProps {
+  ledige: AnkeITRLedig[];
+  tildelte: AnkeITRTildelt[];
   ferdigstilte: AnkeITRFerdigstilt[];
 }
 
-const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshjemlerMap, utfall }: DataProps) => {
-  const baseFiltered = useAnkeITRFilter(useUtfallFilter(useBaseFiltered(ferdigstilte)));
-  const ferdigstilteFiltered = useFerdigstiltInPeriod(baseFiltered);
-  const relevantYtelser = useRelevantYtelser(ferdigstilteFiltered, ytelser);
+const BehandlingerData = ({
+  ledige,
+  tildelte,
+  ferdigstilte,
+  ytelser,
+  klageenheter,
+  registreringshjemlerMap,
+  utfall,
+}: DataProps) => {
+  const baseFilteredFerdigstilte = useAnkeITRFilter(useUtfallFilter(useBaseFiltered(ferdigstilte)));
+  const ferdigstilteInPeriod = useFerdigstiltInPeriod(baseFilteredFerdigstilte);
+  const sentInPeriodFerdigstilte = useSentInPeriod(baseFilteredFerdigstilte);
+  const uferdige = [...ledige, ...tildelte];
+  const baseFilteredUferdige = useAnkeITRFilter(useBaseFiltered(uferdige));
+  const sentInPeriodUferdige = useSentInPeriod(baseFilteredUferdige);
+  const relevantYtelser = useRelevantYtelser(ferdigstilteInPeriod, ytelser);
 
   return (
     <ChartsWrapper>
@@ -80,15 +116,19 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
           </>
         }
       >
-        <OmgjøringsprosentOverTid behandlinger={useSentInPeriod(baseFiltered)} utfall={utfall} />
+        <OmgjøringsprosentOverTid
+          uferdige={sentInPeriodUferdige}
+          ferdigstilte={sentInPeriodFerdigstilte}
+          utfall={utfall}
+        />
       </Card>
 
       <Card span={4}>
         <HjemlerOmgjort
           title="Topp 30 omgjorte hjemler"
-          description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
           maxHjemler={30}
-          behandlinger={ferdigstilteFiltered}
+          behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
           ytelser={ytelser}
           registreringshjemlerMap={registreringshjemlerMap}
@@ -98,8 +138,8 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
       <Card span={3}>
         <TildelteSakerPerKlageenhetOgYtelse
           title="Ferdigstilte anker i TR per klageenhet og ytelse"
-          description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
-          behandlinger={ferdigstilteFiltered}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
         />
@@ -108,8 +148,8 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
       <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Ferdigstilte anker i TR per ytelse og klageenhet"
-          description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
-          behandlinger={ferdigstilteFiltered}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
         />
@@ -119,7 +159,7 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
         <Tidsfordeling
           title="Behandlingstid"
           caseType="Ferdigstilte"
-          behandlinger={ferdigstilteFiltered}
+          behandlinger={ferdigstilteInPeriod}
           getDays={(b) => b.behandlingstid}
         />
       </Card>
@@ -127,8 +167,8 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
       <Card span={2}>
         <DaysThresholdPieChart
           title="Behandlingstid"
-          description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
-          behandlinger={ferdigstilteFiltered}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          behandlinger={ferdigstilteInPeriod}
           getDays={(b) => b.behandlingstid}
         />
       </Card>
@@ -136,8 +176,8 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
       <Card span={4}>
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
-          description={`Viser data for ${ferdigstilteFiltered.length} ferdigstilte anker i TR`}
-          behandlinger={ferdigstilteFiltered}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          behandlinger={ferdigstilteInPeriod}
           relevantYtelser={relevantYtelser}
           getDays={(b) => b.behandlingstid}
         />
@@ -146,7 +186,7 @@ const BehandlingerData = ({ ferdigstilte, ytelser, klageenheter, registreringshj
   );
 };
 
-const useAnkeITRFilter = <T extends AnkeITRFerdigstilt>(behandlinger: T[]) => {
+const useAnkeITRFilter = <T extends BaseAnkeITR>(behandlinger: T[]) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
 

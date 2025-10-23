@@ -39,10 +39,13 @@ export enum AnkeITRUtfall {
 }
 
 export const ANKE_I_TR_UTFALL = Object.values(AnkeITRUtfall);
+export const isAnkeITRUtfall = (value: string): value is AnkeITRUtfall =>
+  ANKE_I_TR_UTFALL.includes(value as AnkeITRUtfall);
+
 export const ANKE_I_TR_OMGJØRINGSUTFALL: AnkeITRUtfall[] = [
   AnkeITRUtfall.OPPHEVET,
-  AnkeITRUtfall.MEDHOLD,
   AnkeITRUtfall.DELVIS_MEDHOLD,
+  AnkeITRUtfall.MEDHOLD,
 ];
 export const ANKE_I_TR_IKKE_OMGJØRINGSUTFALL: AnkeITRUtfall[] = ANKE_I_TR_UTFALL.filter(
   (u) => !ANKE_I_TR_OMGJØRINGSUTFALL.includes(u),

@@ -1,4 +1,5 @@
 import { eachMonthOfInterval, format, parse } from 'date-fns';
+import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
@@ -6,64 +7,94 @@ import { NoData } from '@/components/no-data/no-data';
 import { ISO_DATE_FORMAT, ISO_MONTH_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import {
+  ANKE_I_TR_IKKE_OMGJØRINGSUTFALL,
   ANKE_I_TR_OMGJØRINGSUTFALL,
+  ANKE_I_TR_UTFALL,
+  type AnkeITRFerdigstilt,
+  type AnkeITRLedig,
+  type AnkeITRTildelt,
   AnkeITRUtfall,
-  type BaseAnkeITR,
   type IKodeverkSimpleValue,
-  type Resultat,
+  isAnkeITRUtfall,
   Utfall,
 } from '@/lib/types';
 
 const HOS_TR = 'hos_tr';
-type HosTR = typeof HOS_TR;
-
-interface Result {
-  resultat: Resultat<AnkeITRUtfall> | null;
-}
 
 interface Props {
-  behandlinger: (BaseAnkeITR & Result)[];
+  uferdige: (AnkeITRLedig | AnkeITRTildelt)[];
+  ferdigstilte: AnkeITRFerdigstilt[];
   utfall: IKodeverkSimpleValue<Utfall | AnkeITRUtfall>[];
 }
 
-export const OmgjøringsprosentOverTid = ({ behandlinger, utfall }: Props) => {
+export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
-  const { labels, utfallSeriesData, total, totalPerMonthCountMap, totalOmgjort, totalOmgjortPercent } = useMemo(() => {
+  const ferdigstilteCount = ferdigstilte.filter((f) => f.resultat !== null).length;
+  const totalCaseCount = uferdige.length + ferdigstilteCount;
+
+  const utfallMap = useMemo(() => new Map(utfall.map((u) => [u.id, u])), [utfall]);
+
+  const { labels, perMonth, series, unfinishedData, totalOmgjortCount, totalOmgjortPercent } = useMemo(() => {
     const from = parse(fromFilter, ISO_DATE_FORMAT, new Date());
     const to = parse(toFilter, ISO_DATE_FORMAT, new Date());
 
-    const utfallMap = new Map(utfall.map((u) => [u.id, u]));
     const months = eachMonthOfInterval({ start: from, end: to }).map((d) => format(d, ISO_MONTH_FORMAT));
+    const perMonth = calculateCountPerMonthPerUtfall(months, uferdige, ferdigstilte);
 
-    // Calculate cumulative count per day per omgjort utfall
-    const { percentPerMonthMap, countPerMonthMap, totalPerMonthCountMap } = calculateCountPerMonthPerUtfall(
-      months,
-      behandlinger,
+    const values = perMonth.values().toArray();
+
+    const totalOmgjortCount = values.reduce((sum, monthData) => sum + monthData.omgjortCount, 0);
+    const totalOmgjortPercent = ferdigstilteCount === 0 ? 0 : (totalOmgjortCount / ferdigstilteCount) * 100;
+
+    const series = ANKE_I_TR_OMGJØRINGSUTFALL.map((utfallId) =>
+      createSerie({
+        id: utfallId,
+        name: utfallMap.get(utfallId)?.navn ?? 'Ukjent',
+        data: values.map(({ perUtfall }) => perUtfall.get(utfallId)?.percent ?? 0),
+        yAxisIndex: 0,
+        color: UTFALL_COLORS[utfallId],
+        stack: 'omgjort',
+        markLine:
+          utfallId === AnkeITRUtfall.MEDHOLD
+            ? {
+                symbol: ['none', 'none'],
+                animation: false,
+                data: [
+                  {
+                    yAxis: totalOmgjortPercent,
+                    name: 'Omgjøringsprosent for perioden',
+                    label: {
+                      show: true,
+                      formatter: ({ name }) => {
+                        return `${name}: ${totalOmgjortPercent.toFixed(1)} % (${totalOmgjortCount} saker)`;
+                      },
+                      color: 'var(--ax-text-neutral)',
+                      position: 'insideEndTop',
+                    },
+                  },
+                ],
+              }
+            : undefined,
+      }),
     );
-    const utfallSeriesData = calculateUtfallTimeSeries(utfallMap, percentPerMonthMap, countPerMonthMap);
 
-    const totalOmgjort = behandlinger.filter(
-      (b) => b.resultat !== null && ANKE_I_TR_OMGJØRINGSUTFALL.includes(b.resultat.utfallId),
-    ).length;
+    const unfinishedData = values.map(({ unfinished, total }) => (unfinished / total) * 100);
 
-    return {
-      labels: months,
-      utfallSeriesData,
-      total: behandlinger.length,
-      totalPerMonthCountMap,
-      totalOmgjort,
-      totalOmgjortPercent: ((totalOmgjort / behandlinger.length) * 100).toFixed(1),
-    };
-  }, [behandlinger, utfall, fromFilter, toFilter]);
+    series.push(
+      createSerie({ id: HOS_TR, name: 'Hos TR', data: unfinishedData, yAxisIndex: 1, color: 'var(--ax-neutral-500)' }),
+    );
 
-  if (labels.length === 0 || utfallSeriesData.length === 0) {
+    return { labels: months, series, perMonth, unfinishedData, totalOmgjortCount, totalOmgjortPercent };
+  }, [ferdigstilte, fromFilter, toFilter, uferdige, ferdigstilteCount, utfallMap]);
+
+  if (labels.length === 0) {
     return <NoData title="Omgjøringsprosent over tid" />;
   }
 
-  const description = `Basert på ${total} saker sendt til TR ila. valgt periode. Fordelt på utfall. {bold|Omgjort}: ${totalOmgjortPercent} % (${totalOmgjort})`;
+  const description = `Basert på ${totalCaseCount} saker sendt til TR i løpet av valgt periode. Fordelt på utfall. {bold|Omgjort}: ${totalOmgjortPercent.toFixed(1)} % (${totalOmgjortCount} saker)`;
 
-  const max = Math.min(Math.round(Math.max(...utfallSeriesData.map((u) => Math.max(...u.percentOverTime))) * 2), 100);
+  const max = getMax(perMonth, unfinishedData);
 
   return (
     <EChart
@@ -87,215 +118,197 @@ export const OmgjøringsprosentOverTid = ({ behandlinger, utfall }: Props) => {
               precision: '1',
             },
           },
-          formatter: (params: unknown) => {
+          formatter: (
+            params: {
+              seriesId: string;
+              dataIndex: number;
+              data: number;
+              value: number;
+              axisValue: string;
+              marker: string;
+              seriesName: string;
+            }[],
+            // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
+          ) => {
             if (!Array.isArray(params)) {
               return '';
             }
-            const monthLabel = params[0]?.axisValue ?? '';
+
+            const monthLabel = params[0]?.axisValue;
+
+            if (monthLabel === undefined) {
+              return '';
+            }
+
+            const monthData = perMonth.get(monthLabel);
+
+            if (monthData === undefined) {
+              return '';
+            }
+
             let result = `<strong>${monthLabel}</strong><br/><table class="w-full mt-2">`;
             result +=
-              '<thead><tr><th class="text-left">Utfall</th><th class="text-right pl-3">Prosent</th><th class="text-right pl-3">Antall</th></tr></thead>';
+              '<thead><tr><th class="text-left" colspan="2">Utfall</th><th class="text-right pl-3">Prosent</th><th class="text-right pl-3">Antall</th></tr></thead>';
             result += '<tbody>';
 
-            let omgjortPercentage = 0;
-            let omgjortCount = 0;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Omgjort</td><td class="text-right pl-3">${monthData.omgjortPercent.toFixed(1)} %</td><td class="text-right pl-3">${monthData.omgjortCount}</td></tr>`;
 
             for (const param of params) {
-              const seriesData = utfallSeriesData.find((s) => s.utfallId === param.seriesId);
-
-              if (seriesData === undefined) {
+              if (param.seriesId === HOS_TR || !isAnkeITRUtfall(param.seriesId)) {
                 continue;
               }
 
-              const rawCount = seriesData.countOverTime[param.dataIndex] ?? 0;
-              const percentage = param.value.toFixed(1);
-              result += `<tr><td class="text-left">${param.marker} ${param.seriesName}</td><td class="text-right pl-3">${percentage} %</td><td class="text-right pl-3">${rawCount}</td></tr>`;
+              const utfallData = monthData.perUtfall.get(param.seriesId);
 
-              // Sum up omgjort values (excluding "Hos TR")
-              if (seriesData.utfallId !== HOS_TR) {
-                omgjortPercentage += typeof percentage === 'number' ? percentage : Number.parseFloat(percentage);
-                omgjortCount += rawCount;
+              if (utfallData === undefined) {
+                continue;
               }
+
+              const rawCount = utfallData.count;
+              const percentage = param.value.toFixed(1);
+
+              result += `<tr><td>${param.marker}</td><td class="text-left">${param.seriesName}</td><td class="text-right pl-3">${percentage} %</td><td class="text-right pl-3">${rawCount}</td></tr>`;
             }
 
-            const totalInMonth = totalPerMonthCountMap.get(monthLabel) ?? 0;
-            const ikkeOmgjortCount = totalInMonth - omgjortCount;
-            const ikkeOmgjortPercentage = totalInMonth === 0 ? 0 : ((ikkeOmgjortCount / totalInMonth) * 100).toFixed(1);
+            const ikkeOmgjortCount = monthData.finished - monthData.omgjortCount;
+            const ikkeOmgjortPercentage =
+              monthData.finished === 0 ? 0 : ((ikkeOmgjortCount / monthData.finished) * 100).toFixed(1);
 
-            result += `<tr class="border-t border-ax-border-neutral-strong"><td class="text-left py-1">Omgjort</td><td class="text-right pl-3 pt-1">${omgjortPercentage.toFixed(1)} %</td><td class="text-right pl-3 pt-1">${omgjortCount}</td></tr>`;
-            result += `<tr class="border-t border-ax-border-neutral-strong"><td class="text-left py-1">Ikke omgjort</td><td class="text-right pl-3 pt-1">${ikkeOmgjortPercentage} %</td><td class="text-right pl-3 pt-1">${ikkeOmgjortCount}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Ikke omgjort</td><td class="text-right pl-3">${ikkeOmgjortPercentage} %</td><td class="text-right pl-3">${ikkeOmgjortCount}</td></tr>`;
 
-            // Add "Totalt" row
-            result += `<tr class="border-t border-ax-border-neutral-strong"><td class="text-left pt-1 font-semibold" colspan="2">Totalt</td><td class="text-right pl-3 pt-1 font-semibold">${totalInMonth}</td></tr>`;
+            for (const utfallId of ANKE_I_TR_IKKE_OMGJØRINGSUTFALL) {
+              const utfallData = monthData.perUtfall.get(utfallId);
+
+              if (utfallData === undefined) {
+                continue;
+              }
+
+              const percentage = utfallData.percent.toFixed(1);
+              const rawCount = utfallData.count;
+
+              result += `<tr><td><span style="border-color: ${UTFALL_COLORS[utfallId]};" class="inline-block mr-1 border border-dashed rounded-full w-[10px] h-[10px]" /></td><td class="text-left">${utfallMap.get(utfallId)?.navn ?? 'Ukjent'}</td><td class="text-right">${percentage} %</td><td class="text-right pl-3">${rawCount}</td></tr>`;
+            }
+
+            // Add "Total" row
+            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Total</td><td class="text-right pl-3">100.0 %</td><td class="text-right pl-3">${monthData.total}</td></tr>`;
+
+            // Add "Ferdigstilte" row
+            const finishedPercent = (monthData.total === 0 ? 0 : (monthData.finished / monthData.total) * 100).toFixed(
+              1,
+            );
+            result += `<tr class="border-ax-border-neutral-strong"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] border border-dashed border-ax-accent-500" /></td><td class="text-left">Ferdigstilte</td><td class="text-right pl-3">${finishedPercent} %</td><td class="text-right pl-3">${monthData.finished}</td></tr>`;
+
+            // Add "Hos TR" row
+            const hosTRPercentage = (
+              monthData.total === 0 ? 0 : (monthData.unfinished / monthData.total) * 100
+            ).toFixed(1);
+            result += `<tr class="border-ax-border-neutral-strong italic"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] bg-ax-neutral-500" /></td><td class="text-left py-1">Hos TR</td><td class="text-right pl-3">${hosTRPercentage} %</td><td class="text-right pl-3">${monthData.unfinished}</td></tr>`;
 
             result += '</tbody></table>';
+
+            result += `<div role="progressbar" aria-valuenow="${finishedPercent}" aria-valuemin="0" aria-valuemax="100" class="w-full aksel-progress-bar aksel-progress-bar--small"><div style="width: ${finishedPercent}%" class="h-full bg-ax-accent-500" /></div>`;
+
             return result;
           },
         },
         yAxis: [
-          {
-            type: 'value',
-            name: 'Omgjort',
-            axisLabel: {
-              formatter: '{value} %',
-            },
-            max,
-          },
-          {
-            type: 'value',
-            name: 'Hos TR',
-            inverse: true,
-            axisLabel: {
-              formatter: '{value} %',
-            },
-            max,
-          },
+          { type: 'value', name: 'Omgjort', axisLabel: { formatter: '{value} %' }, max },
+          { type: 'value', name: 'Hos TR', inverse: true, axisLabel: { formatter: '{value} %' }, max },
         ],
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: labels,
-          axisLabel: { rotate: 45 },
-        },
-        series: utfallSeriesData.map(({ utfallId, utfallNavn, percentOverTime: countOverTime }) => ({
-          id: utfallId,
-          name: utfallNavn,
-          type: 'line',
-          smooth: 0.3,
-          stack: utfallId === HOS_TR ? undefined : 'total',
-          stackOrder: 'seriesDesc',
-          symbol: 'none',
-          data: countOverTime,
-          yAxisIndex: utfallId === HOS_TR ? 1 : 0,
-          itemStyle: {
-            color: utfallId === HOS_TR ? 'var(--ax-neutral-500)' : UTFALL_COLORS[utfallId],
-          },
-          lineStyle: {
-            width: 2,
-          },
-          areaStyle: {
-            color: utfallId === HOS_TR ? 'var(--ax-neutral-500)' : UTFALL_COLORS[utfallId],
-            opacity: 0.6,
-          },
-          emphasis: {
-            focus: 'series',
-          },
-        })),
+        xAxis: { type: 'category', boundaryGap: false, data: labels, axisLabel: { rotate: 45 } },
+        series,
       }}
     />
   );
 };
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
-const calculateCountPerMonthPerUtfall = (months: string[], behandlinger: (BaseAnkeITR & Result)[]) => {
-  const percentPerMonthMap = new Map<string, Map<AnkeITRUtfall | HosTR, number>>();
-  const countPerMonthMap = new Map<string, Map<AnkeITRUtfall | HosTR, number>>();
-  const totalPerMonthCountMap = new Map<string, number>();
+interface UtfallData {
+  count: number;
+  percent: number;
+}
+
+type PerUtfall = Map<AnkeITRUtfall, UtfallData>;
+
+type MonthData = {
+  total: number;
+  finished: number;
+  unfinished: number;
+  omgjortCount: number;
+  omgjortPercent: number;
+  perUtfall: PerUtfall;
+};
+
+const calculateCountPerMonthPerUtfall = (
+  months: string[],
+  uferdige: (AnkeITRLedig | AnkeITRTildelt)[],
+  ferdigstilte: AnkeITRFerdigstilt[],
+) => {
+  const countPerMonthMap = new Map<string, MonthData>();
 
   for (const month of months) {
-    const monthBucket = new Map<AnkeITRUtfall | HosTR, number>([[HOS_TR, 0]]);
-    const rawMonthBucket = new Map<AnkeITRUtfall | HosTR, number>([[HOS_TR, 0]]);
-    let monthCount = 0;
+    const perUtfall = new Map<AnkeITRUtfall, UtfallData>(ANKE_I_TR_UTFALL.map((u) => [u, { count: 0, percent: 0 }])); // Initiate with 0 values for all utfall.
 
-    // Ensure all days have an entry for all omgjort utfall, even if 0
-    for (const u of ANKE_I_TR_OMGJØRINGSUTFALL) {
-      monthBucket.set(u, 0);
-      rawMonthBucket.set(u, 0);
+    let unfinishedCount = 0;
+    let finishedCount = 0;
+    let omgjortCount = 0;
+
+    for (const behandling of uferdige) {
+      if (behandling.sendtTilTR.startsWith(month)) {
+        unfinishedCount++;
+      }
     }
 
-    // Count total cases completed on or before this day
-    let totalCasesUntilDay = 0;
+    // Count completed cases
+    for (const behandling of ferdigstilte) {
+      if (behandling.resultat !== null && behandling.sendtTilTR.startsWith(month)) {
+        finishedCount++;
 
-    // Count cases completed on or before this day
-    for (const behandling of behandlinger) {
-      if (behandling.sendtTilTR.startsWith(month)) {
-        monthCount++;
-        totalCasesUntilDay++;
+        if (ANKE_I_TR_OMGJØRINGSUTFALL.includes(behandling.resultat.utfallId)) {
+          omgjortCount++;
+        }
 
-        if (behandling.resultat === null) {
-          const count = monthBucket.get(HOS_TR) ?? 0;
-          monthBucket.set(HOS_TR, count + 1);
-          rawMonthBucket.set(HOS_TR, count + 1);
+        const utfallData = perUtfall.get(behandling.resultat.utfallId);
+
+        if (utfallData !== undefined) {
+          utfallData.count += 1;
         } else {
-          const utfallId = behandling.resultat.utfallId;
-
-          // Only count omgjort utfall
-          if (ANKE_I_TR_OMGJØRINGSUTFALL.includes(utfallId)) {
-            const count = monthBucket.get(utfallId) ?? 0;
-            monthBucket.set(utfallId, count + 1);
-            rawMonthBucket.set(utfallId, count + 1);
-          }
+          perUtfall.set(behandling.resultat.utfallId, { count: 1, percent: 100 });
         }
       }
     }
 
-    totalPerMonthCountMap.set(month, monthCount);
-
-    // Store raw counts
-    countPerMonthMap.set(month, rawMonthBucket);
-
-    // Convert counts to percentages
-    if (totalCasesUntilDay > 0) {
-      for (const [utfallId, count] of monthBucket) {
-        monthBucket.set(utfallId, (count / totalCasesUntilDay) * 100);
-      }
-    } else {
-      for (const [utfallId] of monthBucket) {
-        monthBucket.set(utfallId, 0);
-      }
+    // Calculate percentages
+    for (const [_utfallId, data] of perUtfall) {
+      data.percent = finishedCount === 0 ? 0 : (data.count / finishedCount) * 100;
     }
 
-    percentPerMonthMap.set(month, monthBucket);
+    countPerMonthMap.set(month, {
+      finished: finishedCount,
+      total: finishedCount + unfinishedCount,
+      unfinished: unfinishedCount,
+      omgjortCount: omgjortCount,
+      omgjortPercent: finishedCount === 0 ? 0 : (omgjortCount / finishedCount) * 100,
+      perUtfall,
+    });
   }
 
-  return { percentPerMonthMap, countPerMonthMap, totalPerMonthCountMap };
+  return countPerMonthMap;
 };
 
-interface UtfallTimeSeries {
-  utfallId: AnkeITRUtfall | HosTR;
-  utfallNavn: string;
-  percentOverTime: number[];
-  countOverTime: number[];
-}
+const getMax = (perMonth: Map<string, MonthData>, unfinishedData: number[]) => {
+  const unfinishedMax = Math.ceil(Math.max(...unfinishedData));
 
-const calculateUtfallTimeSeries = (
-  utfallMap: Map<string, IKodeverkSimpleValue>,
-  percentPerMonthPerUtfall: Map<string, Map<AnkeITRUtfall | HosTR, number>>,
-  countsPerMonthPerUtfall: Map<string, Map<AnkeITRUtfall | HosTR, number>>,
-): UtfallTimeSeries[] => {
-  const utfallSeries = new Map<AnkeITRUtfall | HosTR, UtfallTimeSeries>();
-
-  // Transpose the map to be per utfall instead of per day
-  const months = Array.from(percentPerMonthPerUtfall.keys());
-
-  for (const month of months) {
-    const percentPerUtfall = percentPerMonthPerUtfall.get(month);
-    const countPerUtfall = countsPerMonthPerUtfall.get(month);
-
-    if (percentPerUtfall === undefined || countPerUtfall === undefined) {
-      continue;
-    }
-
-    for (const [utfallId, percent] of percentPerUtfall) {
-      const count = countPerUtfall.get(utfallId) ?? 0;
-      const series = utfallSeries.get(utfallId);
-
-      if (series === undefined) {
-        const utfallNavn = utfallId === HOS_TR ? 'Hos TR' : (utfallMap.get(utfallId)?.navn ?? 'Ukjent');
-        utfallSeries.set(utfallId, { utfallId, utfallNavn, percentOverTime: [percent], countOverTime: [count] });
-      } else {
-        series.percentOverTime.push(percent);
-        series.countOverTime.push(count);
-      }
-    }
+  if (unfinishedMax === 100) {
+    return 100;
   }
 
-  return [
-    utfallSeries.get(AnkeITRUtfall.MEDHOLD),
-    utfallSeries.get(AnkeITRUtfall.DELVIS_MEDHOLD),
-    utfallSeries.get(AnkeITRUtfall.OPPHEVET),
-    utfallSeries.get(HOS_TR),
-  ].filter((d): d is UtfallTimeSeries => d !== undefined);
+  const finishedMax = Math.ceil(Math.max(...perMonth.values().map((m) => m.omgjortPercent)));
+
+  if (finishedMax === 100) {
+    return 100;
+  }
+
+  return Math.min(finishedMax + unfinishedMax, 100);
 };
 
 const UTFALL_COLORS: Record<AnkeITRUtfall, string> = {
@@ -305,5 +318,39 @@ const UTFALL_COLORS: Record<AnkeITRUtfall, string> = {
   [Utfall.STADFESTET]: 'var(--ax-success-500)',
   [Utfall.AVVIST]: 'var(--ax-accent-500)',
   [Utfall.HEVET]: 'var(--ax-meta-lime-500)',
-  [Utfall.HENVIST]: 'var(--ax-meta-purple-500)',
+  [Utfall.HENVIST]: 'var(--ax-brand-blue-500)',
 };
+
+interface SerieParams {
+  id: string;
+  name: string;
+  color: string;
+  data: number[];
+  stack?: string;
+  yAxisIndex?: number;
+  markLine?: LineSeriesOption['markLine'];
+}
+
+const createSerie = ({
+  id,
+  name,
+  color,
+  data,
+  stack,
+  yAxisIndex = 0,
+  markLine,
+}: SerieParams): LineSeriesOption | BarSeriesOption => ({
+  id,
+  name,
+  data,
+  yAxisIndex,
+  type: data.length > 1 ? 'line' : 'bar',
+  stack,
+  smooth: 0.3,
+  symbol: 'none',
+  itemStyle: { color },
+  lineStyle: { width: 2 },
+  areaStyle: { color, opacity: 0.6 },
+  emphasis: { focus: 'series' },
+  markLine,
+});
