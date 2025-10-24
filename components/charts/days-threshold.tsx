@@ -79,9 +79,10 @@ export const DaysThresholdPieChart = <T extends BaseBehandling>({
               },
             ],
             label: {
-              formatter: ({ name, value }) => `${name}: ${value}`,
+              formatter: ({ name, value }) =>
+                `${name}: ${((value / behandlinger.length) * 100).toFixed(1)} % (${value} saker)`,
             },
-            emphasis: { focus: 'self' },
+            emphasis: { disabled: true },
           },
         ]}
       />

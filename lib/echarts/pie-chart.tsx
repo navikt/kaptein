@@ -13,7 +13,8 @@ interface Serie<D> {
     formatter?: (data: D) => string;
   };
   emphasis?: {
-    focus: string;
+    disabled?: boolean;
+    focus?: string;
   };
 }
 
