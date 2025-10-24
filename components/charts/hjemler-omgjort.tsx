@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
+import { formatPercent } from '@/lib/format';
+import { percent } from '@/lib/percent';
 import {
   ANKE_I_TR_OMGJØRINGSUTFALL,
   type AnkeITRFerdigstilt,
@@ -281,8 +283,6 @@ export const HjemlerOmgjort = ({
               }
             }
 
-            const overallPercentage = totalCases > 0 ? (totalOmgjort / totalCases) * 100 : 0;
-
             const rows = filtered
               .map(({ value, data, marker, seriesName }) => {
                 const percentage = data?.percentage ?? 0;
@@ -290,7 +290,7 @@ export const HjemlerOmgjort = ({
                   <tr>
                     <td>${marker}</td>
                     <td style="padding-left: 8px;">${seriesName}</td>
-                    <td style="padding-left: 16px; font-weight: bold; text-align: right;">${value} (${typeof percentage === 'number' ? percentage.toFixed(1) : percentage} % av ${seriesName.toLowerCase()} saker)</td>
+                    <td style="padding-left: 16px; font-weight: bold; text-align: right;">${value} (${typeof percentage === 'number' ? formatPercent(percentage / 100) : percentage} av ${seriesName.toLowerCase()} saker)</td>
                   </tr>
                 `;
               })
@@ -300,7 +300,7 @@ export const HjemlerOmgjort = ({
               <tr style="border-top: 1px solid #ccc;">
                 <td></td>
                 <td style="padding-left: 8px; padding-top: 4px;"><strong>Total</strong></td>
-                <td style="padding-left: 16px; font-weight: bold; text-align: right; padding-top: 4px;">${totalCount} (${overallPercentage.toFixed(1)} % av alle saker for ${filtered.length} ${filtered.length === 1 ? 'ytelse' : 'ytelser'})</td>
+                <td style="padding-left: 16px; font-weight: bold; text-align: right; padding-top: 4px;">${totalCount} (${percent(totalOmgjort, totalCases)} av alle saker for ${filtered.length} ${filtered.length === 1 ? 'ytelse' : 'ytelser'})</td>
               </tr>
             `;
 

@@ -7,6 +7,7 @@ import { COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common
 import { DayPicker } from '@/components/charts/common/day-picker';
 import { NoData } from '@/components/no-data/no-data';
 import { PieChart } from '@/lib/echarts/pie-chart';
+import { percent } from '@/lib/percent';
 import type { BaseBehandling } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -79,8 +80,7 @@ export const DaysThresholdPieChart = <T extends BaseBehandling>({
               },
             ],
             label: {
-              formatter: ({ name, value }) =>
-                `${name}: ${((value / behandlinger.length) * 100).toFixed(1)} % (${value} saker)`,
+              formatter: ({ name, value }) => `${name}: ${percent(value, behandlinger.length)} (${value} saker)`,
             },
             emphasis: { disabled: true },
           },

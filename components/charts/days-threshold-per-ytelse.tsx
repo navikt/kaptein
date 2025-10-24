@@ -10,6 +10,8 @@ import {
 import { DayPicker } from '@/components/charts/common/day-picker';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
+import { formatInt } from '@/lib/format';
+import { percent } from '@/lib/percent';
 import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -64,7 +66,7 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
 
       const totalCount = (overCount ?? 0) + (underCount ?? 0);
 
-      labels.push(`${ytelse.navn} (${totalCount})`);
+      labels.push(`${ytelse.navn} (${formatInt(totalCount)})`);
     }
 
     return { overSeriesData, underSeriesData, labels };
@@ -84,6 +86,30 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
         className="grow"
         option={{
           ...COMMON_STACKED_BAR_CHART_PROPS,
+          tooltip: {
+            ...COMMON_STACKED_BAR_CHART_PROPS.tooltip,
+            formatter: (params: unknown) => {
+              if (!Array.isArray(params)) {
+                return '';
+              }
+
+              let tooltip = `${params[0].axisValue}<br/>`;
+
+              // Calculate total for percentage
+              const total = params.reduce((sum, param) => {
+                const count = typeof param.data === 'number' ? param.data : 0;
+                return sum + count;
+              }, 0);
+
+              params.forEach((param) => {
+                const count = typeof param.data === 'number' ? param.data : 0;
+                const percentage = percent(count, total);
+                tooltip += `${param.marker} ${param.seriesName}: ${percentage} (${count} saker)<br/>`;
+              });
+
+              return tooltip;
+            },
+          },
           yAxis: { type: 'category', data: labels },
           series: [
             {

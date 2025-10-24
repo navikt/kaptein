@@ -158,6 +158,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
 
             const axisValue = params[0].axisValue;
             let result = `<strong>${axisValue}</strong><br/>`;
+            result += '<table class="w-full mt-2">';
 
             for (const param of params) {
               const { seriesId, marker, seriesName, value } = param;
@@ -166,12 +167,16 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
                 continue;
               }
 
-              // Add % for pressure series
-              const formattedValue = seriesId === 'pressure' ? `${value} % ift. ferdigstilte` : `${value} saker`;
+              const formattedValue = `${value} saker`;
 
-              result += `${marker} ${seriesName}: ${formattedValue}<br/>`;
+              result += `<tr>
+                <td>${marker}</td>
+                <td>${seriesName}</td>
+                <td class="font-bold">${formattedValue}</td>
+              </tr>`;
             }
 
+            result += '</table>';
             return result;
           },
         },

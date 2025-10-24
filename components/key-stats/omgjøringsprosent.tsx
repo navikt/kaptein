@@ -6,6 +6,8 @@ import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { ISO_DATE_FORMAT, ISO_MONTH_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
+import { formatPercent } from '@/lib/format';
+import { percent } from '@/lib/percent';
 import {
   ANKE_I_TR_IKKE_OMGJØRINGSUTFALL,
   ANKE_I_TR_OMGJØRINGSUTFALL,
@@ -45,7 +47,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     const values = perMonth.values().toArray();
 
     const totalOmgjortCount = values.reduce((sum, monthData) => sum + monthData.omgjortCount, 0);
-    const totalOmgjortPercent = ferdigstilteCount === 0 ? 0 : (totalOmgjortCount / ferdigstilteCount) * 100;
+    const totalOmgjortPercent = ferdigstilteCount === 0 ? 0 : totalOmgjortCount / ferdigstilteCount;
 
     const series = ANKE_I_TR_OMGJØRINGSUTFALL.map((utfallId) =>
       createSerie({
@@ -67,7 +69,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
                     label: {
                       show: true,
                       formatter: ({ name }) => {
-                        return `${name}: ${totalOmgjortPercent.toFixed(1)} % (${totalOmgjortCount} saker)`;
+                        return `${name}: ${formatPercent(totalOmgjortPercent)} (${totalOmgjortCount} saker)`;
                       },
                       color: 'var(--ax-text-neutral)',
                       position: 'insideEndTop',
@@ -79,7 +81,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
       }),
     );
 
-    const unfinishedData = values.map(({ unfinished, total }) => (unfinished / total) * 100);
+    const unfinishedData = values.map(({ unfinished, total }) => unfinished / total);
 
     series.push(
       createSerie({ id: HOS_TR, name: 'Hos TR', data: unfinishedData, yAxisIndex: 1, color: 'var(--ax-neutral-500)' }),
@@ -92,7 +94,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     return <NoData title="Omgjøringsprosent over tid" />;
   }
 
-  const description = `Basert på ${totalCaseCount} saker sendt til TR i løpet av valgt periode. Fordelt på utfall. {bold|Omgjort}: ${totalOmgjortPercent.toFixed(1)} % (${totalOmgjortCount} saker)`;
+  const description = `Basert på ${totalCaseCount} saker sendt til TR i løpet av valgt periode. Fordelt på utfall. {bold|Omgjort}: ${formatPercent(totalOmgjortPercent)} (${totalOmgjortCount} saker)`;
 
   const max = getMax(perMonth, unfinishedData);
 
@@ -115,7 +117,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
             type: 'cross',
             snap: true,
             label: {
-              precision: '1',
+              formatter: ({ axisDimension, value }: Axis) => (axisDimension === 'y' ? formatPercent(value) : value),
             },
           },
           formatter: (
@@ -128,7 +130,6 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
               marker: string;
               seriesName: string;
             }[],
-            // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
           ) => {
             if (!Array.isArray(params)) {
               return '';
@@ -151,7 +152,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
               '<thead><tr><th class="text-left" colspan="2">Utfall</th><th class="text-right pl-3">Prosent</th><th class="text-right pl-3">Antall</th></tr></thead>';
             result += '<tbody>';
 
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Omgjort</td><td class="text-right pl-3">${monthData.omgjortPercent.toFixed(1)} %</td><td class="text-right pl-3">${monthData.omgjortCount}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Omgjort</td><td class="text-right pl-3">${formatPercent(monthData.omgjortPercent)}</td><td class="text-right pl-3">${monthData.omgjortCount}</td></tr>`;
 
             for (const param of params) {
               if (param.seriesId === HOS_TR || !isAnkeITRUtfall(param.seriesId)) {
@@ -165,16 +166,17 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
               }
 
               const rawCount = utfallData.count;
-              const percentage = param.value.toFixed(1);
+              const percentage = formatPercent(param.value);
 
-              result += `<tr><td>${param.marker}</td><td class="text-left">${param.seriesName}</td><td class="text-right pl-3">${percentage} %</td><td class="text-right pl-3">${rawCount}</td></tr>`;
+              result += `<tr><td>${param.marker}</td><td class="text-left">${param.seriesName}</td><td class="text-right pl-3">${percentage}</td><td class="text-right pl-3">${rawCount}</td></tr>`;
             }
 
             const ikkeOmgjortCount = monthData.finished - monthData.omgjortCount;
-            const ikkeOmgjortPercentage =
-              monthData.finished === 0 ? 0 : ((ikkeOmgjortCount / monthData.finished) * 100).toFixed(1);
+            const ikkeOmgjortPercentage = formatPercent(
+              monthData.finished === 0 ? 0 : ikkeOmgjortCount / monthData.finished,
+            );
 
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Ikke omgjort</td><td class="text-right pl-3">${ikkeOmgjortPercentage} %</td><td class="text-right pl-3">${ikkeOmgjortCount}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Ikke omgjort</td><td class="text-right pl-3">${ikkeOmgjortPercentage}</td><td class="text-right pl-3">${ikkeOmgjortCount}</td></tr>`;
 
             for (const utfallId of ANKE_I_TR_IKKE_OMGJØRINGSUTFALL) {
               const utfallData = monthData.perUtfall.get(utfallId);
@@ -183,26 +185,22 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
                 continue;
               }
 
-              const percentage = utfallData.percent.toFixed(1);
+              const percentage = formatPercent(utfallData.percent);
               const rawCount = utfallData.count;
 
-              result += `<tr><td><span style="border-color: ${UTFALL_COLORS[utfallId]};" class="inline-block mr-1 border border-dashed rounded-full w-[10px] h-[10px]" /></td><td class="text-left">${utfallMap.get(utfallId)?.navn ?? 'Ukjent'}</td><td class="text-right">${percentage} %</td><td class="text-right pl-3">${rawCount}</td></tr>`;
+              result += `<tr><td><span style="border-color: ${UTFALL_COLORS[utfallId]};" class="inline-block mr-1 border border-dashed rounded-full w-[10px] h-[10px]" /></td><td class="text-left">${utfallMap.get(utfallId)?.navn ?? 'Ukjent'}</td><td class="text-right">${percentage}</td><td class="text-right pl-3">${rawCount}</td></tr>`;
             }
 
             // Add "Total" row
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Total</td><td class="text-right pl-3">100.0 %</td><td class="text-right pl-3">${monthData.total}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Total</td><td class="text-right pl-3">100,0 %</td><td class="text-right pl-3">${monthData.total}</td></tr>`;
 
             // Add "Ferdigstilte" row
-            const finishedPercent = (monthData.total === 0 ? 0 : (monthData.finished / monthData.total) * 100).toFixed(
-              1,
-            );
-            result += `<tr class="border-ax-border-neutral-strong"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] border border-dashed border-ax-accent-500" /></td><td class="text-left">Ferdigstilte</td><td class="text-right pl-3">${finishedPercent} %</td><td class="text-right pl-3">${monthData.finished}</td></tr>`;
+            const finishedPercent = percent(monthData.finished, monthData.total);
+            result += `<tr class="border-ax-border-neutral-strong"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] border border-dashed border-ax-accent-500" /></td><td class="text-left">Ferdigstilte</td><td class="text-right pl-3">${finishedPercent}</td><td class="text-right pl-3">${monthData.finished}</td></tr>`;
 
             // Add "Hos TR" row
-            const hosTRPercentage = (
-              monthData.total === 0 ? 0 : (monthData.unfinished / monthData.total) * 100
-            ).toFixed(1);
-            result += `<tr class="border-ax-border-neutral-strong italic"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] bg-ax-neutral-500" /></td><td class="text-left py-1">Hos TR</td><td class="text-right pl-3">${hosTRPercentage} %</td><td class="text-right pl-3">${monthData.unfinished}</td></tr>`;
+            const hosTRPercentage = percent(monthData.unfinished, monthData.total);
+            result += `<tr class="border-ax-border-neutral-strong italic"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] bg-ax-neutral-500" /></td><td class="text-left py-1">Hos TR</td><td class="text-right pl-3">${hosTRPercentage}</td><td class="text-right pl-3">${monthData.unfinished}</td></tr>`;
 
             result += '</tbody></table>';
 
@@ -212,8 +210,14 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
           },
         },
         yAxis: [
-          { type: 'value', name: 'Omgjort', axisLabel: { formatter: '{value} %' }, max },
-          { type: 'value', name: 'Hos TR', inverse: true, axisLabel: { formatter: '{value} %' }, max },
+          { type: 'value', name: 'Omgjort', axisLabel: { formatter: (v: number) => formatPercent(v, 0) }, max },
+          {
+            type: 'value',
+            name: 'Hos TR',
+            inverse: true,
+            axisLabel: { formatter: (v: number) => formatPercent(v, 0) },
+            max,
+          },
         ],
         xAxis: { type: 'category', boundaryGap: false, data: labels, axisLabel: { rotate: 45 } },
         series,
@@ -272,14 +276,14 @@ const calculateCountPerMonthPerUtfall = (
         if (utfallData !== undefined) {
           utfallData.count += 1;
         } else {
-          perUtfall.set(behandling.resultat.utfallId, { count: 1, percent: 100 });
+          perUtfall.set(behandling.resultat.utfallId, { count: 1, percent: 1 });
         }
       }
     }
 
     // Calculate percentages
     for (const [_utfallId, data] of perUtfall) {
-      data.percent = finishedCount === 0 ? 0 : (data.count / finishedCount) * 100;
+      data.percent = finishedCount === 0 ? 0 : data.count / finishedCount;
     }
 
     countPerMonthMap.set(month, {
@@ -287,7 +291,7 @@ const calculateCountPerMonthPerUtfall = (
       total: finishedCount + unfinishedCount,
       unfinished: unfinishedCount,
       omgjortCount: omgjortCount,
-      omgjortPercent: finishedCount === 0 ? 0 : (omgjortCount / finishedCount) * 100,
+      omgjortPercent: finishedCount === 0 ? 0 : omgjortCount / finishedCount,
       perUtfall,
     });
   }
@@ -298,17 +302,17 @@ const calculateCountPerMonthPerUtfall = (
 const getMax = (perMonth: Map<string, MonthData>, unfinishedData: number[]) => {
   const unfinishedMax = Math.ceil(Math.max(...unfinishedData));
 
-  if (unfinishedMax === 100) {
-    return 100;
+  if (unfinishedMax === 1) {
+    return 1;
   }
 
   const finishedMax = Math.ceil(Math.max(...perMonth.values().map((m) => m.omgjortPercent)));
 
-  if (finishedMax === 100) {
-    return 100;
+  if (finishedMax === 1) {
+    return 1;
   }
 
-  return Math.min(finishedMax + unfinishedMax, 100);
+  return Math.min(finishedMax + unfinishedMax, 1);
 };
 
 const UTFALL_COLORS: Record<AnkeITRUtfall, string> = {
@@ -354,3 +358,17 @@ const createSerie = ({
   emphasis: { focus: 'series' },
   markLine,
 });
+
+interface YAxis {
+  axisDimension: 'y';
+  axisIndex: 1;
+  value: number;
+}
+
+interface XAxis {
+  axisDimension: 'x';
+  axisIndex: 0;
+  value: string;
+}
+
+type Axis = YAxis | XAxis;
