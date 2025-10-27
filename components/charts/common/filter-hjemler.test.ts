@@ -29,11 +29,17 @@ describe('filterHjemler', () => {
   });
 
   test('Include all in behandling', () => {
-    const result = filterHjemler(LIST, ['A', 'B', 'C'], HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING, getHjemler);
+    const result1 = filterHjemler(LIST, ['A', 'B', 'C'], HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING, getHjemler);
 
-    expect(result).toContain(AB);
-    expect(result).not.toContain(CD);
-    expect(result).not.toContain(EF);
+    expect(result1).not.toContain(AB);
+    expect(result1).not.toContain(CD);
+    expect(result1).not.toContain(EF);
+
+    const result2 = filterHjemler(LIST, ['A', 'B'], HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING, getHjemler);
+
+    expect(result2).toContain(AB);
+    expect(result2).not.toContain(CD);
+    expect(result2).not.toContain(EF);
   });
 
   test('null defaults to some', () => {
