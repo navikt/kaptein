@@ -116,7 +116,7 @@ const BehandlingerData = ({ ledige, tildelte, ytelser, klageenheter }: DataProps
 
       <Card span={4}>
         <DaysThresholdPerYtelse
-          title="Alder"
+          title="Alder per ytelse"
           description={`Viser data for ${uferdige.length} aktive saker`}
           behandlinger={uferdige}
           relevantYtelser={relevantYtelser}
