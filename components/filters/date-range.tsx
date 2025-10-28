@@ -1,7 +1,7 @@
 'use client';
 
 import { ClockDashedIcon } from '@navikt/aksel-icons';
-import { Button, DatePicker, HGrid, HStack, useDatepicker, VStack } from '@navikt/ds-react';
+import { Button, DatePicker, ErrorMessage, HGrid, HStack, useDatepicker, VStack } from '@navikt/ds-react';
 import { endOfMonth, endOfYear, format, parse, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
@@ -42,13 +42,9 @@ export const DateRange = () => {
       if (date === undefined) {
         return;
       }
+
       const formatted = format(date, ISO_DATE_FORMAT);
       setFrom(formatted);
-
-      if (to !== null && formatted > to) {
-        setTo(formatted);
-        setToSelected(date);
-      }
     },
   });
 
@@ -66,13 +62,9 @@ export const DateRange = () => {
       if (date === undefined) {
         return;
       }
+
       const formatted = format(date, ISO_DATE_FORMAT);
       setTo(formatted);
-
-      if (from !== null && formatted < from) {
-        setFrom(formatted);
-        setFromSelected(date);
-      }
     },
   });
 
@@ -109,22 +101,28 @@ export const DateRange = () => {
 
   return (
     <VStack gap="4">
-      <HGrid columns={2} align="start" gap="2" className="!auto-cols-max">
-        <DatePicker {...fromDatePickerProps} dropdownCaption wrapperClassName="w-full">
-          <DatePicker.Input
-            {...fromInputProps}
-            className="w-full"
-            label={<LabelWithReset label="Fra og med" resetLabel="Tilbakestill fra og med" onClick={resetFrom} />}
-          />
-        </DatePicker>
+      <VStack gap="1">
+        <HGrid columns={2} align="start" gap="2" className="!auto-cols-max">
+          <DatePicker {...fromDatePickerProps} dropdownCaption wrapperClassName="w-full">
+            <DatePicker.Input
+              {...fromInputProps}
+              className="w-full"
+              label={<LabelWithReset label="Fra og med" resetLabel="Tilbakestill fra og med" onClick={resetFrom} />}
+            />
+          </DatePicker>
 
-        <DatePicker {...toDatePickerProps} dropdownCaption wrapperClassName="w-full">
-          <DatePicker.Input
-            {...toInputProps}
-            label={<LabelWithReset label="Til og med" resetLabel="Tilbakestill til og med" onClick={resetTo} />}
-          />
-        </DatePicker>
-      </HGrid>
+          <DatePicker {...toDatePickerProps} dropdownCaption wrapperClassName="w-full">
+            <DatePicker.Input
+              {...toInputProps}
+              label={<LabelWithReset label="Til og med" resetLabel="Tilbakestill til og med" onClick={resetTo} />}
+            />
+          </DatePicker>
+        </HGrid>
+
+        {from !== null && to !== null && from > to ? (
+          <ErrorMessage>Fra og med kan ikke være etter til og med</ErrorMessage>
+        ) : null}
+      </VStack>
 
       <HGrid columns={2} gap="2">
         <Button variant={isDenneMåneden ? 'primary' : 'secondary'} onClick={() => setSelected(START_OF_MONTH, TODAY)}>
