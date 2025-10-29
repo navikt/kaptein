@@ -210,7 +210,7 @@ const BehandlingerData = ({
       <Card span={4}>
         <SakerPerYtelseOgSakstype
           title="Aktive saker per ytelse og sakstype"
-          description={`Viser data for ${behandlinger.length} aktive saker`}
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
           behandlinger={filteredBehandlinger}
           sakstyper={sakstyper}
           relevantYtelser={relevantYtelser}
@@ -220,7 +220,7 @@ const BehandlingerData = ({
       <Card>
         <SakerPerSakstype
           title="Aktive saker per sakstype"
-          description={`Viser data for ${behandlinger.length} aktive saker`}
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
           behandlinger={filteredBehandlinger}
           sakstyper={sakstyper}
         />
@@ -254,7 +254,7 @@ const BehandlingerData = ({
         <Card>
           <TildelteSakerPerKlageenhet
             title="Tildelte saker per klageenhet"
-            description={`Viser data for ${behandlinger.length} tildelte saker`}
+            description={`Viser data for ${filteredTildelte.length} tildelte saker`}
             behandlinger={filteredTildelte}
             klageenheter={klageenheter}
           />
@@ -276,7 +276,7 @@ const BehandlingerData = ({
       <Card>
         <VarsletFrist
           title="Varslet frist"
-          description={`Viser data for ${behandlinger.length} aktive saker`}
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
           behandlinger={filteredBehandlinger}
         />
       </Card>
@@ -301,7 +301,7 @@ const BehandlingerData = ({
       <Card span={4}>
         <FristPerYtelse
           title="Frist per ytelse"
-          description={`Viser data for ${behandlinger.length} aktive saker`}
+          description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
           behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
         />
