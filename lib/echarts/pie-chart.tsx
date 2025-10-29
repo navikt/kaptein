@@ -8,6 +8,7 @@ interface Serie<D> {
   type: string;
   radius?: string;
   stack?: string;
+  top?: number | string;
   label?: {
     show?: boolean;
     formatter?: (data: D) => string;

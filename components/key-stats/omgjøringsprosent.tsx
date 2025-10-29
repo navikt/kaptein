@@ -94,7 +94,12 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     return <NoData title="Omgjøringsprosent over tid" />;
   }
 
-  const description = `Basert på ${totalCaseCount} saker sendt til TR i løpet av valgt periode. Fordelt på utfall. {bold|Omgjort}: ${formatPercent(totalOmgjortPercent)} (${totalOmgjortCount} saker)`;
+  const description = (
+    <>
+      Basert på {totalCaseCount} saker sendt til TR i løpet av valgt periode. Fordelt på utfall.{' '}
+      <strong>Omgjort:</strong> {formatPercent(totalOmgjortPercent)} ({totalOmgjortCount} saker)
+    </>
+  );
 
   const max = getMax(perMonth, unfinishedData);
 
@@ -103,7 +108,6 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
       title="Omgjøringsprosent over tid"
       description={description}
       getInstance={resetDataZoomOnDblClick}
-      className="rounded-full"
       option={{
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],

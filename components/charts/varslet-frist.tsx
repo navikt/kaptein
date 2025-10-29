@@ -12,10 +12,11 @@ import { type FristBehandling, isFerdigstilt } from '@/lib/types';
 interface Props {
   title: string;
   description: string;
+  helpText: string;
   behandlinger: FristBehandling[];
 }
 
-export const VarsletFrist = ({ title, description, behandlinger }: Props) => {
+export const VarsletFrist = ({ title, description, helpText, behandlinger }: Props) => {
   const data = useMemo(() => {
     const map = behandlinger.reduce<Record<ExceededFrist, number>>(
       (acc, curr) => {
@@ -47,6 +48,7 @@ export const VarsletFrist = ({ title, description, behandlinger }: Props) => {
     <EChart
       title={title}
       description={description}
+      helpText={helpText}
       option={{
         ...COMMON_PIE_CHART_PROPS,
         series: [

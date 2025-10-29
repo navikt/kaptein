@@ -277,6 +277,7 @@ const BehandlingerData = ({
         <VarsletFrist
           title="Varslet frist"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          helpText={VARSLET_FRIST_HELP_TEXT}
           behandlinger={filteredBehandlinger}
         />
       </Card>
@@ -285,6 +286,7 @@ const BehandlingerData = ({
         <FristIKabal
           title="Frist i Kabal"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          helpText={FRIST_I_KABAL_HELP_TEXT}
           behandlinger={filteredBehandlinger}
         />
       </Card>
@@ -293,6 +295,7 @@ const BehandlingerData = ({
         <VarsletFristPerYtelse
           title="Varslet frist per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          helpText={VARSLET_FRIST_HELP_TEXT}
           behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
         />
@@ -302,6 +305,7 @@ const BehandlingerData = ({
         <FristPerYtelse
           title="Frist per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          helpText={FRIST_I_KABAL_HELP_TEXT}
           behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
         />
@@ -311,6 +315,7 @@ const BehandlingerData = ({
         <DaysThresholdPieChart
           title="Alder"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          helpText={ALDER_HELP_TEXT}
           behandlinger={filteredBehandlinger}
         />
       </Card>
@@ -319,6 +324,7 @@ const BehandlingerData = ({
         <DaysThresholdPerYtelse
           title="Alder per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
+          helpText={ALDER_HELP_TEXT}
           behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
         />
@@ -327,6 +333,7 @@ const BehandlingerData = ({
       <Card fullWidth span={4}>
         <Tidsfordeling
           title="Aldersfordeling"
+          helpText={ALDER_HELP_TEXT}
           caseType="Aktive"
           behandlinger={filteredBehandlinger}
           getDays={(b) => b.ageKA}
@@ -335,3 +342,9 @@ const BehandlingerData = ({
     </ChartsWrapper>
   );
 };
+
+const VARSLET_FRIST_HELP_TEXT =
+  'Varslet frist regnes som overskredet dersom varslet frist er før dagens dato. Varslet frist regnes som innenfor dersom varslet frist er dagens dato eller senere.';
+const FRIST_I_KABAL_HELP_TEXT =
+  'Frist i Kabal regnes som overskredet dersom frist i Kabal er før dagens dato. Frist i Kabal regnes som innenfor dersom varslet frist er dagens dato eller senere.';
+const ALDER_HELP_TEXT = 'Alder regnes fra dato mottatt klageinstans til dagens dato.';

@@ -108,11 +108,16 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps)
   return (
     <ChartsWrapper>
       <Card fullWidth span={3}>
-        <BehandlingstidIKlageinstans ferdigstilte={behandlinger} />
+        <BehandlingstidIKlageinstans
+          title="Behandlingstid i klageinstans"
+          helpText={BEHANDLINGSTID_HELP_TEXT}
+          ferdigstilte={behandlinger}
+        />
       </Card>
       <Card fullWidth span={3}>
         <IntervalOverTime
           title="Behandlingstid over tid (uker)"
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           xAxisLabel="Ferdigstilt"
           behandlinger={behandlinger}
           getValue={getBehandlingstid}
@@ -123,6 +128,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps)
       <Card fullWidth span={3}>
         <IntervalOverTime
           title="Behandlingstid over tid (måneder)"
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           xAxisLabel="Ferdigstilt"
           behandlinger={behandlinger}
           getValue={getBehandlingstid}
@@ -133,6 +139,8 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps)
     </ChartsWrapper>
   );
 };
+
+const BEHANDLINGSTID_HELP_TEXT = 'Behandlingstid regnes fra dato mottatt klageinstans til dato ferdigstilt i Kabal.';
 
 const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
 const MS_IN_A_WEEK = SECONDS_IN_A_WEEK * 1000;

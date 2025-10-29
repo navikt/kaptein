@@ -1,7 +1,7 @@
 'use client';
 
 import { eachDayOfInterval, format, parse } from 'date-fns';
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { getRestanseAfterDate } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
@@ -14,12 +14,13 @@ import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } 
 
 interface Props {
   title: string;
+  helpText: ReactNode;
   ferdigstilte: (BaseBehandling & Avsluttet)[];
   uferdige: (BaseBehandling & (Ledig | Tildelt))[];
   ytelser: IKodeverkSimpleValue[];
 }
 
-export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Props) => {
+export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpText }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
   const { labels, ytelseSeriesData } = useMemo(() => {
@@ -66,7 +67,14 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser }: Prop
   return (
     <EChart
       title={title}
-      description={`{bold|Restanse ved periodestart}: ${startRestanse} {bold|Restanse ved periodeslutt}: ${endRestanse} {bold|Endring}: ${sign(diff)}${Math.abs(diff)}`}
+      description={
+        <>
+          <strong>Restanse ved periodestart:</strong> {startRestanse} <strong>Restanse ved periodeslutt:</strong>{' '}
+          {endRestanse} <strong>Endring:</strong> {sign(diff)}
+          {Math.abs(diff)}
+        </>
+      }
+      helpText={helpText}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 225 },

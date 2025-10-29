@@ -15,6 +15,7 @@ import { type FristBehandling, type IKodeverkSimpleValue, isFerdigstilt } from '
 interface Props {
   title: string;
   description: string;
+  helpText: string;
   behandlinger: FristBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
 }
@@ -42,7 +43,7 @@ const getData = (behandling: FristBehandling, exceeded: ExceededFrist): number =
   }
 };
 
-export const FristPerYtelse = ({ title, description, behandlinger, relevantYtelser }: Props) => {
+export const FristPerYtelse = ({ title, description, behandlinger, relevantYtelser, helpText }: Props) => {
   const series = useMemo(
     () =>
       Object.values(ExceededFrist).map((type) => ({
@@ -71,6 +72,7 @@ export const FristPerYtelse = ({ title, description, behandlinger, relevantYtels
     <EChart
       title={title}
       description={description}
+      helpText={helpText}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },

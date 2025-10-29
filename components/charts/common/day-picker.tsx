@@ -42,6 +42,7 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
   return (
     <HStack gap="4">
       <ToggleGroup
+        size="small"
         label={title}
         className="self-end"
         value={toggleGroupValue}
@@ -75,6 +76,7 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
       </ToggleGroup>
 
       <TextField
+        size="small"
         className="w-20"
         type="number"
         value={textFieldValue}

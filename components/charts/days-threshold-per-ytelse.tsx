@@ -2,7 +2,7 @@
 
 import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
@@ -18,6 +18,7 @@ import { QueryParam } from '@/lib/types/query-param';
 interface Props<T extends BaseBehandling> {
   title: string;
   description: string;
+  helpText: ReactNode;
   behandlinger: T[];
   relevantYtelser: IKodeverkSimpleValue[];
   getDays?: (b: T) => number;
@@ -33,6 +34,7 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
   getDays = (b) => b.ageKA,
   exceededName = 'Over',
   withinName = 'Innenfor',
+  helpText,
 }: Props<T>) => {
   const [maxDays, setMaxDays] = useQueryState(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, parseAsInteger);
 
@@ -82,8 +84,7 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
       <EChart
         title={title}
         description={description}
-        height="auto"
-        className="grow"
+        helpText={helpText}
         option={{
           ...COMMON_STACKED_BAR_CHART_PROPS,
           tooltip: {

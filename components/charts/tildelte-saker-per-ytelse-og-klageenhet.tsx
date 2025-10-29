@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
@@ -12,6 +12,7 @@ import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
 interface Props {
   title: string;
   description: string;
+  helpText?: ReactNode;
   behandlinger: (BaseBehandling & { tildeltEnhet: string })[];
   relevantYtelser: IKodeverkSimpleValue[];
   klageenheter: IKodeverkSimpleValue[];
@@ -23,6 +24,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
   klageenheter,
   title,
   description,
+  helpText,
 }: Props) => {
   const series = useMemo(
     () =>
@@ -54,6 +56,7 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
     <EChart
       title={title}
       description={description}
+      helpText={helpText}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },

@@ -1,5 +1,6 @@
 'use client';
 
+import { Heading, HelpText, HStack, VStack } from '@navikt/ds-react';
 import { BarChart, CustomChart, LineChart, PieChart, SankeyChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
   AriaComponent,
@@ -23,8 +24,8 @@ import { LabelLayout, UniversalTransition } from 'echarts/features';
 // @ts-expect-error - No types available
 import nbNO from 'echarts/lib/i18n/langnb-NO.js';
 import { SVGRenderer } from 'echarts/renderers';
-import type { ECBasicOption, TitleOption } from 'echarts/types/dist/shared';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ECBasicOption } from 'echarts/types/dist/shared';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
@@ -59,45 +60,23 @@ echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
 echarts.registerLocale('nb-NO', nbNO);
 
 export interface CommonChartProps {
-  title: string;
-  description?: string;
-  width?: string;
-  height?: string;
-  className?: string;
+  title: ReactNode;
+  description?: ReactNode;
+  helpText?: ReactNode;
   getInstance?: (instance: ECharts) => void;
 }
 
 interface EChartProps extends CommonChartProps {
-  option: ECBasicOption & { title?: Omit<TitleOption, 'text' | 'subtext'> };
+  option: Omit<ECBasicOption, 'title'>;
 }
 
-export const EChart = ({
-  option,
-  title,
-  description,
-  width = '100%',
-  height = '100%',
-  className,
-  getInstance,
-}: EChartProps) => {
+export const EChart = ({ option, title, description, getInstance, helpText }: EChartProps) => {
   const theme = useAppTheme();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
-  const optionWithTitle = useMemo(
-    () => ({
-      ...option,
-      title: {
-        ...option.title,
-        text: title,
-        subtext: description,
-        subtextStyle: { rich: { bold: { fontWeight: 'bold' } } },
-      },
-      aria: { show: true },
-    }),
-    [option, title, description],
-  );
+  const optionWithAria = useMemo(() => ({ ...option, aria: { show: true } }), [option]);
 
   // Create ResizeObserver to update chart size when container size changes
   useEffect(() => {
@@ -133,8 +112,8 @@ export const EChart = ({
       return;
     }
 
-    eChartsRef.current.setOption(optionWithTitle, { notMerge: true, lazyUpdate: true });
-  }, [optionWithTitle]);
+    eChartsRef.current.setOption(optionWithAria, { notMerge: true, lazyUpdate: true });
+  }, [optionWithAria]);
 
   // Initialize ECharts instance
   useEffect(() => {
@@ -144,12 +123,12 @@ export const EChart = ({
 
     eChartsRef.current = echarts.init(ref.current, theme, { locale: 'nb-NO' });
 
-    eChartsRef.current.setOption(optionWithTitle);
+    eChartsRef.current.setOption(optionWithAria);
 
     if (getInstance !== undefined) {
       getInstance(eChartsRef.current);
     }
-  }, [optionWithTitle, theme, getInstance]);
+  }, [optionWithAria, theme, getInstance]);
 
   // Update theme when it changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: setOption(option) is a workaround for a bug in ECharts
@@ -160,7 +139,7 @@ export const EChart = ({
 
     eChartsRef.current.setTheme(theme);
     // Without this eChart would show data from previous filtering after changing theme
-    eChartsRef.current.setOption(optionWithTitle);
+    eChartsRef.current.setOption(optionWithAria);
   }, [theme]);
 
   // Dispose ECharts instance on unmount
@@ -173,5 +152,22 @@ export const EChart = ({
     };
   }, []);
 
-  return <div style={{ width, height }} ref={ref} className={className} />;
+  return (
+    <VStack height="100%" width="100%" gap="4">
+      <VStack align="center">
+        <HStack gap="2" align="center">
+          <Heading size="small" level="1">
+            {title}
+          </Heading>
+
+          {helpText !== undefined && <HelpText>{helpText}</HelpText>}
+        </HStack>
+        <Heading size="xsmall" level="2" className="font-normal!">
+          {description}
+        </Heading>
+      </VStack>
+
+      <div ref={ref} className="grow" />
+    </VStack>
+  );
 };

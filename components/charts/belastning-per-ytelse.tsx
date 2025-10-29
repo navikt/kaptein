@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
@@ -11,6 +11,7 @@ export type Buckets = Record<number, Bucket>;
 
 interface Props {
   title: string;
+  helpText: ReactNode;
   ferdigstilteInPeriod: (BaseBehandling & Avsluttet)[];
   mottattInPeriod: (BaseBehandling & (Ledig | Tildelt))[];
   outgoingRestanse: BaseBehandling[];
@@ -32,6 +33,7 @@ export const BelastningPerYtelse = ({
   mottattInPeriod,
   outgoingRestanse,
   ytelser,
+  helpText,
 }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
@@ -101,7 +103,13 @@ export const BelastningPerYtelse = ({
   return (
     <EChart
       title={title}
-      description={`{bold|Mottatt}: ${totalMottatt}. {bold|Ferdigstilt}: ${totalFerdigstilt}. {bold|Endring i restanse}: ${numberWithSign(totalDiff)}.`}
+      description={
+        <>
+          <strong>Mottatt:</strong> {totalMottatt}. <strong>Ferdigstilt:</strong> {totalFerdigstilt}.{' '}
+          <strong>Endring i restanse:</strong> {diffText(totalDiff)}.
+        </>
+      }
+      helpText={helpText}
       option={{
         grid: { left: 200, right: 100 },
         tooltip: {
@@ -300,7 +308,7 @@ const getTooltip = ({ ytelseNavn, mottatt, ferdigstilt, diff, restanse }: Ytelse
 </table>
 `.trim();
 
-const diffText = (n: number): string => {
+const diffText = (n: number): ReactNode => {
   const color = n > 0 ? 'var(--ax-text-danger)' : 'var(--ax-text-success)';
-  return `<span style="color: ${color};">${numberWithSign(n)}</span>`;
+  return <span style={{ color }}>{numberWithSign(n)}</span>;
 };

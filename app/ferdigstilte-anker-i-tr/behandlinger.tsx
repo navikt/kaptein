@@ -18,20 +18,22 @@ import { TildelteSakerPerKlageenhetOgYtelse } from '@/components/charts/tildelte
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { OmgjøringsprosentOverTid } from '@/components/key-stats/omgjøringsprosent';
+import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import type {
-  AnkeITRFerdigstilt,
-  AnkeITRLedig,
-  AnkeITRTildelt,
-  AnkeITRUtfall,
-  AnkerITRFerdigstilteResponse,
-  AnkerITRLedigeResponse,
-  AnkerITRTildelteResponse,
-  BaseAnkeITR,
-  IKodeverkSimpleValue,
-  IYtelse,
-  RegistreringshjemlerMap,
-  Utfall,
+import {
+  type AnkeITRFerdigstilt,
+  type AnkeITRLedig,
+  type AnkeITRTildelt,
+  type AnkeITRUtfall,
+  type AnkerITRFerdigstilteResponse,
+  type AnkerITRLedigeResponse,
+  type AnkerITRTildelteResponse,
+  type BaseAnkeITR,
+  type IKodeverkSimpleValue,
+  type IYtelse,
+  type RegistreringshjemlerMap,
+  Sakstype,
+  type Utfall,
 } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -139,6 +141,7 @@ const BehandlingerData = ({
         <TildelteSakerPerKlageenhetOgYtelse
           title="Ferdigstilte anker i TR per klageenhet og ytelse"
           description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          helpText={ANKE_I_TR_HELP_TEXT}
           behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
@@ -149,6 +152,7 @@ const BehandlingerData = ({
         <TildelteSakerPerYtelseOgKlageenhet
           title="Ferdigstilte anker i TR per ytelse og klageenhet"
           description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          helpText={ANKE_I_TR_HELP_TEXT}
           behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
@@ -158,6 +162,7 @@ const BehandlingerData = ({
       <Card span={4}>
         <Tidsfordeling
           title="Behandlingstid"
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           caseType="Ferdigstilte"
           behandlinger={ferdigstilteInPeriod}
           getDays={(b) => b.behandlingstid}
@@ -168,6 +173,7 @@ const BehandlingerData = ({
         <DaysThresholdPieChart
           title="Behandlingstid"
           description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           behandlinger={ferdigstilteInPeriod}
           getDays={(b) => b.behandlingstid}
         />
@@ -176,6 +182,7 @@ const BehandlingerData = ({
       <Card span={4}>
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
           behandlinger={ferdigstilteInPeriod}
           relevantYtelser={relevantYtelser}
@@ -185,6 +192,28 @@ const BehandlingerData = ({
     </ChartsWrapper>
   );
 };
+
+const ANKE_I_TR_HELP_TEXT = (
+  <>
+    Viser <TypeTag type={Sakstype.ANKE_I_TRYGDERETTEN} />
+    -oppgaver som er ferdigstilt i valgt periode. Ferdigstilt <TypeTag type={Sakstype.ANKE_I_TRYGDERETTEN} />
+    -oppgave knyttes til samme klageenhet som den ferdigstilte <TypeTag type={Sakstype.ANKE} />
+    -oppgaven i Kabal som førte til opprettelsen av <TypeTag type={Sakstype.ANKE_I_TRYGDERETTEN} />
+    -oppgaven. Dersom vi mangler teknisk informasjon om hvilken klageenhet som ferdigstilte{' '}
+    <TypeTag type={Sakstype.ANKE} />
+    -oppgaven i Kabal, knyttes saken til enheten som ferdigstilte <TypeTag type={Sakstype.ANKE_I_TRYGDERETTEN} />
+    -oppgaven.
+  </>
+);
+
+const BEHANDLINGSTID_HELP_TEXT = (
+  <>
+    Behandlingstid regnes fra <TypeTag type={Sakstype.ANKE} />
+    -oppgaven ble ferdigstilt / <TypeTag type={Sakstype.ANKE_I_TRYGDERETTEN} />
+    -oppgaven ble opprettet til dato <TypeTag type={Sakstype.ANKE_I_TRYGDERETTEN} />
+    -oppgaven ble ferdigstilt i Kabal.
+  </>
+);
 
 const useAnkeITRFilter = <T extends BaseAnkeITR>(behandlinger: T[]) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));

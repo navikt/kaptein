@@ -22,5 +22,5 @@ export const COMMON_PIE_CHART_PROPS = {
 
 export const COMMON_PIE_CHART_SERIES_PROPS = {
   type: 'pie',
-  radius: '50%',
+  top: -100,
 };

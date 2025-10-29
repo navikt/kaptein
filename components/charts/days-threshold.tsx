@@ -2,7 +2,7 @@
 
 import { VStack } from '@navikt/ds-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { DayPicker } from '@/components/charts/common/day-picker';
 import { NoData } from '@/components/no-data/no-data';
@@ -14,6 +14,7 @@ import { QueryParam } from '@/lib/types/query-param';
 interface Props<T extends BaseBehandling> {
   title: string;
   description: string;
+  helpText: ReactNode;
   behandlinger: T[];
   getDays?: (b: T) => number;
   exceededName?: string;
@@ -32,6 +33,7 @@ export const DaysThresholdPieChart = <T extends BaseBehandling>({
   getDays = (b) => b.ageKA,
   exceededName = 'Over',
   withinName = 'Innenfor',
+  helpText,
 }: Props<T>) => {
   const [maxDays, setMaxDays] = useQueryState(QueryParam.ALDER_MAX_DAYS, parseAsInteger);
 
@@ -63,11 +65,11 @@ export const DaysThresholdPieChart = <T extends BaseBehandling>({
       <PieChart<DaysData>
         title={title}
         description={description}
-        height="auto"
-        className="grow"
+        helpText={helpText}
         series={[
           {
             ...COMMON_PIE_CHART_SERIES_PROPS,
+            top: -50,
             color: ['var(--ax-accent-500)', 'var(--ax-danger-500)'],
             data: [
               {

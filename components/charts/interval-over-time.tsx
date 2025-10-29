@@ -20,6 +20,7 @@ interface Props<T extends Behandling> {
   getBucketKey: (b: T, from: Date, to: Date) => number | null;
   createBuckets: (from: Date, to: Date) => Buckets;
   title: string;
+  helpText: string;
   xAxisLabel: string;
 }
 
@@ -30,6 +31,7 @@ export const IntervalOverTime = <T extends Behandling>({
   title,
   xAxisLabel,
   createBuckets,
+  helpText,
 }: Props<T>) => {
   const { fromFilter, toFilter } = useDateFilter();
 
@@ -75,9 +77,13 @@ export const IntervalOverTime = <T extends Behandling>({
   return (
     <EChart
       title={title}
-      description={`{bold|Totalt} ${behandlinger.length} ferdigstilte saker. {bold|Gjennomsnitt}: ${getStatText(
-        globalAvg,
-      )}. {bold|Median}: ${getStatText(globalMedian)}.`}
+      description={
+        <>
+          <strong>Totalt</strong> {behandlinger.length} ferdigstilte saker. <strong>Gjennomsnitt</strong>:{' '}
+          {getStatText(globalAvg)}. <strong>Median</strong>: {getStatText(globalMedian)}.
+        </>
+      }
+      helpText={helpText}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 225 },

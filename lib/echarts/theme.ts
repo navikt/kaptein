@@ -63,6 +63,7 @@ const theme: ThemeOption = {
     },
   },
   grid: {
+    top: -100,
     left: 0,
     right: 0,
   },

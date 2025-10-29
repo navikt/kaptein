@@ -13,12 +13,12 @@ type Bucket = { count: number; label: string };
 type Buckets = Record<number, Bucket>;
 
 interface Props {
+  title: string;
+  helpText: string;
   ferdigstilte: (BaseBehandling & Avsluttet)[];
 }
 
-const TITLE = 'Behandlingstid i klageinstans';
-
-export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
+export const BehandlingstidIKlageinstans = ({ ferdigstilte, title, helpText }: Props) => {
   const { labels, data, median, avg } = useMemo(() => {
     let max = 0;
 
@@ -66,15 +66,19 @@ export const BehandlingstidIKlageinstans = ({ ferdigstilte }: Props) => {
   }, [ferdigstilte]);
 
   if (ferdigstilte.length === 0 || labels.length === 0) {
-    return <NoData title={TITLE} />;
+    return <NoData title={title} />;
   }
 
   return (
     <EChart
-      title={TITLE}
-      description={`{bold|Totalt} ${ferdigstilte.length} ferdigstilte saker. {bold|Gjennomsnitt}: ${getStatText(
-        avg,
-      )}. {bold|Median}: ${getStatText(median)}.`}
+      title={title}
+      description={
+        <>
+          <strong>Totalt</strong> {ferdigstilte.length} ferdigstilte saker. <strong>Gjennomsnitt</strong>:{' '}
+          {getStatText(avg)}. <strong>Median</strong>: {getStatText(median)}.
+        </>
+      }
+      helpText={helpText}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 150 },

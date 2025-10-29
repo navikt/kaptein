@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { getAvg, getMedian, NUBMER_FORMAT } from '@/components/charts/common/calculations';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { NoData } from '@/components/no-data/no-data';
@@ -13,6 +13,7 @@ type Buckets = Record<number, Bucket>;
 
 interface Props<T extends BaseBehandling> {
   title: string;
+  helpText: ReactNode;
   caseType: string;
   behandlinger: T[];
   getDays?: (b: T) => number;
@@ -30,6 +31,7 @@ export const Tidsfordeling = <T extends BaseBehandling>({
   caseType,
   behandlinger,
   getDays = (b) => b.ageKA,
+  helpText,
 }: Props<T>) => {
   const { labels, data, median, avg } = useMemo<Data>(() => {
     const maxDays = behandlinger.reduce((max, b) => Math.max(getDays(b), max), 0);
@@ -71,9 +73,13 @@ export const Tidsfordeling = <T extends BaseBehandling>({
   return (
     <EChart
       title={title}
-      description={`{bold|Totalt} ${behandlinger.length} ${caseType.toLowerCase()} saker. {bold|Gjennomsnitt}: ${getStatText(
-        avg,
-      )}. {bold|Median}: ${getStatText(median)}.`}
+      description={
+        <>
+          <strong>Totalt</strong> {behandlinger.length} {caseType.toLowerCase()} saker. <strong>Gjennomsnitt</strong>:{' '}
+          {getStatText(avg)}. <strong>Median</strong>: {getStatText(median)}.
+        </>
+      }
+      helpText={helpText}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 150 },

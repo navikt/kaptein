@@ -151,6 +151,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
         <VarsletFrist
           title="Varslet frist"
           description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          helpText={VARSLET_FRIST_HELP_TEXT}
           behandlinger={behandlinger}
         />
       </Card>
@@ -159,6 +160,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
         <FristIKabal
           title="Frist i Kabal"
           description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          helpText={FRIST_I_KABAL_HELP_TEXT}
           behandlinger={behandlinger}
         />
       </Card>
@@ -167,6 +169,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
         <VarsletFristPerYtelse
           title="Varslet frist per ytelse"
           description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          helpText={VARSLET_FRIST_HELP_TEXT}
           behandlinger={behandlinger}
           relevantYtelser={relevantYtelser}
         />
@@ -176,6 +179,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
         <FristPerYtelse
           title="Frist per ytelse"
           description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          helpText={FRIST_I_KABAL_HELP_TEXT}
           behandlinger={behandlinger}
           relevantYtelser={relevantYtelser}
         />
@@ -185,6 +189,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
         <DaysThresholdPieChart
           title="Behandlingstid"
           description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           behandlinger={behandlinger}
           getDays={(b) => b.behandlingstid}
         />
@@ -194,6 +199,7 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
           description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          helpText={BEHANDLINGSTID_HELP_TEXT}
           behandlinger={behandlinger}
           relevantYtelser={relevantYtelser}
           getDays={(b) => b.behandlingstid}
@@ -202,3 +208,9 @@ const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, y
     </ChartsWrapper>
   );
 };
+
+const VARSLET_FRIST_HELP_TEXT =
+  'Varslet frist regnes som overskredet dersom saken ble ferdigstilt i Kabal etter dato for varslet frist. Varslet frist regnes som innenfor dersom saken ble ferdigstilt i Kabal samme dag som varslet frist eller før.';
+const FRIST_I_KABAL_HELP_TEXT =
+  'Frist i Kabal regnes som overskredet dersom saken ble ferdigstilt i Kabal etter dato for frist i Kabal. Frist i Kabal regnes som innenfor dersom saken ble ferdigstilt i Kabal samme dag som frist i Kabal eller før.';
+const BEHANDLINGSTID_HELP_TEXT = 'Behandlingstid regnes fra dato mottatt klageinstans til dato ferdigstilt i Kabal.';

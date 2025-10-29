@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
@@ -18,6 +18,7 @@ interface Props {
   getOutBucketIndex: (b: Avsluttet, from: string) => number;
   createBuckets: (from: string, to: string) => Buckets;
   title: string;
+  helpText: ReactNode;
 }
 
 interface Data {
@@ -39,6 +40,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   createBuckets,
   getInBucketIndex,
   getOutBucketIndex,
+  helpText,
 }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
@@ -116,7 +118,14 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   return (
     <EChart
       title={title}
-      description={`{bold|Mottatt}: ${innTotal}. {bold|Ferdigstilt}: ${utTotal}. {bold|Endring i restanse}: ${sign(diffTotal)}${Math.abs(diffTotal)}.`}
+      description={
+        <>
+          <strong>Mottatt:</strong> {innTotal}. <strong>Ferdigstilt:</strong> {utTotal}.{' '}
+          <strong>Endring i restanse:</strong> {sign(diffTotal)}
+          {Math.abs(diffTotal)}.
+        </>
+      }
+      helpText={helpText}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 225 },
