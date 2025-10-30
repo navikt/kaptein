@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDownIcon } from '@navikt/aksel-icons';
-import { ActionMenu, Button, HStack, TextField, VStack } from '@navikt/ds-react';
+import { ActionMenu, Button, Checkbox, CheckboxGroup, HStack, TextField, VStack } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
 import { HjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
@@ -88,25 +88,21 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
   const filteredItems = useMemo(
     () =>
       filteredOptions.map(({ lovkildeLabel: label, lovkildeId, hjemler }) => (
-        <ActionMenu.Group key={lovkildeId} label={label}>
+        <CheckboxGroup
+          key={lovkildeId}
+          legend={label}
+          value={selectedOptions}
+          onChange={(values) => setSelectedHjemler(values.length === 0 ? null : values)}
+        >
           {hjemler.map(({ label: hjemmelLabel, value: hjemmelId }) => (
-            <ActionMenu.CheckboxItem
-              key={lovkildeId + hjemmelId}
-              checked={selectedOptions.some((o) => o === hjemmelId)}
-              onCheckedChange={(checked) => {
-                setSelectedHjemler(
-                  checked
-                    ? [...(selectedHjemler || []), hjemmelId]
-                    : (selectedHjemler || []).filter((selectedId) => hjemmelId !== selectedId),
-                );
-              }}
-            >
+            // <Checkbox> renders much faster than <ActionMenu.CheckboxItem>
+            <Checkbox size="small" value={hjemmelId}>
               {hjemmelLabel}
-            </ActionMenu.CheckboxItem>
+            </Checkbox>
           ))}
-        </ActionMenu.Group>
+        </CheckboxGroup>
       )),
-    [filteredOptions, selectedOptions, selectedHjemler, setSelectedHjemler],
+    [filteredOptions, selectedOptions, setSelectedHjemler],
   );
 
   const all = useMemo(() => options.flatMap(({ hjemler }) => hjemler.map(({ value }) => value)), [options]);
@@ -120,7 +116,7 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
             variant="secondary-neutral"
             icon={<ChevronDownIcon aria-hidden />}
             iconPosition="right"
-            className="!justify-between grow"
+            className="justify-between! grow"
           >
             Registreringshjemler ({selectedOptions.length})
           </Button>
@@ -149,7 +145,7 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
 
           <ActionMenu.Divider />
 
-          {filteredItems}
+          <VStack gap="4">{filteredItems}</VStack>
         </ActionMenu.Content>
       </ActionMenu>
     </VStack>

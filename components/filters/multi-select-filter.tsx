@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDownIcon } from '@navikt/aksel-icons';
-import { ActionMenu, Button, HStack, TextField } from '@navikt/ds-react';
+import { ActionMenu, Button, Checkbox, CheckboxGroup, HStack, TextField } from '@navikt/ds-react';
 import { useMemo, useState } from 'react';
 
 interface MultiSelectFilterProps {
@@ -37,7 +37,7 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
           variant="secondary-neutral"
           icon={<ChevronDownIcon aria-hidden />}
           iconPosition="right"
-          className="!justify-between"
+          className="justify-between!"
         >
           {label} ({selectedOptions.length})
         </Button>
@@ -65,22 +65,19 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
         </HStack>
 
         <ActionMenu.Divider />
-
-        <ActionMenu.Group label={label}>
+        <CheckboxGroup
+          legend={label}
+          hideLegend
+          value={selected ?? []}
+          onChange={(values) => setSelected(values.length === 0 ? null : values)}
+        >
           {filteredOptions.map((option) => (
-            <ActionMenu.CheckboxItem
-              key={option.value}
-              checked={selectedOptions.some((o) => o.value === option.value)}
-              onCheckedChange={(checked) => {
-                setSelected(
-                  checked ? [...(selected || []), option.value] : (selected || []).filter((id) => id !== option.value),
-                );
-              }}
-            >
+            // <Checkbox> renders much faster than <ActionMenu.CheckboxItem>
+            <Checkbox size="small" value={option.value}>
               {option.label}
-            </ActionMenu.CheckboxItem>
+            </Checkbox>
           ))}
-        </ActionMenu.Group>
+        </CheckboxGroup>
       </ActionMenu.Content>
     </ActionMenu>
   );
