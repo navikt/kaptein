@@ -19,7 +19,7 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
     () =>
       (selected || [])
         .map((id) => options.find((option) => option.value === id))
-        .filter((v): v is NonNullable<typeof v> => Boolean(v)),
+        .filter((v): v is NonNullable<typeof v> => v !== undefined),
     [options, selected],
   );
 

@@ -45,16 +45,11 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
       .map(([lovkildeId, hjemlerMap]) => ({
         lovkildeId,
         lovkildeLabel: lovkildeToRegistreringshjemler.find((l) => l.id === lovkildeId)?.navn ?? lovkildeId,
-        hjemlerMap,
-      }))
-      .toSorted((a, b) => sortWithOrdinals(a.lovkildeLabel, b.lovkildeLabel))
-      .map(({ lovkildeId, lovkildeLabel, hjemlerMap }) => ({
-        lovkildeLabel,
-        lovkildeId,
         hjemler: Array.from(hjemlerMap.entries())
           .toSorted(([, a], [, b]) => sortWithOrdinals(a, b))
           .map(([value, label]) => ({ label, value })),
-      }));
+      }))
+      .toSorted((a, b) => sortWithOrdinals(a.lovkildeLabel, b.lovkildeLabel));
   }, [relevantYtelser, lovkildeToRegistreringshjemler]);
 
   const selectedOptions = selectedHjemler ?? [];
