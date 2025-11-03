@@ -4,10 +4,10 @@ import { BodyShort } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
+import { Skeleton } from '@/app/ferdigstilte-anker-i-tr/skeleton';
 import { Card } from '@/components/cards';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
 import { useBaseFiltered, useFerdigstiltInPeriod, useSentInPeriod } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
@@ -62,7 +62,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   } = useClientKapteinApiFetch<AnkerITRFerdigstilteResponse>('/anker-i-tr/ferdigstilte');
 
   if (isLoadingFerdigstilte || isLoadingLedige || isLoadingTildelte) {
-    return <SkeletonFerdigstilte />;
+    return <Skeleton />;
   }
 
   if (errorFerdigstilte !== null || errorLedige !== null || errorTildelte !== null) {

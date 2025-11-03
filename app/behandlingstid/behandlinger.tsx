@@ -15,10 +15,10 @@ import {
   subDays,
 } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { Skeleton } from '@/app/behandlingstid/skeleton';
 import { Card } from '@/components/cards';
 import { BehandlingstidIKlageinstans } from '@/components/charts/behandlingstid-i-klageinstans';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonBehandlingstid } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
 import { type Buckets, IntervalOverTime } from '@/components/charts/interval-over-time';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
@@ -62,7 +62,7 @@ export const Behandlinger = () => {
   } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
 
   if (isLoadingKlager || isLoadingAnker || betongFerdigstilteLoading || omgjøringskravFerdigstilteLoading) {
-    return <SkeletonBehandlingstid />;
+    return <Skeleton />;
   }
 
   if (errorKlager !== null) {

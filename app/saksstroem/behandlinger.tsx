@@ -17,10 +17,10 @@ import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
+import { SkeletonSaksstrøm } from '@/app/saksstroem/skeleton';
 import { Card } from '@/components/cards';
 import { BelastningPerYtelse } from '@/components/charts/belastning-per-ytelse';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonSaksstrøm } from '@/components/charts/common/skeleton-chart';
 import {
   getRestanseAfterDate,
   useBaseFiltered,

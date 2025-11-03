@@ -3,11 +3,11 @@
 import { BodyLong, List } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
+import { Skeleton } from '@/app/aktive/skeleton';
 import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonAktive } from '@/components/charts/common/skeleton-chart';
 import { useBaseFiltered } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
@@ -110,7 +110,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     omgjøringskravLedigeLoading ||
     omgjøringskravTildelteLoading
   ) {
-    return <SkeletonAktive />;
+    return <Skeleton />;
   }
 
   if (

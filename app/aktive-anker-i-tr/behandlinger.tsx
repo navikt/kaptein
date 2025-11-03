@@ -3,11 +3,11 @@
 import { BodyLong, BodyShort } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
+import { Skeleton } from '@/app/aktive-anker-i-tr/skeleton';
 import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { Card } from '@/components/cards';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
 import { useBaseFiltered } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
@@ -48,7 +48,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   } = useClientKapteinApiFetch<AnkerITRTildelteResponse>('/anker-i-tr/tildelte');
 
   if (isLoadingLedige || isLoadingTildelte) {
-    return <SkeletonFerdigstilte />;
+    return <Skeleton />;
   }
 
   if (errorLedige !== null) {

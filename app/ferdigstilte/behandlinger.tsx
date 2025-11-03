@@ -1,8 +1,8 @@
 'use client';
 
+import { Skeleton } from '@/app/ferdigstilte/skeleton';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { SkeletonFerdigstilte } from '@/components/charts/common/skeleton-chart';
 import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
@@ -62,7 +62,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
 
   if (isLoadingKlager || isLoadingAnker || betongFerdigstilteLoading || omgjøringskravFerdigstilteLoading) {
-    return <SkeletonFerdigstilte />;
+    return <Skeleton />;
   }
 
   if (errorKlager !== null) {
