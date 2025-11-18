@@ -132,12 +132,14 @@ const BehandlingerData = ({
   const filteredAnker = useFerdigstilteInPeriod(anker);
   const filteredBetong = useFerdigstilteInPeriod(betong);
   const filteredOmgjøringskrav = useFerdigstilteInPeriod(omgjøringskrav);
+  const filteredBegjæringerOmGjenopptak = useFerdigstilteInPeriod(begjæringerOmGjenopptak);
+
   const behandlinger = [
     ...filteredKlager,
     ...filteredAnker,
     ...filteredBetong,
     ...filteredOmgjøringskrav,
-    ...begjæringerOmGjenopptak,
+    ...filteredBegjæringerOmGjenopptak,
   ];
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelser);
 
