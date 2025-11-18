@@ -61,6 +61,8 @@ export const KEEP_PARAMS: Record<RouteName, QueryParam[]> = {
     QueryParam.INNSENDINGSHJEMLER,
     QueryParam.REGISTRERINGSHJEMLER_MODE,
     QueryParam.REGISTRERINGSHJEMLER,
+    QueryParam.ALDER_MAX_DAYS,
+    QueryParam.ALDER_PER_YTELSE_MAX_DAYS,
   ],
   [RouteName.FERDIGSTILTE_I_TR]: [
     ...COMMON_PARAMS,
@@ -72,5 +74,7 @@ export const KEEP_PARAMS: Record<RouteName, QueryParam[]> = {
     QueryParam.INNSENDINGSHJEMLER,
     QueryParam.REGISTRERINGSHJEMLER_MODE,
     QueryParam.REGISTRERINGSHJEMLER,
+    QueryParam.ALDER_MAX_DAYS,
+    QueryParam.ALDER_PER_YTELSE_MAX_DAYS,
   ],
 };
