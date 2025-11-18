@@ -7,6 +7,6 @@ export const SAKSTYPE_COLORS: Record<Sakstype, ColorToken> = {
   [Sakstype.ANKE_I_TRYGDERETTEN]: ColorToken.Danger500,
   [Sakstype.OMGJØRINGSKRAV]: ColorToken.Info600,
   [Sakstype.BEHANDLING_ETTER_TR_OPPHEVET]: ColorToken.Lime600,
-  [Sakstype.BEGJÆRING_OM_GJENOPPTAK]: ColorToken.Neutral100,
-  [Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN]: ColorToken.Neutral100,
+  [Sakstype.BEGJÆRING_OM_GJENOPPTAK]: ColorToken.Warning600,
+  [Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN]: ColorToken.Neutral600,
 };
