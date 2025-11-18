@@ -14,11 +14,14 @@ interface Props {
 }
 
 export const Tilbakekreving = ({ help }: Props) => {
-  const [tilbakekreving, setTilbakekreving] = useQueryState(QueryParam.TILBAKEKREVING, parseAsTilbakekrevingFilter);
+  const [tilbakekreving, setTilbakekreving] = useQueryState(
+    QueryParam.TILBAKEKREVING,
+    parseAsTilbakekrevingFilter.withDefault(TilbakekrevingFilter.MED),
+  );
 
   return (
     <ToggleGroup
-      value={tilbakekreving ?? TilbakekrevingFilter.MED}
+      value={tilbakekreving}
       onChange={(v) => setTilbakekreving(isTilbakekrevingFilter(v) ? v : TilbakekrevingFilter.MED)}
       label={help}
     >

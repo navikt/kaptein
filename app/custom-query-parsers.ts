@@ -3,12 +3,16 @@ import { HjemlerModeFilter, TilbakekrevingFilter, TildelingFilter } from '@/app/
 
 const TILDELT_FILTER_VALUES = Object.values(TildelingFilter);
 const TILBAKEKREVING_FILTER_VALUES = Object.values(TilbakekrevingFilter);
+const HJEMLER_MODE_FILTER_VALUES = Object.values(HjemlerModeFilter);
 
 export const isLedigeFilter = (value: string): value is TildelingFilter =>
   TILDELT_FILTER_VALUES.some((v) => v === value);
 
 export const isTilbakekrevingFilter = (value: string): value is TilbakekrevingFilter =>
   TILBAKEKREVING_FILTER_VALUES.some((v) => v === value);
+
+export const isHjemlerModeFilter = (value: string): value is HjemlerModeFilter =>
+  HJEMLER_MODE_FILTER_VALUES.some((v) => v === value);
 
 export const parseAsLedigeFilter = createParser({
   parse: (value): TildelingFilter => {

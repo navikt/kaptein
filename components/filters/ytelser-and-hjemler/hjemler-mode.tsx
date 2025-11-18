@@ -1,5 +1,6 @@
 import { BodyLong, Heading, HelpText, HStack, ToggleGroup } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
+import { isHjemlerModeFilter, parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { HjemlerModeFilter } from '@/app/query-types';
 import type { QueryParam } from '@/lib/types/query-param';
 
@@ -8,13 +9,20 @@ interface Props {
 }
 
 export const HjemlerMode = ({ queryParam }: Props) => {
-  const [mode, setMode] = useQueryState(queryParam);
+  const [mode, setMode] = useQueryState(
+    queryParam,
+    parseAsHjemlerModeFilter.withDefault(HjemlerModeFilter.INCLUDE_FOR_SOME),
+  );
 
   return (
     <HStack wrap={false} gap="4">
       <ToggleGroup
-        value={mode ?? HjemlerModeFilter.INCLUDE_FOR_SOME}
-        onChange={(v) => setMode(v)}
+        value={mode}
+        onChange={(v) => {
+          if (isHjemlerModeFilter(v)) {
+            setMode(v);
+          }
+        }}
         size="small"
         label={
           <HStack gap="2" align="center">

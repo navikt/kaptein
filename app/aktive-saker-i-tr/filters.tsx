@@ -1,9 +1,9 @@
 import { HStack, VStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
-import { Reset } from '@/app/aktive-saker-i-tr/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
+import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { Sakstyper } from '@/components/filters/sakstyper';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
@@ -84,6 +84,7 @@ const RenderFilters = ({
         klageenheter={klageenheter}
         registreringshjemler={registreringshjemler}
         innsendingshjemler={innsendingshjemler}
+        sakstyper={sakstyper}
       />
     </VStack>
   </FilterWrapper>

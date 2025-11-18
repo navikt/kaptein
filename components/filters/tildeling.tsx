@@ -2,24 +2,17 @@
 
 import { ToggleGroup } from '@navikt/ds-react';
 import { useQueryState } from 'nuqs';
-import { useEffect } from 'react';
 import { isLedigeFilter, parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const Tildeling = () => {
-  const [ledige, setLedige] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
-
-  useEffect(() => {
-    if (ledige === null) {
-      setLedige(TildelingFilter.ALL);
-    }
-  }, [setLedige, ledige]);
+  const [ledige, setLedige] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter.withDefault(TildelingFilter.ALL));
 
   return (
     <ToggleGroup
       label="Tildeling"
-      value={ledige ?? undefined}
+      value={ledige}
       onChange={(v) => setLedige(isLedigeFilter(v) ? v : TildelingFilter.ALL)}
     >
       <ToggleGroup.Item value={TildelingFilter.LEDIGE}>Ledige</ToggleGroup.Item>

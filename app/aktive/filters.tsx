@@ -1,9 +1,9 @@
 import { HStack, VStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
-import { Reset } from '@/app/aktive/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
+import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { Sakstyper } from '@/components/filters/sakstyper';
 import { HelpForAktive, Tilbakekreving } from '@/components/filters/tilbakekreving';

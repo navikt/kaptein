@@ -1,10 +1,10 @@
 import { HStack, VStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
-import { Reset } from '@/app/behandlingstid/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
 import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
+import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';

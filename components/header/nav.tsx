@@ -1,111 +1,88 @@
 'use client';
 
 import { InternalHeader } from '@navikt/ds-react/InternalHeader';
-import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
-import { TildelingFilter } from '@/app/query-types';
-import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
-import { QueryParam } from '@/lib/types/query-param';
+import { KEEP_PARAMS, RouteName } from '@/components/header/default-params';
+import { isSakITRUtfall, Sakstype } from '@/lib/types';
+import { ALL_QUERY_PARAMS, QueryParam } from '@/lib/types/query-param';
 
 const ACTIVE_CLASS = 'bg-ax-bg-accent-strong-pressed! text-ax-text-accent-contrast!';
-const DEFAULT_TO = TODAY;
-const DEFAULT_FROM = format(startOfMonth(NOW), ISO_DATE_FORMAT);
 
-const SAKSSTRØM_DEFAULT_FROM = format(startOfMonth(subMonths(NOW, 4)), ISO_DATE_FORMAT);
-const SAKSSTRØM_DEFAULT_TO = format(endOfMonth(subMonths(NOW, 1)), ISO_DATE_FORMAT);
-
-export const Nav = () => {
-  const params = useSearchParams();
-
-  const setDefaultParams = useCallback((searchParams: URLSearchParams) => {
-    setParamIfNotSet(searchParams, QueryParam.TILDELING, TildelingFilter.ALL);
-  }, []);
-
-  const aktiveParams = useMemo(() => {
-    const searchParams = new URLSearchParams(params.toString());
-
-    setParamIfNotSet(searchParams, QueryParam.ALDER_MAX_DAYS, '84');
-    setParamIfNotSet(searchParams, QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
-
-    setDefaultParams(searchParams);
-
-    return searchParams.toString();
-  }, [params, setDefaultParams]);
-
-  const ferdigstilteParams = useMemo(() => {
-    const searchParams = new URLSearchParams(params.toString());
-
-    setParamIfNotSet(searchParams, QueryParam.FROM, DEFAULT_FROM);
-    setParamIfNotSet(searchParams, QueryParam.TO, DEFAULT_TO);
-    setParamIfNotSet(searchParams, QueryParam.ALDER_MAX_DAYS, '84');
-    setParamIfNotSet(searchParams, QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
-
-    setDefaultParams(searchParams);
-
-    return searchParams.toString();
-  }, [params, setDefaultParams]);
-
-  const saksstrømParams = useMemo(() => {
-    const searchParams = new URLSearchParams(params.toString());
-
-    setParamIfNotSet(searchParams, QueryParam.FROM, SAKSSTRØM_DEFAULT_FROM);
-    setParamIfNotSet(searchParams, QueryParam.TO, SAKSSTRØM_DEFAULT_TO);
-
-    setDefaultParams(searchParams);
-
-    return searchParams.toString();
-  }, [params, setDefaultParams]);
-
-  return (
-    <>
-      <NavLink path="/aktive" params={aktiveParams}>
-        Aktive saker
-      </NavLink>
-
-      <NavLink path="/ferdigstilte" params={ferdigstilteParams}>
-        Ferdigstilte saker
-      </NavLink>
-
-      <NavLink path="/saksstroem" params={saksstrømParams}>
-        Saksstrøm
-      </NavLink>
-
-      {/* Same as ferdigstilteParams for now */}
-      <NavLink path="/behandlingstid" params={ferdigstilteParams}>
-        Behandlingstid
-      </NavLink>
-
-      <NavLink path="/aktive-saker-i-tr" params={aktiveParams}>
-        Aktive saker i TR
-      </NavLink>
-
-      <NavLink path="/ferdigstilte-saker-i-tr" params={ferdigstilteParams}>
-        Ferdigstilte saker i TR
-      </NavLink>
-    </>
-  );
-};
+export const Nav = () => (
+  <>
+    <NavLink path={RouteName.AKTIVE}>Aktive saker</NavLink>
+    <NavLink path={RouteName.FERDIGSTILTE}>Ferdigstilte saker</NavLink>
+    <NavLink path={RouteName.SAKSSTRØM}>Saksstrøm</NavLink>
+    <NavLink path={RouteName.BEHANDLINGSTID}>Behandlingstid</NavLink>
+    <NavLink path={RouteName.AKTIVE_SAKER_I_TR}>Aktive saker i TR</NavLink>
+    <NavLink path={RouteName.FERDIGSTILTE_I_TR}>Ferdigstilte saker i TR</NavLink>
+  </>
+);
 
 interface Props {
-  path: string;
-  params: string;
+  path: RouteName;
   children: React.ReactNode;
 }
 
-const NavLink = ({ path, params, children }: Props) => {
+const NavLink = ({ path, children }: Props) => {
   const pathname = usePathname();
+  const params = useSearchParams();
 
   return (
-    <InternalHeader.Button as={Link} className={pathname === path ? ACTIVE_CLASS : ''} href={`${path}?${params}`}>
+    <InternalHeader.Button
+      as={Link}
+      className={pathname === path ? ACTIVE_CLASS : ''}
+      href={`${path}${removeUnusedParams(path, params)}`}
+    >
       {children}
     </InternalHeader.Button>
   );
 };
 
-const setParamIfNotSet = (searchParams: URLSearchParams, param: QueryParam, defaultValue: string) => {
-  if (!searchParams.has(param)) {
-    searchParams.set(param, defaultValue);
+const removeUnusedParams = (route: RouteName, params: URLSearchParams) => {
+  const newParams = new URLSearchParams(params.toString());
+
+  const unusedParams = ALL_QUERY_PARAMS.filter((p) => !KEEP_PARAMS[route].includes(p));
+
+  for (const param of unusedParams) {
+    newParams.delete(param);
+  }
+
+  if (route === RouteName.AKTIVE_SAKER_I_TR || route === RouteName.FERDIGSTILTE_I_TR) {
+    filterSakerITRParams(newParams, false);
+  } else {
+    filterSakerITRParams(newParams, true);
+  }
+
+  const paramString = newParams.toString();
+
+  return paramString === '' ? '' : `?${paramString}`;
+};
+
+const filterSakerITRParams = (searchParams: URLSearchParams, remove: boolean) => {
+  const sakstyper = searchParams.get(QueryParam.SAKSTYPER)?.split(',') || [];
+  const utfall = searchParams.get(QueryParam.UTFALL)?.split(',') || [];
+
+  const filteredSakstyper = remove
+    ? sakstyper.filter(
+        (s) => s !== Sakstype.ANKE_I_TRYGDERETTEN && s !== Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN,
+      )
+    : sakstyper.filter(
+        (s) => s === Sakstype.ANKE_I_TRYGDERETTEN || s === Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN,
+      );
+
+  if (filteredSakstyper.length === 0) {
+    searchParams.delete(QueryParam.SAKSTYPER);
+  } else {
+    searchParams.set(QueryParam.SAKSTYPER, filteredSakstyper.join(','));
+  }
+
+  const filteredUtfall = remove ? utfall.filter((u) => !isSakITRUtfall(u)) : utfall.filter((u) => isSakITRUtfall(u));
+
+  if (filteredUtfall.length === 0) {
+    searchParams.delete(QueryParam.UTFALL);
+  } else {
+    searchParams.set(QueryParam.UTFALL, filteredUtfall.join(','));
   }
 };

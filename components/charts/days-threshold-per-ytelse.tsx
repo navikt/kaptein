@@ -36,7 +36,10 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
   withinName = 'Innenfor',
   helpText,
 }: Props<T>) => {
-  const [maxDays, setMaxDays] = useQueryState(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, parseAsInteger);
+  const [maxDays, setMaxDays] = useQueryState(
+    QueryParam.ALDER_PER_YTELSE_MAX_DAYS,
+    parseAsInteger.withDefault(TWELVE_WEEKS_IN_DAYS),
+  );
 
   const { overSeriesData, underSeriesData, labels } = useMemo(() => {
     const overMap: Map<string, number> = new Map();
@@ -132,13 +135,10 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
   );
 };
 
+const TWELVE_WEEKS_IN_DAYS = 12 * 7;
+const FIFTEEN_WEEKS_IN_DAYS = 15 * 7;
+
 const DAY_PICKER_OPTIONS = [
-  {
-    numDays: 12 * 7,
-    label: '12 uker',
-  },
-  {
-    numDays: 15 * 7,
-    label: '15 uker',
-  },
+  { numDays: TWELVE_WEEKS_IN_DAYS, label: '12 uker' },
+  { numDays: FIFTEEN_WEEKS_IN_DAYS, label: '15 uker' },
 ];
