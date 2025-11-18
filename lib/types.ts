@@ -58,6 +58,9 @@ export const SAK_I_TR_OMGJØRINGSUTFALL: SakITRUtfall[] = [
   SakITRUtfall.GJENOPPTATT_DELVIS_FULLT_MEDHOLD,
 ];
 
+export const isSakITROmgjøringsutfall = (value: string): value is SakITRUtfall =>
+  SAK_I_TR_OMGJØRINGSUTFALL.includes(value as SakITRUtfall);
+
 export const SAK_I_TR_IKKE_OMGJØRINGSUTFALL: SakITRUtfall[] = SAK_I_TR_UTFALL.filter(
   (u) => !SAK_I_TR_OMGJØRINGSUTFALL.includes(u),
 );

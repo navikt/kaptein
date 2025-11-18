@@ -1,5 +1,6 @@
 import { eachMonthOfInterval, format, parse } from 'date-fns';
 import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
@@ -11,6 +12,7 @@ import { percent } from '@/lib/percent';
 import {
   type FerdigstiltSakITR,
   type IKodeverkSimpleValue,
+  isSakITROmgjøringsutfall,
   isSakITRUtfall,
   type LedigSakITR,
   SAK_I_TR_IKKE_OMGJØRINGSUTFALL,
@@ -20,6 +22,7 @@ import {
   type TildeltSakITR,
   Utfall,
 } from '@/lib/types';
+import { QueryParam } from '@/lib/types/query-param';
 
 const HOS_TR = 'hos_tr';
 
@@ -31,6 +34,7 @@ interface Props {
 
 export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
+  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
 
   const ferdigstilteCount = ferdigstilte.filter((f) => f.resultat !== null).length;
   const totalCaseCount = uferdige.length + ferdigstilteCount;
@@ -49,7 +53,13 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     const totalOmgjortCount = values.reduce((sum, monthData) => sum + monthData.omgjortCount, 0);
     const totalOmgjortPercent = ferdigstilteCount === 0 ? 0 : totalOmgjortCount / ferdigstilteCount;
 
-    const series = SAK_I_TR_OMGJØRINGSUTFALL.map((utfallId) =>
+    // Only show selected, if any, and relevant utfall in the legend
+    const filteredUtfall =
+      utfallFilter === null || utfallFilter.length === 0
+        ? SAK_I_TR_OMGJØRINGSUTFALL
+        : utfallFilter.filter(isSakITROmgjøringsutfall);
+
+    const series = filteredUtfall.map((utfallId) =>
       createSerie({
         id: utfallId,
         name: utfallMap.get(utfallId)?.navn ?? 'Ukjent',
@@ -88,7 +98,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     );
 
     return { labels: months, series, perMonth, unfinishedData, totalOmgjortCount, totalOmgjortPercent };
-  }, [ferdigstilte, fromFilter, toFilter, uferdige, ferdigstilteCount, utfallMap]);
+  }, [ferdigstilte, fromFilter, toFilter, uferdige, ferdigstilteCount, utfallMap, utfallFilter]);
 
   if (labels.length === 0) {
     return <NoData title="Omgjøringsprosent over tid" />;
