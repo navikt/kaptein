@@ -41,7 +41,7 @@ interface Props {
   sakstyper?: IKodeverkSimpleValue<Sakstype>[];
 }
 
-const RenderFilters = ({ ytelser = [], innsendingshjemlerMap = {}, klageenheter = [], sakstyper = [] }: Props) => (
+const RenderFilters = ({ ytelser, innsendingshjemlerMap, klageenheter, sakstyper }: Props) => (
   <FilterWrapper>
     <VStack gap="4" flexGrow="1">
       <HStack justify="space-between" gap="4" wrap={false}>

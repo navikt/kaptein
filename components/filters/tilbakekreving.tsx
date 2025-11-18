@@ -47,10 +47,10 @@ export const HelpForFerdigstilte = () => (
 );
 
 interface HelpForAktiveProps {
-  innsendingshjemlerMap: Record<string, string>;
+  innsendingshjemlerMap: Record<string, string> | undefined;
 }
 
-export const HelpForAktive = ({ innsendingshjemlerMap }: HelpForAktiveProps) => {
+export const HelpForAktive = ({ innsendingshjemlerMap = {} }: HelpForAktiveProps) => {
   const listItems = useMemo(
     () =>
       TILBAKEKREVINGINNSENDINGSHJEMLER.map((id) => ({ id, label: innsendingshjemlerMap[id] ?? id }))

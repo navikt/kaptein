@@ -61,12 +61,12 @@ interface Props {
 }
 
 const RenderFilters = ({
-  ytelser = [],
-  lovkildeToRegistreringshjemler = [],
-  sakstyperToUtfall = [],
-  klageenheter = [],
-  utfall = [],
-  registreringshjemler = {},
+  ytelser,
+  lovkildeToRegistreringshjemler,
+  sakstyperToUtfall,
+  klageenheter,
+  utfall,
+  registreringshjemler,
 }: Props) => (
   <FilterWrapper>
     <VStack gap="4" flexGrow="1">

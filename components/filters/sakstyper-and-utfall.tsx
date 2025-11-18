@@ -8,10 +8,10 @@ import type { SakstypeToUtfall } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  sakstyperToUtfall: SakstypeToUtfall[];
+  sakstyperToUtfall: SakstypeToUtfall[] | undefined;
 }
 
-export const SakstyperAndUtfall = ({ sakstyperToUtfall }: Props) => {
+export const SakstyperAndUtfall = ({ sakstyperToUtfall = [] }: Props) => {
   const [selectedSakstyper, setSelectedSakstyper] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
   const [selectedUtfall, setSelectedUtfall] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
 

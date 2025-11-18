@@ -7,10 +7,10 @@ import type { IKodeverkSimpleValue, Sakstype } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  sakstyper: IKodeverkSimpleValue<Sakstype>[];
+  sakstyper: IKodeverkSimpleValue<Sakstype>[] | undefined;
 }
 
-export const Sakstyper = ({ sakstyper }: Props) => {
+export const Sakstyper = ({ sakstyper = [] }: Props) => {
   const [selected, setSelected] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
 
   const options = useMemo(() => sakstyper.map(({ navn, id }) => ({ label: navn, value: id })), [sakstyper]);

@@ -10,8 +10,8 @@ import type { IKodeverkValue, IYtelse } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
-  ytelser: IYtelse[];
-  lovkildeToRegistreringshjemler: IKodeverkValue[];
+  ytelser: IYtelse[] | undefined;
+  lovkildeToRegistreringshjemler: IKodeverkValue[] | undefined;
 }
 
 const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
@@ -29,7 +29,7 @@ const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
   return { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk };
 };
 
-export const YtelserAndRegistreringshjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
+export const YtelserAndRegistreringshjemler = ({ ytelser = [], lovkildeToRegistreringshjemler = [] }: Props) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedHjemler] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
 
@@ -55,7 +55,7 @@ export const YtelserAndRegistreringshjemler = ({ ytelser, lovkildeToRegistrering
   );
 };
 
-export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }) => {
+export const YtelserAndInnsendingshjemler = ({ ytelser = [] }: { ytelser: IYtelse[] | undefined }) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
 
@@ -78,7 +78,10 @@ export const YtelserAndInnsendingshjemler = ({ ytelser }: { ytelser: IYtelse[] }
   );
 };
 
-export const YtelserAndInnsendingsAndRegistreringshjemler = ({ ytelser, lovkildeToRegistreringshjemler }: Props) => {
+export const YtelserAndInnsendingsAndRegistreringshjemler = ({
+  ytelser = [],
+  lovkildeToRegistreringshjemler = [],
+}: Props) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedInnsendingsHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [, setSelectedRegistreringsHjemler] = useQueryState(
