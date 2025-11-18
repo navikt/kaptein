@@ -39,6 +39,9 @@ import type {
   AnkerTildelteResponse,
   Avsluttet,
   BaseBehandling,
+  BegjæringOmGjenopptakFerdigstilteResponse,
+  BegjæringOmGjenopptakLedigeResponse,
+  BegjæringOmGjenopptakTildelteResponse,
   BetongFerdigstilteResponse,
   BetongLedigeResponse,
   BetongTildelteResponse,
@@ -120,6 +123,21 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     isLoading: omgjøringskravFerdigstilteLoading,
     error: omgjøringskravFerdigstilteError,
   } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
+  const {
+    data: ledigeGb,
+    isLoading: isLoadingLedigeGb,
+    error: errorLedigeGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakLedigeResponse>('/begjaeringer-om-gjenopptak/ledige');
+  const {
+    data: tildelteGb,
+    isLoading: isLoadingTildelteGb,
+    error: errorTildelteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakTildelteResponse>('/begjaeringer-om-gjenopptak/tildelte');
+  const {
+    data: ferdigstilteGb,
+    isLoading: isLoadingFerdigstilteGb,
+    error: errorFerdigstilteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakFerdigstilteResponse>('/begjaeringer-om-gjenopptak/ferdigstilte');
 
   if (
     klagerLedigeLoading ||
@@ -133,7 +151,10 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     betongFerdigstilteLoading ||
     omgjøringskravLedigeLoading ||
     omgjøringskravTildelteLoading ||
-    omgjøringskravFerdigstilteLoading
+    omgjøringskravFerdigstilteLoading ||
+    isLoadingLedigeGb ||
+    isLoadingTildelteGb ||
+    isLoadingFerdigstilteGb
   ) {
     return <SkeletonSaksstrøm />;
   }
@@ -150,7 +171,10 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     betongFerdigstilteError !== null ||
     omgjøringskravLedigeError !== null ||
     omgjøringskravTildelteError !== null ||
-    omgjøringskravFerdigstilteError !== null
+    omgjøringskravFerdigstilteError !== null ||
+    errorLedigeGb !== null ||
+    errorTildelteGb !== null ||
+    errorFerdigstilteGb !== null
   ) {
     return (
       <LoadingError>
@@ -168,6 +192,9 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
           {omgjøringskravLedigeError === null ? null : <List.Item>{omgjøringskravLedigeError}</List.Item>}
           {omgjøringskravTildelteError === null ? null : <List.Item>{omgjøringskravTildelteError}</List.Item>}
           {omgjøringskravFerdigstilteError === null ? null : <List.Item>{omgjøringskravFerdigstilteError}</List.Item>}
+          {errorLedigeGb === null ? null : <List.Item>{errorLedigeGb}</List.Item>}
+          {errorTildelteGb === null ? null : <List.Item>{errorTildelteGb}</List.Item>}
+          {errorFerdigstilteGb === null ? null : <List.Item>{errorFerdigstilteGb}</List.Item>}
         </List>
       </LoadingError>
     );
@@ -180,18 +207,21 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
         ...ankerLedige.behandlinger,
         ...betongLedige.behandlinger,
         ...omgjøringskravLedige.behandlinger,
+        ...ledigeGb.behandlinger,
       ]}
       tildelte={[
         ...klagerTildelte.behandlinger,
         ...ankerTildelte.behandlinger,
         ...betongTildelte.behandlinger,
         ...omgjøringskravTildelte.behandlinger,
+        ...tildelteGb.behandlinger,
       ]}
       ferdigstilte={[
         ...klagerFerdigstilte.behandlinger,
         ...ankerFerdigstilte.behandlinger,
         ...betongFerdigstilte.behandlinger,
         ...omgjøringskravFerdigstilte.behandlinger,
+        ...ferdigstilteGb.behandlinger,
       ]}
       {...kodeverk}
     />

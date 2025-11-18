@@ -9,7 +9,7 @@ import { TildelingFilter } from '@/app/query-types';
 import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
-const ACTIVE_CLASS = '!bg-ax-bg-accent-strong-pressed !text-ax-text-accent-contrast';
+const ACTIVE_CLASS = 'bg-ax-bg-accent-strong-pressed! text-ax-text-accent-contrast!';
 const DEFAULT_TO = TODAY;
 const DEFAULT_FROM = format(startOfMonth(NOW), ISO_DATE_FORMAT);
 
@@ -20,20 +20,14 @@ export const Nav = () => {
   const params = useSearchParams();
 
   const setDefaultParams = useCallback((searchParams: URLSearchParams) => {
-    searchParams.get(QueryParam.TILDELING) ?? searchParams.set(QueryParam.TILDELING, TildelingFilter.ALL);
+    setParamIfNotSet(searchParams, QueryParam.TILDELING, TildelingFilter.ALL);
   }, []);
 
   const aktiveParams = useMemo(() => {
     const searchParams = new URLSearchParams(params.toString());
 
-    searchParams.delete(QueryParam.FROM);
-    searchParams.delete(QueryParam.TO);
-    searchParams.delete(QueryParam.REGISTRERINGSHJEMLER);
-    searchParams.delete(QueryParam.REGISTRERINGSHJEMLER_MODE);
-
-    searchParams.get(QueryParam.ALDER_MAX_DAYS) ?? searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
-    searchParams.get(QueryParam.ALDER_PER_YTELSE_MAX_DAYS) ??
-      searchParams.set(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
+    setParamIfNotSet(searchParams, QueryParam.ALDER_MAX_DAYS, '84');
+    setParamIfNotSet(searchParams, QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
 
     setDefaultParams(searchParams);
 
@@ -43,15 +37,10 @@ export const Nav = () => {
   const ferdigstilteParams = useMemo(() => {
     const searchParams = new URLSearchParams(params.toString());
 
-    searchParams.delete(QueryParam.TILDELING);
-    searchParams.delete(QueryParam.INNSENDINGSHJEMLER);
-    searchParams.delete(QueryParam.INNSENDINGSHJEMLER_MODE);
-
-    searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, DEFAULT_FROM);
-    searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, DEFAULT_TO);
-    searchParams.get(QueryParam.ALDER_MAX_DAYS) ?? searchParams.set(QueryParam.ALDER_MAX_DAYS, '84');
-    searchParams.get(QueryParam.ALDER_PER_YTELSE_MAX_DAYS) ??
-      searchParams.set(QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
+    setParamIfNotSet(searchParams, QueryParam.FROM, DEFAULT_FROM);
+    setParamIfNotSet(searchParams, QueryParam.TO, DEFAULT_TO);
+    setParamIfNotSet(searchParams, QueryParam.ALDER_MAX_DAYS, '84');
+    setParamIfNotSet(searchParams, QueryParam.ALDER_PER_YTELSE_MAX_DAYS, '84');
 
     setDefaultParams(searchParams);
 
@@ -61,11 +50,8 @@ export const Nav = () => {
   const saksstrømParams = useMemo(() => {
     const searchParams = new URLSearchParams(params.toString());
 
-    searchParams.get(QueryParam.FROM) ?? searchParams.set(QueryParam.FROM, SAKSSTRØM_DEFAULT_FROM);
-    searchParams.get(QueryParam.TO) ?? searchParams.set(QueryParam.TO, SAKSSTRØM_DEFAULT_TO);
-
-    searchParams.delete(QueryParam.ALDER_MAX_DAYS);
-    searchParams.delete(QueryParam.ALDER_PER_YTELSE_MAX_DAYS);
+    setParamIfNotSet(searchParams, QueryParam.FROM, SAKSSTRØM_DEFAULT_FROM);
+    setParamIfNotSet(searchParams, QueryParam.TO, SAKSSTRØM_DEFAULT_TO);
 
     setDefaultParams(searchParams);
 
@@ -91,12 +77,12 @@ export const Nav = () => {
         Behandlingstid
       </NavLink>
 
-      <NavLink path="/aktive-anker-i-tr" params={aktiveParams}>
-        Aktive anker i TR
+      <NavLink path="/aktive-saker-i-tr" params={aktiveParams}>
+        Aktive saker i TR
       </NavLink>
 
-      <NavLink path="/ferdigstilte-anker-i-tr" params={ferdigstilteParams}>
-        Ferdigstilte anker i TR
+      <NavLink path="/ferdigstilte-saker-i-tr" params={ferdigstilteParams}>
+        Ferdigstilte saker i TR
       </NavLink>
     </>
   );
@@ -116,4 +102,10 @@ const NavLink = ({ path, params, children }: Props) => {
       {children}
     </InternalHeader.Button>
   );
+};
+
+const setParamIfNotSet = (searchParams: URLSearchParams, param: QueryParam, defaultValue: string) => {
+  if (!searchParams.has(param)) {
+    searchParams.set(param, defaultValue);
+  }
 };

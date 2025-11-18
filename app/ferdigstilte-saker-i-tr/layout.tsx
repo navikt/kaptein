@@ -1,4 +1,4 @@
-import { Filters } from '@/app/aktive-anker-i-tr/filters';
+import { Filters } from '@/app/ferdigstilte-saker-i-tr/filters';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   return (

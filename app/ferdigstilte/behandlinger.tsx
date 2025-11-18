@@ -19,6 +19,8 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import type {
   AnkeFerdigstilt,
+  BegjæringOmGjenopptakFerdigstilt,
+  BegjæringOmGjenopptakFerdigstilteResponse,
   BetongFerdigstilt,
   BetongFerdigstilteResponse,
   IKodeverkSimpleValue,
@@ -60,8 +62,19 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     isLoading: omgjøringskravFerdigstilteLoading,
     error: omgjøringskravFerdigstilteError,
   } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
+  const {
+    data: ferdigstilteGb,
+    isLoading: isLoadingFerdigstilteGb,
+    error: errorFerdigstilteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakFerdigstilteResponse>('/begjaeringer-om-gjenopptak/ferdigstilte');
 
-  if (isLoadingKlager || isLoadingAnker || betongFerdigstilteLoading || omgjøringskravFerdigstilteLoading) {
+  if (
+    isLoadingKlager ||
+    isLoadingAnker ||
+    betongFerdigstilteLoading ||
+    omgjøringskravFerdigstilteLoading ||
+    isLoadingFerdigstilteGb
+  ) {
     return <Skeleton />;
   }
 
@@ -81,6 +94,10 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     return <LoadingError>Feil ved lasting av data: {omgjøringskravFerdigstilteError}</LoadingError>;
   }
 
+  if (errorFerdigstilteGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorFerdigstilteGb}</LoadingError>;
+  }
+
   return (
     <BehandlingerData
       {...kodeverk}
@@ -88,6 +105,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
       anker={anker.behandlinger}
       betong={betongFerdigstilte.behandlinger}
       omgjøringskrav={omgjøringskravFerdigstilte.behandlinger}
+      begjæringerOmGjenopptak={ferdigstilteGb.behandlinger}
     />
   );
 };
@@ -97,14 +115,30 @@ interface DataProps extends KodeverkProps {
   anker: AnkeFerdigstilt[];
   betong: BetongFerdigstilt[];
   omgjøringskrav: OmgjøringskravFerdigstilt[];
+  begjæringerOmGjenopptak: BegjæringOmGjenopptakFerdigstilt[];
 }
 
-const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, sakstyper, ytelser, klageenheter }: DataProps) => {
+const BehandlingerData = ({
+  klager,
+  anker,
+  betong,
+  omgjøringskrav,
+  begjæringerOmGjenopptak,
+  sakstyper,
+  ytelser,
+  klageenheter,
+}: DataProps) => {
   const filteredKlager = useFerdigstilteInPeriod(klager);
   const filteredAnker = useFerdigstilteInPeriod(anker);
   const filteredBetong = useFerdigstilteInPeriod(betong);
   const filteredOmgjøringskrav = useFerdigstilteInPeriod(omgjøringskrav);
-  const behandlinger = [...filteredKlager, ...filteredAnker, ...filteredBetong, ...filteredOmgjøringskrav];
+  const behandlinger = [
+    ...filteredKlager,
+    ...filteredAnker,
+    ...filteredBetong,
+    ...filteredOmgjøringskrav,
+    ...begjæringerOmGjenopptak,
+  ];
   const relevantYtelser = useRelevantYtelser(behandlinger, ytelser);
 
   return (

@@ -1,30 +1,22 @@
 import { HStack, VStack } from '@navikt/ds-react';
 import { Suspense } from 'react';
-import { Reset } from '@/app/ferdigstilte-anker-i-tr/reset';
+import { Reset } from '@/app/aktive-saker-i-tr/reset';
 import { ActiveFilters } from '@/components/filters/active-filters';
-import { DateRange } from '@/components/filters/date-range';
 import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
+import { Sakstyper } from '@/components/filters/sakstyper';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
-import { UtfallFilter } from '@/components/filters/utfall';
 import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
   getInnsendingshjemlerMap,
   getKlageenheter,
   getLovkildeToRegistreringshjemler,
   getRegistreringshjemlerMap,
-  getUtfallForSakstype,
+  getTRSaksttyper,
   getYtelser,
 } from '@/lib/server/api';
-import {
-  type IKodeverkSimpleValue,
-  type IKodeverkValue,
-  type IYtelse,
-  type RegistreringshjemlerMap,
-  Sakstype,
-  type Utfall,
-} from '@/lib/types';
+import type { IKodeverkSimpleValue, IKodeverkValue, IYtelse, RegistreringshjemlerMap, Sakstype } from '@/lib/types';
 
 export const Filters = async () => (
   <Suspense fallback={<RenderFilters />}>
@@ -35,19 +27,19 @@ export const Filters = async () => (
 const AsyncFilters = async () => {
   const ytelser = await getYtelser();
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
-  const ankeITRUtfall = await getUtfallForSakstype(Sakstype.ANKE_I_TRYGDERETTEN);
   const klageEnheter = await getKlageenheter();
   const registreringshjemler = await getRegistreringshjemlerMap();
-  const innsendingshjemlerMap = await getInnsendingshjemlerMap();
+  const innsendingshjemler = await getInnsendingshjemlerMap();
+  const sakstyper = await getTRSaksttyper();
 
   return (
     <RenderFilters
       ytelser={ytelser}
       lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
       klageenheter={klageEnheter}
-      utfall={ankeITRUtfall}
       registreringshjemler={registreringshjemler}
-      innsendingshjemlerMap={innsendingshjemlerMap}
+      innsendingshjemler={innsendingshjemler}
+      sakstyper={sakstyper}
     />
   );
 };
@@ -56,18 +48,18 @@ interface Props {
   ytelser?: IYtelse[];
   lovkildeToRegistreringshjemler?: IKodeverkValue<string>[];
   klageenheter?: IKodeverkSimpleValue<string>[];
-  utfall?: IKodeverkSimpleValue<Utfall>[];
   registreringshjemler?: RegistreringshjemlerMap;
-  innsendingshjemlerMap?: Record<string, string>;
+  innsendingshjemler?: Record<string, string>;
+  sakstyper?: IKodeverkSimpleValue<Sakstype>[];
 }
 
 const RenderFilters = ({
   ytelser = [],
   lovkildeToRegistreringshjemler = [],
   klageenheter = [],
-  utfall = [],
   registreringshjemler = {},
-  innsendingshjemlerMap = {},
+  innsendingshjemler = {},
+  sakstyper = [],
 }: Props) => (
   <FilterWrapper>
     <VStack gap="4" flexGrow="1">
@@ -76,26 +68,22 @@ const RenderFilters = ({
         <ResetCacheButton />
       </HStack>
 
-      <DateRange />
-    </VStack>
-
-    <VStack gap="4" flexGrow="1">
       <Klageenheter klageenheter={klageenheter} />
-      <UtfallFilter utfall={utfall} />
+      <Sakstyper sakstyper={sakstyper} />
+
       <YtelserAndInnsendingsAndRegistreringshjemler
         ytelser={ytelser}
         lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
       />
     </VStack>
 
-    <VStack gap="4" flexGrow="2" width="100%">
+    <VStack gap="4" flexGrow="1">
       <Tilbakekreving help={<HelpForFerdigstilte />} />
       <ActiveFilters
         ytelser={ytelser}
         klageenheter={klageenheter}
-        utfall={utfall}
         registreringshjemler={registreringshjemler}
-        innsendingshjemler={innsendingshjemlerMap}
+        innsendingshjemler={innsendingshjemler}
       />
     </VStack>
   </FilterWrapper>

@@ -28,6 +28,8 @@ import type {
   AnkeFerdigstilt,
   Avsluttet,
   BaseBehandling,
+  BegjæringOmGjenopptakFerdigstilt,
+  BegjæringOmGjenopptakFerdigstilteResponse,
   BetongFerdigstilt,
   BetongFerdigstilteResponse,
   KapteinApiResponse,
@@ -60,8 +62,19 @@ export const Behandlinger = () => {
     isLoading: omgjøringskravFerdigstilteLoading,
     error: omgjøringskravFerdigstilteError,
   } = useClientKapteinApiFetch<OmgjøringskravFerdigstilteResponse>('/omgjoeringskrav/ferdigstilte');
+  const {
+    data: ferdigstilteGb,
+    isLoading: isLoadingFerdigstilteGb,
+    error: errorFerdigstilteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakFerdigstilteResponse>('/begjaeringer-om-gjenopptak/ferdigstilte');
 
-  if (isLoadingKlager || isLoadingAnker || betongFerdigstilteLoading || omgjøringskravFerdigstilteLoading) {
+  if (
+    isLoadingKlager ||
+    isLoadingAnker ||
+    betongFerdigstilteLoading ||
+    omgjøringskravFerdigstilteLoading ||
+    isLoadingFerdigstilteGb
+  ) {
     return <Skeleton />;
   }
 
@@ -81,12 +94,17 @@ export const Behandlinger = () => {
     return <LoadingError>Feil ved lasting av data: {omgjøringskravFerdigstilteError}</LoadingError>;
   }
 
+  if (errorFerdigstilteGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorFerdigstilteGb}</LoadingError>;
+  }
+
   return (
     <BehandlingerData
       klager={klager.behandlinger}
       anker={anker.behandlinger}
       betong={betongFerdigstilte.behandlinger}
       omgjøringskrav={omgjøringskravFerdigstilte.behandlinger}
+      begjæringerOmGjenopptak={ferdigstilteGb.behandlinger}
     />
   );
 };
@@ -96,14 +114,22 @@ interface DataProps {
   anker: AnkeFerdigstilt[];
   betong: BetongFerdigstilt[];
   omgjøringskrav: OmgjøringskravFerdigstilt[];
+  begjæringerOmGjenopptak: BegjæringOmGjenopptakFerdigstilt[];
 }
 
-const BehandlingerData = ({ klager, anker, betong, omgjøringskrav }: DataProps) => {
+const BehandlingerData = ({ klager, anker, betong, omgjøringskrav, begjæringerOmGjenopptak }: DataProps) => {
   const filteredKlager = useFerdigstilteInPeriod(klager);
   const filteredAnker = useFerdigstilteInPeriod(anker);
   const filteredBetong = useFerdigstilteInPeriod(betong);
   const filteredOmgjøringskrav = useFerdigstilteInPeriod(omgjøringskrav);
-  const behandlinger = [...filteredKlager, ...filteredAnker, ...filteredBetong, ...filteredOmgjøringskrav];
+  const filteredBegjæringerOmGjenopptak = useFerdigstilteInPeriod(begjæringerOmGjenopptak);
+  const behandlinger = [
+    ...filteredKlager,
+    ...filteredAnker,
+    ...filteredBetong,
+    ...filteredOmgjøringskrav,
+    ...filteredBegjæringerOmGjenopptak,
+  ];
 
   return (
     <ChartsWrapper>

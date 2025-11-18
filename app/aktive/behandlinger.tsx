@@ -31,6 +31,10 @@ import type {
   AnkerLedigeResponse,
   AnkerTildelteResponse,
   AnkeTildelt,
+  BegjæringOmGjenopptakLedig,
+  BegjæringOmGjenopptakLedigeResponse,
+  BegjæringOmGjenopptakTildelt,
+  BegjæringOmGjenopptakTildelteResponse,
   BetongLedig,
   BetongLedigeResponse,
   BetongTildelt,
@@ -99,6 +103,16 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     error: omgjøringskravTildelteError,
     isLoading: omgjøringskravTildelteLoading,
   } = useClientKapteinApiFetch<OmgjøringskravTildelteResponse>('/omgjoeringskrav/tildelte');
+  const {
+    data: ledigeGb,
+    isLoading: isLoadingLedigeGb,
+    error: errorLedigeGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakLedigeResponse>('/begjaeringer-om-gjenopptak/ledige');
+  const {
+    data: tildelteGb,
+    isLoading: isLoadingTildelteGb,
+    error: errorTildelteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakTildelteResponse>('/begjaeringer-om-gjenopptak/tildelte');
 
   if (
     klagerLedigeLoading ||
@@ -108,7 +122,9 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     betongLedigeLoading ||
     betongTildelteLoading ||
     omgjøringskravLedigeLoading ||
-    omgjøringskravTildelteLoading
+    omgjøringskravTildelteLoading ||
+    isLoadingLedigeGb ||
+    isLoadingTildelteGb
   ) {
     return <Skeleton />;
   }
@@ -121,7 +137,9 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     betongLedigeError !== null ||
     betongTildelteError !== null ||
     omgjøringskravLedigeError !== null ||
-    omgjøringskravTildelteError !== null
+    omgjøringskravTildelteError !== null ||
+    errorLedigeGb !== null ||
+    errorTildelteGb !== null
   ) {
     return (
       <LoadingError>
@@ -135,6 +153,8 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
           {betongTildelteError === null ? null : <List.Item>{betongTildelteError}</List.Item>}
           {omgjøringskravLedigeError === null ? null : <List.Item>{omgjøringskravLedigeError}</List.Item>}
           {omgjøringskravTildelteError === null ? null : <List.Item>{omgjøringskravTildelteError}</List.Item>}
+          {errorLedigeGb === null ? null : <List.Item>{errorLedigeGb}</List.Item>}
+          {errorTildelteGb === null ? null : <List.Item>{errorTildelteGb}</List.Item>}
         </List>
       </LoadingError>
     );
@@ -150,6 +170,8 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
       betongTildelte={betongTildelte.behandlinger}
       omgjøringskravLedige={omgjøringskravLedige.behandlinger}
       omgjøringskravTildelte={omgjøringskravTildelte.behandlinger}
+      gbLedige={ledigeGb.behandlinger}
+      gbTildelte={tildelteGb.behandlinger}
       {...kodeverk}
     />
   );
@@ -164,6 +186,8 @@ interface Props {
   betongTildelte: BetongTildelt[];
   omgjøringskravLedige: OmgjøringskravLedig[];
   omgjøringskravTildelte: OmgjøringskravTildelt[];
+  gbLedige: BegjæringOmGjenopptakLedig[];
+  gbTildelte: BegjæringOmGjenopptakTildelt[];
 }
 
 const BehandlingerData = ({
@@ -175,6 +199,8 @@ const BehandlingerData = ({
   betongTildelte,
   omgjøringskravLedige,
   omgjøringskravTildelte,
+  gbLedige,
+  gbTildelte,
   sakstyper,
   ytelser,
   klageenheter,
@@ -185,21 +211,21 @@ const BehandlingerData = ({
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
 
   const tildelte = useMemo(
-    () => [...klagerTildelte, ...ankerTildelte, ...betongTildelte, ...omgjøringskravTildelte],
-    [ankerTildelte, betongTildelte, klagerTildelte, omgjøringskravTildelte],
+    () => [...klagerTildelte, ...ankerTildelte, ...betongTildelte, ...omgjøringskravTildelte, ...gbTildelte],
+    [ankerTildelte, betongTildelte, klagerTildelte, omgjøringskravTildelte, gbTildelte],
   );
 
   const behandlinger = useMemo(() => {
     if (tildelingFilter === TildelingFilter.LEDIGE) {
-      return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige];
+      return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige, ...gbLedige];
     }
 
     if (tildelingFilter === TildelingFilter.TILDELTE) {
       return tildelte;
     }
 
-    return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige, ...tildelte];
-  }, [tildelingFilter, klagerLedige, ankerLedige, betongLedige, omgjøringskravLedige, tildelte]);
+    return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige, ...gbLedige, ...tildelte];
+  }, [tildelingFilter, klagerLedige, ankerLedige, betongLedige, omgjøringskravLedige, gbLedige, tildelte]);
 
   const filteredBehandlinger = useBaseFiltered(behandlinger);
   const filteredTildelte = useBaseFiltered(tildelte);

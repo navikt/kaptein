@@ -7,13 +7,13 @@ import { getLogger } from '@/lib/logger';
 import { getOboToken } from '@/lib/server/get-obo-token';
 import { generateTraceParent } from '@/lib/server/traceparent';
 import {
-  type AnkeITRUtfall,
   type IKodeverkSimpleValue,
   type IKodeverkValue,
   type IUserData,
   type IYtelse,
   type PåVentReason,
   type RegistreringshjemlerMap,
+  type SakITRUtfall,
   Sakstype,
   type SakstypeToUtfall,
   type Utfall,
@@ -137,7 +137,7 @@ export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/k
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/kodeverk/ytelser');
 
 export const getUtfall = () =>
-  getData<IKodeverkSimpleValue<Utfall | AnkeITRUtfall>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/utfall');
+  getData<IKodeverkSimpleValue<Utfall | SakITRUtfall>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/utfall');
 
 export const getKlageenheter = async () => {
   const enheter = await getData<IKodeverkSimpleValue[]>(AppName.KLAGE_KODEVERK, '/kodeverk/klageenheter');
@@ -154,10 +154,16 @@ export const getUtfallForSakstype = async (sakstype: Sakstype) =>
 export const getSakstyperToUtfall = async () =>
   getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstypertoutfall');
 
-export const getRelevantSakstyperToUtfall = async () => {
+export const getDefaultSakstyperToUtfall = async () => {
   const sakstyper = await getSakstyperToUtfall();
 
-  return sakstyper.filter(({ id }) => RELEVANT_SAKSTYPER.includes(id));
+  return sakstyper.filter(({ id }) => DEFAULT_SAKSTYPER.includes(id));
+};
+
+export const getTrSaksTyperToUtfall = async () => {
+  const sakstyper = await getSakstyperToUtfall();
+
+  return sakstyper.filter(({ id }) => TR_SAKSTYPER.includes(id));
 };
 
 export const getInnsendingshjemlerMap = () =>
@@ -169,17 +175,26 @@ export const getRegistreringshjemlerMap = () =>
 export const getPåVentReasons = () =>
   getData<IKodeverkValue<PåVentReason>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/satt-paa-vent-reasons');
 
-export const getSakstyper = async () => {
+export const getDefaultSakstyper = async () => {
   const sakstyper = await getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstyper');
 
-  return sakstyper.filter(({ id }) => RELEVANT_SAKSTYPER.includes(id));
+  return sakstyper.filter(({ id }) => DEFAULT_SAKSTYPER.includes(id));
+};
+
+export const getTRSaksttyper = async () => {
+  const sakstyper = await getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstyper');
+
+  return sakstyper.filter(({ id }) => TR_SAKSTYPER.includes(id));
 };
 
 const STYRINGSENHETEN: IKodeverkSimpleValue = { id: '4200', navn: 'Nav klageinstans styringsenhet' };
 
-const RELEVANT_SAKSTYPER = [
+const DEFAULT_SAKSTYPER = [
   Sakstype.KLAGE,
   Sakstype.ANKE,
   Sakstype.BEHANDLING_ETTER_TR_OPPHEVET,
   Sakstype.OMGJØRINGSKRAV,
+  Sakstype.BEGJÆRING_OM_GJENOPPTAK,
 ];
+
+const TR_SAKSTYPER = [Sakstype.ANKE_I_TRYGDERETTEN, Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN];

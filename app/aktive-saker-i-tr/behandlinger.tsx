@@ -3,7 +3,7 @@
 import { BodyLong, BodyShort } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { Skeleton } from '@/app/aktive-anker-i-tr/skeleton';
+import { Skeleton } from '@/app/aktive-saker-i-tr/skeleton';
 import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { Card } from '@/components/cards';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
@@ -23,7 +23,11 @@ import {
   type AnkeITRTildelt,
   type AnkerITRLedigeResponse,
   type AnkerITRTildelteResponse,
-  type BaseAnkeITR,
+  type BaseSakITR,
+  type BegjæringOmGjenopptakITRLedig,
+  type BegjæringOmGjenopptakITRLedigeResponse,
+  type BegjæringOmGjenopptakITRTildelt,
+  type BegjæringOmGjenopptakITRTildelteResponse,
   type IKodeverkSimpleValue,
   type IYtelse,
   Sakstype,
@@ -37,48 +41,70 @@ interface KodeverkProps {
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
   const {
-    data: ledige,
-    isLoading: isLoadingLedige,
-    error: errorLedige,
+    data: ledigeAnker,
+    isLoading: isLoadingLedigeAnker,
+    error: errorLedigeAnker,
   } = useClientKapteinApiFetch<AnkerITRLedigeResponse>('/anker-i-tr/ledige');
   const {
-    data: tildelte,
-    isLoading: isLoadingTildelte,
-    error: errorTildelte,
+    data: tildelteAnker,
+    isLoading: isLoadingTildelteAnker,
+    error: errorTildelteAnker,
   } = useClientKapteinApiFetch<AnkerITRTildelteResponse>('/anker-i-tr/tildelte');
+  const {
+    data: ledigeGb,
+    isLoading: isLoadingLedigeGb,
+    error: errorLedigeGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakITRLedigeResponse>('/begjaeringer-om-gjenopptak-i-tr/ledige');
+  const {
+    data: tildelteGb,
+    isLoading: isLoadingTildelteGb,
+    error: errorTildelteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakITRTildelteResponse>('/begjaeringer-om-gjenopptak-i-tr/tildelte');
 
-  if (isLoadingLedige || isLoadingTildelte) {
+  if (isLoadingLedigeAnker || isLoadingTildelteAnker || isLoadingLedigeGb || isLoadingTildelteGb) {
     return <Skeleton />;
   }
 
-  if (errorLedige !== null) {
-    return <LoadingError>Feil ved lasting av data: {errorLedige}</LoadingError>;
+  if (errorLedigeAnker !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorLedigeAnker}</LoadingError>;
   }
 
-  if (errorTildelte !== null) {
-    return <LoadingError>Feil ved lasting av data: {errorTildelte}</LoadingError>;
+  if (errorTildelteAnker !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorTildelteAnker}</LoadingError>;
   }
 
-  return <BehandlingerData {...kodeverk} ledige={ledige.behandlinger} tildelte={tildelte.behandlinger} />;
+  if (errorLedigeGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorLedigeGb}</LoadingError>;
+  }
+
+  if (errorTildelteGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorTildelteGb}</LoadingError>;
+  }
+
+  return (
+    <BehandlingerData
+      {...kodeverk}
+      ledigeAnker={ledigeAnker.behandlinger}
+      tildelteAnker={tildelteAnker.behandlinger}
+      ledigeGb={ledigeGb.behandlinger}
+      tildelteGb={tildelteGb.behandlinger}
+    />
+  );
 };
 
 interface DataProps extends KodeverkProps {
-  ledige: AnkeITRLedig[];
-  tildelte: AnkeITRTildelt[];
+  ledigeAnker: AnkeITRLedig[];
+  tildelteAnker: AnkeITRTildelt[];
+  ledigeGb: BegjæringOmGjenopptakITRLedig[];
+  tildelteGb: BegjæringOmGjenopptakITRTildelt[];
 }
 
-const BehandlingerData = ({ ledige, tildelte, ytelser, klageenheter }: DataProps) => {
-  const ledigeFiltered = useAnkeITRFilter(useBaseFiltered(ledige));
-  const tildelteFiltered = useAnkeITRFilter(useBaseFiltered(tildelte));
+const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, ytelser, klageenheter }: DataProps) => {
+  const ledigeFiltered = useAnkeITRFilter(useBaseFiltered([...ledigeAnker, ...ledigeGb]));
+  const tildelteFiltered = useAnkeITRFilter(useBaseFiltered([...tildelteAnker, ...tildelteGb]));
 
   const uferdige = useMemo(
-    () => [
-      ...ledigeFiltered.map<BaseAnkeITR & { tildeltEnhet: string }>((b) => ({
-        ...b,
-        tildeltEnhet: b.tildeltEnhet ?? '4293',
-      })),
-      ...tildelteFiltered,
-    ],
+    () => [...ledigeFiltered.map((b) => ({ ...b, tildeltEnhet: b.tildeltEnhet ?? '4293' })), ...tildelteFiltered],
     [ledigeFiltered, tildelteFiltered],
   );
   const relevantYtelser = useRelevantYtelser([...ledigeFiltered, ...tildelteFiltered], ytelser);
@@ -87,8 +113,8 @@ const BehandlingerData = ({ ledige, tildelte, ytelser, klageenheter }: DataProps
     <ChartsWrapper>
       <Card span={3}>
         <TildelteSakerPerKlageenhetOgYtelse
-          title="Aktive anker i TR per klageenhet og ytelse"
-          description={`Viser data for ${uferdige.length} aktive anker i TR`}
+          title="Aktive saker i TR per klageenhet og ytelse"
+          description={`Viser data for ${uferdige.length} aktive saker i TR`}
           helpText={ANKE_I_TR_HELP_TEXT}
           behandlinger={uferdige}
           klageenheter={klageenheter}
@@ -98,8 +124,8 @@ const BehandlingerData = ({ ledige, tildelte, ytelser, klageenheter }: DataProps
 
       <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
-          title="Aktive anker i TR per ytelse og klageenhet"
-          description={`Viser data for ${uferdige.length} aktive anker i TR`}
+          title="Aktive saker i TR per ytelse og klageenhet"
+          description={`Viser data for ${uferdige.length} aktive saker i TR`}
           helpText={ANKE_I_TR_HELP_TEXT}
           behandlinger={uferdige}
           klageenheter={klageenheter}
@@ -166,7 +192,7 @@ const ALDER_HELP_TEXT = (
   </BodyShort>
 );
 
-const useAnkeITRFilter = <T extends BaseAnkeITR>(behandlinger: T[]) => {
+const useAnkeITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
 

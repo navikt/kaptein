@@ -9,24 +9,24 @@ import { EChart } from '@/lib/echarts/echarts';
 import { formatPercent } from '@/lib/format';
 import { percent } from '@/lib/percent';
 import {
-  ANKE_I_TR_IKKE_OMGJØRINGSUTFALL,
-  ANKE_I_TR_OMGJØRINGSUTFALL,
-  ANKE_I_TR_UTFALL,
-  type AnkeITRFerdigstilt,
-  type AnkeITRLedig,
-  type AnkeITRTildelt,
-  AnkeITRUtfall,
+  type FerdigstiltSakITR,
   type IKodeverkSimpleValue,
-  isAnkeITRUtfall,
+  isSakITRUtfall,
+  type LedigSakITR,
+  SAK_I_TR_IKKE_OMGJØRINGSUTFALL,
+  SAK_I_TR_OMGJØRINGSUTFALL,
+  SAK_I_TR_UTFALL,
+  SakITRUtfall,
+  type TildeltSakITR,
   Utfall,
 } from '@/lib/types';
 
 const HOS_TR = 'hos_tr';
 
 interface Props {
-  uferdige: (AnkeITRLedig | AnkeITRTildelt)[];
-  ferdigstilte: AnkeITRFerdigstilt[];
-  utfall: IKodeverkSimpleValue<Utfall | AnkeITRUtfall>[];
+  uferdige: (LedigSakITR | TildeltSakITR)[];
+  ferdigstilte: FerdigstiltSakITR[];
+  utfall: IKodeverkSimpleValue<Utfall | SakITRUtfall>[];
 }
 
 export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Props) => {
@@ -49,7 +49,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     const totalOmgjortCount = values.reduce((sum, monthData) => sum + monthData.omgjortCount, 0);
     const totalOmgjortPercent = ferdigstilteCount === 0 ? 0 : totalOmgjortCount / ferdigstilteCount;
 
-    const series = ANKE_I_TR_OMGJØRINGSUTFALL.map((utfallId) =>
+    const series = SAK_I_TR_OMGJØRINGSUTFALL.map((utfallId) =>
       createSerie({
         id: utfallId,
         name: utfallMap.get(utfallId)?.navn ?? 'Ukjent',
@@ -58,7 +58,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
         color: UTFALL_COLORS[utfallId],
         stack: 'omgjort',
         markLine:
-          utfallId === AnkeITRUtfall.MEDHOLD
+          utfallId === SakITRUtfall.MEDHOLD
             ? {
                 symbol: ['none', 'none'],
                 animation: false,
@@ -159,7 +159,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
             result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Omgjort</td><td class="text-right pl-3">${formatPercent(monthData.omgjortPercent)}</td><td class="text-right pl-3">${monthData.omgjortCount}</td></tr>`;
 
             for (const param of params) {
-              if (param.seriesId === HOS_TR || !isAnkeITRUtfall(param.seriesId)) {
+              if (param.seriesId === HOS_TR || !isSakITRUtfall(param.seriesId)) {
                 continue;
               }
 
@@ -182,7 +182,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
 
             result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Ikke omgjort</td><td class="text-right pl-3">${ikkeOmgjortPercentage}</td><td class="text-right pl-3">${ikkeOmgjortCount}</td></tr>`;
 
-            for (const utfallId of ANKE_I_TR_IKKE_OMGJØRINGSUTFALL) {
+            for (const utfallId of SAK_I_TR_IKKE_OMGJØRINGSUTFALL) {
               const utfallData = monthData.perUtfall.get(utfallId);
 
               if (utfallData === undefined) {
@@ -235,7 +235,7 @@ interface UtfallData {
   percent: number;
 }
 
-type PerUtfall = Map<AnkeITRUtfall, UtfallData>;
+type PerUtfall = Map<SakITRUtfall, UtfallData>;
 
 type MonthData = {
   total: number;
@@ -248,13 +248,13 @@ type MonthData = {
 
 const calculateCountPerMonthPerUtfall = (
   months: string[],
-  uferdige: (AnkeITRLedig | AnkeITRTildelt)[],
-  ferdigstilte: AnkeITRFerdigstilt[],
+  uferdige: (LedigSakITR | TildeltSakITR)[],
+  ferdigstilte: FerdigstiltSakITR[],
 ) => {
   const countPerMonthMap = new Map<string, MonthData>();
 
   for (const month of months) {
-    const perUtfall = new Map<AnkeITRUtfall, UtfallData>(ANKE_I_TR_UTFALL.map((u) => [u, { count: 0, percent: 0 }])); // Initiate with 0 values for all utfall.
+    const perUtfall = new Map<SakITRUtfall, UtfallData>(SAK_I_TR_UTFALL.map((u) => [u, { count: 0, percent: 0 }])); // Initiate with 0 values for all utfall.
 
     let unfinishedCount = 0;
     let finishedCount = 0;
@@ -271,7 +271,7 @@ const calculateCountPerMonthPerUtfall = (
       if (behandling.resultat !== null && behandling.sendtTilTR.startsWith(month)) {
         finishedCount++;
 
-        if (ANKE_I_TR_OMGJØRINGSUTFALL.includes(behandling.resultat.utfallId)) {
+        if (SAK_I_TR_OMGJØRINGSUTFALL.includes(behandling.resultat.utfallId)) {
           omgjortCount++;
         }
 
@@ -319,7 +319,7 @@ const getMax = (perMonth: Map<string, MonthData>, unfinishedData: number[]) => {
   return Math.min(finishedMax + unfinishedMax, 1);
 };
 
-const UTFALL_COLORS: Record<AnkeITRUtfall, string> = {
+const UTFALL_COLORS: Record<SakITRUtfall, string> = {
   [Utfall.OPPHEVET]: 'var(--ax-meta-purple-500)',
   [Utfall.MEDHOLD]: 'var(--ax-danger-500)',
   [Utfall.DELVIS_MEDHOLD]: 'var(--ax-warning-500)',
@@ -327,6 +327,11 @@ const UTFALL_COLORS: Record<AnkeITRUtfall, string> = {
   [Utfall.AVVIST]: 'var(--ax-accent-500)',
   [Utfall.HEVET]: 'var(--ax-meta-lime-500)',
   [Utfall.HENVIST]: 'var(--ax-brand-blue-500)',
+
+  [Utfall.GJENOPPTATT_DELVIS_FULLT_MEDHOLD]: 'var(--ax-meta-purple-800)',
+  [Utfall.GJENOPPTATT_OPPHEVET]: 'var(--ax-danger-800)',
+  [Utfall.GJENOPPTATT_STADFESTET]: 'var(--ax-warning-800)',
+  [Utfall.IKKE_GJENOPPTATT]: 'var(--ax-success-800)',
 };
 
 interface SerieParams {

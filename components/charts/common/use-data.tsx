@@ -6,7 +6,7 @@ import { parseAsHjemlerModeFilter, parseAsTilbakekrevingFilter } from '@/app/cus
 import { TilbakekrevingFilter } from '@/app/query-types';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
-import type { Avsluttet, BaseAnkeITR, BaseBehandling, Ferdigstilt, Frist } from '@/lib/types';
+import type { Avsluttet, BaseBehandling, BaseSakITR, Ferdigstilt, Frist } from '@/lib/types';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Avsluttet & Ferdigstilt & Frist)[]) => {
@@ -36,7 +36,7 @@ export const useFerdigstiltInPeriod = <T extends Avsluttet>(ferdigstilteBehandli
   }, [ferdigstilteBehandlinger, fromFilter, toFilter]);
 };
 
-export const useSentInPeriod = <T extends BaseAnkeITR>(ferdigstilteBehandlinger: T[]) => {
+export const useSentInPeriod = <T extends BaseSakITR>(ferdigstilteBehandlinger: T[]) => {
   const { fromFilter, toFilter } = useDateFilter();
 
   return useMemo(() => {

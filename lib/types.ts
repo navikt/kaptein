@@ -28,27 +28,38 @@ export const UTFALL = Object.values(Utfall);
 export const OMGJØRINGSUTFALL: Utfall[] = [Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD];
 export const IKKE_OMGJØRINGSUTFALL: Utfall[] = UTFALL.filter((u) => !OMGJØRINGSUTFALL.includes(u));
 
-export enum AnkeITRUtfall {
+export enum SakITRUtfall {
+  // Anke i TR
   OPPHEVET = '3',
   MEDHOLD = '4',
   DELVIS_MEDHOLD = '5',
   STADFESTET = '6',
+  HENVIST = '12',
+
+  // Begjæring om gjenopptak i TR
+  GJENOPPTATT_DELVIS_FULLT_MEDHOLD = '19',
+  GJENOPPTATT_OPPHEVET = '20',
+  GJENOPPTATT_STADFESTET = '21',
+  IKKE_GJENOPPTATT = '22',
+
+  // Both
   AVVIST = '8',
   HEVET = '11',
-  HENVIST = '12',
 }
 
-export const ANKE_I_TR_UTFALL = Object.values(AnkeITRUtfall);
-export const isAnkeITRUtfall = (value: string): value is AnkeITRUtfall =>
-  ANKE_I_TR_UTFALL.includes(value as AnkeITRUtfall);
+export const SAK_I_TR_UTFALL = Object.values(SakITRUtfall);
+export const isSakITRUtfall = (value: string): value is SakITRUtfall => SAK_I_TR_UTFALL.includes(value as SakITRUtfall);
 
-export const ANKE_I_TR_OMGJØRINGSUTFALL: AnkeITRUtfall[] = [
-  AnkeITRUtfall.OPPHEVET,
-  AnkeITRUtfall.DELVIS_MEDHOLD,
-  AnkeITRUtfall.MEDHOLD,
+export const SAK_I_TR_OMGJØRINGSUTFALL: SakITRUtfall[] = [
+  SakITRUtfall.OPPHEVET,
+  SakITRUtfall.DELVIS_MEDHOLD,
+  SakITRUtfall.MEDHOLD,
+  SakITRUtfall.GJENOPPTATT_OPPHEVET,
+  SakITRUtfall.GJENOPPTATT_DELVIS_FULLT_MEDHOLD,
 ];
-export const ANKE_I_TR_IKKE_OMGJØRINGSUTFALL: AnkeITRUtfall[] = ANKE_I_TR_UTFALL.filter(
-  (u) => !ANKE_I_TR_OMGJØRINGSUTFALL.includes(u),
+
+export const SAK_I_TR_IKKE_OMGJØRINGSUTFALL: SakITRUtfall[] = SAK_I_TR_UTFALL.filter(
+  (u) => !SAK_I_TR_OMGJØRINGSUTFALL.includes(u),
 );
 
 // Employee from vedtaksinstans or KA.
@@ -148,7 +159,7 @@ export interface Avsluttet {
 
 export interface Ferdigstilt {
   tildeltEnhet: string;
-  isTildelt: true;
+  isTildelt: never;
   sattPaaVentReasonId: never;
   resultat: Resultat;
 }
@@ -157,6 +168,22 @@ export interface Frist {
   frist: string | null;
   varsletFrist: string | null;
 }
+
+type LedigSakITr = {
+  isTildelt: false;
+  tildeltEnhet: string | null; // Is null for old migrated cases where the previous case is not known or possible to deduct.
+};
+
+type TildeltSakITr = {
+  isTildelt: true;
+  tildeltEnhet: string;
+};
+
+type FerdigstiltSakITr<U = SakITRUtfall> = {
+  isTildelt: true;
+  tildeltEnhet: string;
+  resultat: Resultat<U> | null;
+};
 
 // Klage
 export type KlageLedig = BaseBehandling<Sakstype.KLAGE> & Ledig & Frist;
@@ -194,8 +221,18 @@ export type OmgjøringskravLedigeResponse = KapteinApiResponse<OmgjøringskravLe
 export type OmgjøringskravTildelteResponse = KapteinApiResponse<OmgjøringskravTildelt>;
 export type OmgjøringskravFerdigstilteResponse = KapteinApiResponse<OmgjøringskravFerdigstilt>;
 
-// Anke i Trygderetten
-export interface BaseAnkeITR extends BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN> {
+export type BegjæringOmGjenopptakLedig = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK> & Frist & Ledig;
+export type BegjæringOmGjenopptakTildelt = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK> & Frist & Tildelt;
+export type BegjæringOmGjenopptakFerdigstilt = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK> &
+  Ferdigstilt &
+  Avsluttet &
+  Frist;
+
+export type BegjæringOmGjenopptakLedigeResponse = KapteinApiResponse<BegjæringOmGjenopptakLedig>;
+export type BegjæringOmGjenopptakTildelteResponse = KapteinApiResponse<BegjæringOmGjenopptakTildelt>;
+export type BegjæringOmGjenopptakFerdigstilteResponse = KapteinApiResponse<BegjæringOmGjenopptakFerdigstilt>;
+
+interface SakITRBase {
   previousRegistreringshjemmelIdList: string[] | null;
   sendtTilTR: string;
   isTildelt: boolean;
@@ -203,24 +240,34 @@ export interface BaseAnkeITR extends BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN
   avsluttetAvSaksbehandlerDate?: string;
 }
 
-export type AnkeITRLedig = BaseAnkeITR & {
-  isTildelt: false;
-  tildeltEnhet: string | null; // Is null for old migrated cases where the previous case is not known or possible to deduct.
-};
-export type AnkeITRTildelt = BaseAnkeITR & {
-  isTildelt: true;
-  tildeltEnhet: string;
-};
-export type AnkeITRFerdigstilt = BaseAnkeITR &
-  Avsluttet & {
-    isTildelt: true;
-    tildeltEnhet: string;
-    resultat: Resultat<AnkeITRUtfall> | null;
-  };
+// Begjæring om gjenopptak i Trygderetten
+export type BaseBegjæringOmGjenopptakITR = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN> & SakITRBase;
+
+export type BegjæringOmGjenopptakITRLedig = BaseBegjæringOmGjenopptakITR & LedigSakITr;
+export type BegjæringOmGjenopptakITRTildelt = BaseBegjæringOmGjenopptakITR & TildeltSakITr;
+export type BegjæringOmGjenopptakITRFerdigstilt = BaseBegjæringOmGjenopptakITR &
+  Avsluttet &
+  FerdigstiltSakITr<SakITRUtfall>;
+
+export type BegjæringOmGjenopptakITRLedigeResponse = KapteinApiResponse<BegjæringOmGjenopptakITRLedig>;
+export type BegjæringOmGjenopptakITRTildelteResponse = KapteinApiResponse<BegjæringOmGjenopptakITRTildelt>;
+export type BegjæringOmGjenopptakITRFerdigstilteResponse = KapteinApiResponse<BegjæringOmGjenopptakITRFerdigstilt>;
+
+// Anke i Trygderetten
+export type BaseAnkeITR = BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN> & SakITRBase;
+
+export type AnkeITRLedig = BaseAnkeITR & LedigSakITr;
+export type AnkeITRTildelt = BaseAnkeITR & TildeltSakITr;
+export type AnkeITRFerdigstilt = BaseAnkeITR & Avsluttet & FerdigstiltSakITr<SakITRUtfall>;
 
 export type AnkerITRLedigeResponse = KapteinApiResponse<AnkeITRLedig>;
 export type AnkerITRTildelteResponse = KapteinApiResponse<AnkeITRTildelt>;
 export type AnkerITRFerdigstilteResponse = KapteinApiResponse<AnkeITRFerdigstilt>;
+
+export type BaseSakITR = BaseAnkeITR | BaseBegjæringOmGjenopptakITR;
+export type LedigSakITR = AnkeITRLedig | BegjæringOmGjenopptakITRLedig;
+export type TildeltSakITR = AnkeITRTildelt | BegjæringOmGjenopptakITRTildelt;
+export type FerdigstiltSakITR = AnkeITRFerdigstilt | BegjæringOmGjenopptakITRFerdigstilt;
 
 export interface KapteinApiResponse<T> {
   behandlinger: T[];

@@ -6,11 +6,11 @@ import { EChart } from '@/lib/echarts/echarts';
 import { formatPercent } from '@/lib/format';
 import { percent } from '@/lib/percent';
 import {
-  ANKE_I_TR_OMGJØRINGSUTFALL,
-  type AnkeITRFerdigstilt,
+  type FerdigstiltSakITR,
   type IKodeverkSimpleValue,
   type IYtelse,
   type RegistreringshjemlerMap,
+  SAK_I_TR_OMGJØRINGSUTFALL,
 } from '@/lib/types';
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
    * Maximum number of hjemler to show in the chart. Set to -1 to show all.
    */
   maxHjemler: number;
-  behandlinger: AnkeITRFerdigstilt[];
+  behandlinger: FerdigstiltSakITR[];
   klageenheter: IKodeverkSimpleValue[];
   ytelser: IYtelse[];
   registreringshjemlerMap: RegistreringshjemlerMap;
@@ -37,7 +37,7 @@ interface YtelseBranch {
   children: Map<string, HjemmelBranch>;
 }
 
-const getYtelserToHjemler = (behandlinger: AnkeITRFerdigstilt[]) => {
+const getYtelserToHjemler = (behandlinger: FerdigstiltSakITR[]) => {
   const branches = new Map<string, YtelseBranch>();
 
   for (const behandling of behandlinger) {
@@ -48,7 +48,7 @@ const getYtelserToHjemler = (behandlinger: AnkeITRFerdigstilt[]) => {
     }
 
     const { utfallId, registreringshjemmelIdList } = resultat;
-    const isOmgjort = ANKE_I_TR_OMGJØRINGSUTFALL.includes(utfallId);
+    const isOmgjort = SAK_I_TR_OMGJØRINGSUTFALL.includes(utfallId);
 
     const ytelse = branches.get(ytelseId) ?? { id: ytelseId, children: new Map() };
     branches.set(ytelseId, ytelse);

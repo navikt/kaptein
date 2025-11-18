@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Behandlinger } from '@/app/aktive-anker-i-tr/behandlinger';
+import { Behandlinger } from '@/app/aktive-saker-i-tr/behandlinger';
 import { getKlageenheter, getYtelser } from '@/lib/server/api';
 
 export const metadata: Metadata = {

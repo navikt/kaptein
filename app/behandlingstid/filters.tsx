@@ -10,10 +10,10 @@ import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
+  getDefaultSakstyperToUtfall,
   getKlageenheter,
   getLovkildeToRegistreringshjemler,
   getRegistreringshjemlerMap,
-  getRelevantSakstyperToUtfall,
   getUtfall,
   getYtelser,
 } from '@/lib/server/api';
@@ -34,7 +34,7 @@ export const Filters = async () => (
 const AsyncFilters = async () => {
   const ytelser = await getYtelser();
   const lovkildeToRegistreringshjemler = await getLovkildeToRegistreringshjemler();
-  const sakstyperToUtfall = await getRelevantSakstyperToUtfall();
+  const sakstyperToUtfall = await getDefaultSakstyperToUtfall();
   const klageEnheter = await getKlageenheter();
   const utfall = await getUtfall();
   const registreringshjemler = await getRegistreringshjemlerMap();

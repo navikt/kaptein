@@ -4,7 +4,7 @@ import { BodyShort } from '@navikt/ds-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
-import { Skeleton } from '@/app/ferdigstilte-anker-i-tr/skeleton';
+import { Skeleton } from '@/app/ferdigstilte-saker-i-tr/skeleton';
 import { Card } from '@/components/cards';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
@@ -24,14 +24,21 @@ import {
   type AnkeITRFerdigstilt,
   type AnkeITRLedig,
   type AnkeITRTildelt,
-  type AnkeITRUtfall,
   type AnkerITRFerdigstilteResponse,
   type AnkerITRLedigeResponse,
   type AnkerITRTildelteResponse,
-  type BaseAnkeITR,
+  type BaseSakITR,
+  type BegjæringOmGjenopptakITRFerdigstilt,
+  type BegjæringOmGjenopptakITRFerdigstilteResponse,
+  type BegjæringOmGjenopptakITRLedig,
+  type BegjæringOmGjenopptakITRLedigeResponse,
+  type BegjæringOmGjenopptakITRTildelt,
+  type BegjæringOmGjenopptakITRTildelteResponse,
+  type FerdigstiltSakITR,
   type IKodeverkSimpleValue,
   type IYtelse,
   type RegistreringshjemlerMap,
+  type SakITRUtfall,
   Sakstype,
   type Utfall,
 } from '@/lib/types';
@@ -41,64 +48,119 @@ interface KodeverkProps {
   ytelser: IYtelse[];
   klageenheter: IKodeverkSimpleValue[];
   registreringshjemlerMap: RegistreringshjemlerMap;
-  utfall: IKodeverkSimpleValue<Utfall | AnkeITRUtfall>[];
+  utfall: IKodeverkSimpleValue<Utfall | SakITRUtfall>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
   const {
-    data: ledige,
-    isLoading: isLoadingLedige,
-    error: errorLedige,
+    data: ledigeAnker,
+    isLoading: isLoadingLedigeAnker,
+    error: errorLedigeAnker,
   } = useClientKapteinApiFetch<AnkerITRLedigeResponse>('/anker-i-tr/ledige');
   const {
-    data: tildelte,
-    isLoading: isLoadingTildelte,
-    error: errorTildelte,
+    data: tildelteAnker,
+    isLoading: isLoadingTildelteAnker,
+    error: errorTildelteAnker,
   } = useClientKapteinApiFetch<AnkerITRTildelteResponse>('/anker-i-tr/tildelte');
   const {
-    data: ferdigstilte,
-    isLoading: isLoadingFerdigstilte,
-    error: errorFerdigstilte,
+    data: ferdigstilteAnker,
+    isLoading: isLoadingFerdigstilteAnker,
+    error: errorFerdigstilteAnker,
   } = useClientKapteinApiFetch<AnkerITRFerdigstilteResponse>('/anker-i-tr/ferdigstilte');
+  const {
+    data: ledigeGb,
+    isLoading: isLoadingLedigeGb,
+    error: errorLedigeGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakITRLedigeResponse>('/begjaeringer-om-gjenopptak-i-tr/ledige');
+  const {
+    data: tildelteGb,
+    isLoading: isLoadingTildelteGb,
+    error: errorTildelteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakITRTildelteResponse>('/begjaeringer-om-gjenopptak-i-tr/tildelte');
+  const {
+    data: ferdigstilteGb,
+    isLoading: isLoadingFerdigstilteGb,
+    error: errorFerdigstilteGb,
+  } = useClientKapteinApiFetch<BegjæringOmGjenopptakITRFerdigstilteResponse>(
+    '/begjaeringer-om-gjenopptak-i-tr/ferdigstilte',
+  );
 
-  if (isLoadingFerdigstilte || isLoadingLedige || isLoadingTildelte) {
+  if (
+    isLoadingFerdigstilteAnker ||
+    isLoadingLedigeAnker ||
+    isLoadingTildelteAnker ||
+    isLoadingFerdigstilteGb ||
+    isLoadingLedigeGb ||
+    isLoadingTildelteGb
+  ) {
     return <Skeleton />;
   }
 
-  if (errorFerdigstilte !== null || errorLedige !== null || errorTildelte !== null) {
-    return <LoadingError>Feil ved lasting av data: {errorFerdigstilte}</LoadingError>;
+  if (errorLedigeAnker !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorLedigeAnker}</LoadingError>;
+  }
+
+  if (errorTildelteAnker !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorTildelteAnker}</LoadingError>;
+  }
+
+  if (errorFerdigstilteAnker !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorFerdigstilteAnker}</LoadingError>;
+  }
+
+  if (errorLedigeGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorLedigeGb}</LoadingError>;
+  }
+
+  if (errorTildelteGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorTildelteGb}</LoadingError>;
+  }
+
+  if (errorFerdigstilteGb !== null) {
+    return <LoadingError>Feil ved lasting av data: {errorFerdigstilteGb}</LoadingError>;
   }
 
   return (
     <BehandlingerData
       {...kodeverk}
-      ledige={ledige.behandlinger}
-      tildelte={tildelte.behandlinger}
-      ferdigstilte={ferdigstilte.behandlinger}
+      ledigeAnker={ledigeAnker.behandlinger}
+      tildelteAnker={tildelteAnker.behandlinger}
+      ferdigstilteAnker={ferdigstilteAnker.behandlinger}
+      ledigeGb={ledigeGb.behandlinger}
+      tildelteGb={tildelteGb.behandlinger}
+      ferdigstilteGb={ferdigstilteGb.behandlinger}
     />
   );
 };
 
 interface DataProps extends KodeverkProps {
-  ledige: AnkeITRLedig[];
-  tildelte: AnkeITRTildelt[];
-  ferdigstilte: AnkeITRFerdigstilt[];
+  ledigeAnker: AnkeITRLedig[];
+  tildelteAnker: AnkeITRTildelt[];
+  ferdigstilteAnker: AnkeITRFerdigstilt[];
+  ledigeGb: BegjæringOmGjenopptakITRLedig[];
+  tildelteGb: BegjæringOmGjenopptakITRTildelt[];
+  ferdigstilteGb: BegjæringOmGjenopptakITRFerdigstilt[];
 }
 
 const BehandlingerData = ({
-  ledige,
-  tildelte,
-  ferdigstilte,
+  ledigeAnker,
+  tildelteAnker,
+  ferdigstilteAnker,
+  ledigeGb,
+  tildelteGb,
+  ferdigstilteGb,
   ytelser,
   klageenheter,
   registreringshjemlerMap,
   utfall,
 }: DataProps) => {
-  const baseFilteredFerdigstilte = useAnkeITRFilter(useUtfallFilter(useBaseFiltered(ferdigstilte)));
+  const baseFilteredFerdigstilte = useSakITRFilter(
+    useUtfallFilter(useBaseFiltered([...ferdigstilteAnker, ...ferdigstilteGb])),
+  );
   const ferdigstilteInPeriod = useFerdigstiltInPeriod(baseFilteredFerdigstilte);
   const sentInPeriodFerdigstilte = useSentInPeriod(baseFilteredFerdigstilte);
-  const uferdige = [...ledige, ...tildelte];
-  const baseFilteredUferdige = useAnkeITRFilter(useBaseFiltered(uferdige));
+  const uferdige = [...ledigeAnker, ...tildelteAnker, ...ledigeGb, ...tildelteGb];
+  const baseFilteredUferdige = useSakITRFilter(useBaseFiltered(uferdige));
   const sentInPeriodUferdige = useSentInPeriod(baseFilteredUferdige);
   const relevantYtelser = useRelevantYtelser(ferdigstilteInPeriod, ytelser);
 
@@ -128,7 +190,7 @@ const BehandlingerData = ({
       <Card span={4}>
         <HjemlerOmgjort
           title="Topp 30 omgjorte hjemler"
-          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte saker i TR`}
           maxHjemler={30}
           behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
@@ -139,8 +201,8 @@ const BehandlingerData = ({
 
       <Card span={3}>
         <TildelteSakerPerKlageenhetOgYtelse
-          title="Ferdigstilte anker i TR per klageenhet og ytelse"
-          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          title="Ferdigstilte saker i TR per klageenhet og ytelse"
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte saker i TR`}
           helpText={ANKE_I_TR_HELP_TEXT}
           behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
@@ -150,8 +212,8 @@ const BehandlingerData = ({
 
       <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
-          title="Ferdigstilte anker i TR per ytelse og klageenhet"
-          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          title="Ferdigstilte saker i TR per ytelse og klageenhet"
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte saker i TR`}
           helpText={ANKE_I_TR_HELP_TEXT}
           behandlinger={ferdigstilteInPeriod}
           klageenheter={klageenheter}
@@ -172,7 +234,7 @@ const BehandlingerData = ({
       <Card span={2}>
         <DaysThresholdPieChart
           title="Behandlingstid"
-          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte saker i TR`}
           helpText={BEHANDLINGSTID_HELP_TEXT}
           behandlinger={ferdigstilteInPeriod}
           getDays={(b) => b.behandlingstid}
@@ -183,7 +245,7 @@ const BehandlingerData = ({
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
           helpText={BEHANDLINGSTID_HELP_TEXT}
-          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte anker i TR`}
+          description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte saker i TR`}
           behandlinger={ferdigstilteInPeriod}
           relevantYtelser={relevantYtelser}
           getDays={(b) => b.behandlingstid}
@@ -215,7 +277,7 @@ const BEHANDLINGSTID_HELP_TEXT = (
   </>
 );
 
-const useAnkeITRFilter = <T extends BaseAnkeITR>(behandlinger: T[]) => {
+const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
   const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
   const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
 
@@ -229,7 +291,7 @@ const useAnkeITRFilter = <T extends BaseAnkeITR>(behandlinger: T[]) => {
   }, [behandlinger, registreringshjemlerFilter, hjemmelModeFilter]);
 };
 
-const useUtfallFilter = <T extends AnkeITRFerdigstilt>(behandlinger: T[]) => {
+const useUtfallFilter = <T extends FerdigstiltSakITR>(behandlinger: T[]) => {
   const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
 
   return useMemo(() => {
