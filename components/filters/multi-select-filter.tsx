@@ -73,7 +73,7 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
         >
           {filteredOptions.map((option) => (
             // <Checkbox> renders much faster than <ActionMenu.CheckboxItem>
-            <Checkbox size="small" value={option.value}>
+            <Checkbox size="small" value={option.value} key={option.value}>
               {option.label}
             </Checkbox>
           ))}
