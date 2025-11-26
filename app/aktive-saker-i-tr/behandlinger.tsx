@@ -1,10 +1,8 @@
 'use client';
 
 import { BodyLong, BodyShort } from '@navikt/ds-react';
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/aktive-saker-i-tr/skeleton';
-import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { Card } from '@/components/cards';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
@@ -18,6 +16,7 @@ import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
+import { useRegistreringshjemlerFilter, useRegistreringshjemlerModeFilter } from '@/lib/query-state/query-state';
 import {
   type AnkeITRLedig,
   type AnkeITRTildelt,
@@ -32,7 +31,6 @@ import {
   type IYtelse,
   Sakstype,
 } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -193,15 +191,17 @@ const ALDER_HELP_TEXT = (
 );
 
 const useAnkeITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
-  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
+  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
+  const [hjemmelModeFilter] = useRegistreringshjemlerModeFilter();
 
-  return useMemo(() => {
-    return filterHjemler(
-      behandlinger,
-      registreringshjemlerFilter,
-      hjemmelModeFilter,
-      (b) => b.previousRegistreringshjemmelIdList ?? [],
-    );
-  }, [behandlinger, registreringshjemlerFilter, hjemmelModeFilter]);
+  return useMemo(
+    () =>
+      filterHjemler(
+        behandlinger,
+        registreringshjemlerFilter,
+        hjemmelModeFilter,
+        (b) => b.previousRegistreringshjemmelIdList ?? [],
+      ),
+    [behandlinger, registreringshjemlerFilter, hjemmelModeFilter],
+  );
 };

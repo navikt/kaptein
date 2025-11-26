@@ -1,6 +1,5 @@
 import { eachMonthOfInterval, format, parse } from 'date-fns';
 import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
@@ -9,6 +8,7 @@ import { ISO_DATE_FORMAT, ISO_MONTH_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import { formatPercent } from '@/lib/format';
 import { percent } from '@/lib/percent';
+import { useUtfallFilter } from '@/lib/query-state/query-state';
 import {
   type FerdigstiltSakITR,
   type IKodeverkSimpleValue,
@@ -22,7 +22,6 @@ import {
   type TildeltSakITR,
   Utfall,
 } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 const HOS_TR = 'hos_tr';
 
@@ -34,7 +33,7 @@ interface Props {
 
 export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
-  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
+  const [utfallFilter] = useUtfallFilter();
 
   const ferdigstilteCount = ferdigstilte.filter((f) => f.resultat !== null).length;
   const totalCaseCount = uferdige.length + ferdigstilteCount;
@@ -55,9 +54,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
 
     // Only show selected, if any, and relevant utfall in the legend
     const filteredUtfall =
-      utfallFilter === null || utfallFilter.length === 0
-        ? SAK_I_TR_OMGJØRINGSUTFALL
-        : utfallFilter.filter(isSakITROmgjøringsutfall);
+      utfallFilter.length === 0 ? SAK_I_TR_OMGJØRINGSUTFALL : utfallFilter.filter(isSakITROmgjøringsutfall);
 
     const series = filteredUtfall.map((utfallId) =>
       createSerie({

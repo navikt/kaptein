@@ -1,13 +1,21 @@
 'use client';
 
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsHjemlerModeFilter, parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
+import {
+  useInnsendingshjemlerFilter,
+  useInnsendingshjemlerModeFilter,
+  useKlageenheterFilter,
+  useRegistreringshjemlerFilter,
+  useRegistreringshjemlerModeFilter,
+  useSakstyperFilter,
+  useTilbakekrevingFilter,
+  useUtfallFilter,
+  useYtelserFilter,
+} from '@/lib/query-state/query-state';
 import type { Avsluttet, BaseBehandling, BaseSakITR, Ferdigstilt, Frist } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Avsluttet & Ferdigstilt & Frist)[]) => {
   const baseFiltered = useBaseFiltered(behandlinger);
@@ -89,9 +97,9 @@ export const useMottattInPeriod = <T extends BaseBehandling>(behandlinger: T[]) 
 export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>(
   ferdigstilteBehandlinger: T[],
 ) => {
-  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
-  const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
+  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
+  const [utfallFilter] = useUtfallFilter();
+  const [hjemmelModeFilter] = useRegistreringshjemlerModeFilter();
 
   return useMemo(() => {
     const filteredForRegistreringshjemler = filterHjemler(
@@ -102,7 +110,7 @@ export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avs
     );
 
     const filteredForUtfall =
-      utfallFilter === null || utfallFilter.length === 0
+      utfallFilter.length === 0
         ? filteredForRegistreringshjemler
         : filteredForRegistreringshjemler.filter((b) => utfallFilter.includes(b.resultat.utfallId));
 
@@ -111,17 +119,12 @@ export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avs
 };
 
 export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
-  const [ytelseFilter] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
-  const [klageenheterFilter] = useQueryState(QueryParam.KLAGEENHETER, parseAsArrayOf(parseAsString));
-  const [innsendingshjemlerFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [sakstyperFilter] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
-  const [hjemmelModeFilter] = useQueryState(QueryParam.INNSENDINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
-  const [tilbakekrevingFilter] = useQueryState(QueryParam.TILBAKEKREVING, parseAsTilbakekrevingFilter);
-
-  const ytelser = ytelseFilter ?? [];
-  const klageenheter = klageenheterFilter ?? [];
-  const sakstyper = sakstyperFilter ?? [];
-  const tilbakekreving = tilbakekrevingFilter ?? TilbakekrevingFilter.MED;
+  const [ytelser] = useYtelserFilter();
+  const [klageenheter] = useKlageenheterFilter();
+  const [innsendingshjemler] = useInnsendingshjemlerFilter();
+  const [sakstyper] = useSakstyperFilter();
+  const [hjemmelMode] = useInnsendingshjemlerModeFilter();
+  const [tilbakekreving] = useTilbakekrevingFilter();
 
   return useMemo(() => {
     const filteredForTilbakekreving =
@@ -144,11 +147,11 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
 
     const filteredForInnsendingshjemler = filterHjemler(
       filteredForKlageenheter,
-      innsendingshjemlerFilter,
-      hjemmelModeFilter,
+      innsendingshjemler,
+      hjemmelMode,
       (b) => b.innsendingshjemmelIdList,
     );
 
     return filteredForInnsendingshjemler;
-  }, [behandlinger, ytelser, klageenheter, innsendingshjemlerFilter, sakstyper, tilbakekreving, hjemmelModeFilter]);
+  }, [behandlinger, ytelser, klageenheter, innsendingshjemler, sakstyper, tilbakekreving, hjemmelMode]);
 };

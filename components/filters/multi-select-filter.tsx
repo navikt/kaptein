@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 
 interface MultiSelectFilterProps {
   label: string;
-  selected: string[] | null;
+  selected: string[];
   setSelected: (selected: string[] | null) => void;
   options: { label: string; value: string }[];
   includeNone?: boolean;
@@ -17,7 +17,7 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
 
   const selectedOptions = useMemo(
     () =>
-      (selected || [])
+      selected
         .map((id) => options.find((option) => option.value === id))
         .filter((v): v is NonNullable<typeof v> => v !== undefined),
     [options, selected],

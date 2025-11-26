@@ -1,7 +1,6 @@
 'use client';
 
 import { VStack } from '@navikt/ds-react';
-import { parseAsInteger, useQueryState } from 'nuqs';
 import { type ReactNode, useMemo } from 'react';
 import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
@@ -12,8 +11,8 @@ import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { formatInt } from '@/lib/format';
 import { percent } from '@/lib/percent';
+import { useAlderPerYtelseMaxDaysFilter } from '@/lib/query-state/query-state';
 import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props<T extends BaseBehandling> {
   title: string;
@@ -36,10 +35,7 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
   withinName = 'Innenfor',
   helpText,
 }: Props<T>) => {
-  const [maxDays, setMaxDays] = useQueryState(
-    QueryParam.ALDER_PER_YTELSE_MAX_DAYS,
-    parseAsInteger.withDefault(TWELVE_WEEKS_IN_DAYS),
-  );
+  const [maxDays, setMaxDays] = useAlderPerYtelseMaxDaysFilter();
 
   const { overSeriesData, underSeriesData, labels } = useMemo(() => {
     const overMap: Map<string, number> = new Map();

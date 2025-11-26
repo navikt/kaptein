@@ -1,18 +1,17 @@
 import { VStack } from '@navikt/ds-react';
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
-import { HjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
+import { InnsendingshjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
+import { useInnsendingshjemlerFilter } from '@/lib/query-state/query-state';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
 import type { IYtelse } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   relevantYtelser: IYtelse[];
 }
 
 export const Innsendingshjemler = ({ relevantYtelser }: Props) => {
-  const [selected, setSelected] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [selected, setSelected] = useInnsendingshjemlerFilter();
 
   const options = useMemo(() => {
     const hjemler: Record<string, string> = {};
@@ -30,7 +29,7 @@ export const Innsendingshjemler = ({ relevantYtelser }: Props) => {
 
   return (
     <VStack gap="1" className="grow">
-      <HjemlerMode queryParam={QueryParam.INNSENDINGSHJEMLER_MODE} />
+      <InnsendingshjemlerMode />
       <MultiselectFilter label="Innsendingshjemler" selected={selected} setSelected={setSelected} options={options} />
     </VStack>
   );

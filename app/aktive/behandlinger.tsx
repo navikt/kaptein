@@ -1,10 +1,8 @@
 'use client';
 
 import { BodyLong, List } from '@navikt/ds-react';
-import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/aktive/skeleton';
-import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
@@ -26,6 +24,7 @@ import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-yte
 import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/charts/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
+import { useTildelingFilter } from '@/lib/query-state/query-state';
 import type {
   AnkeLedig,
   AnkerLedigeResponse,
@@ -53,7 +52,6 @@ import type {
   PåVentReason,
   Sakstype,
 } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -206,7 +204,7 @@ const BehandlingerData = ({
   klageenheter,
   påVentReasons,
 }: Props & KodeverkProps) => {
-  const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
+  const [tildelingFilter] = useTildelingFilter();
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
 

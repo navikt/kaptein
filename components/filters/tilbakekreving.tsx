@@ -2,11 +2,10 @@
 
 import { BodyShort, HelpText, HStack, Label, List, ToggleGroup } from '@navikt/ds-react';
 import { ListItem } from '@navikt/ds-react/List';
-import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { isTilbakekrevingFilter, parseAsTilbakekrevingFilter } from '@/app/custom-query-parsers';
+import { isTilbakekrevingFilter } from '@/app/custom-query-parsers';
 import { TilbakekrevingFilter } from '@/app/query-types';
-import { QueryParam } from '@/lib/types/query-param';
+import { useTilbakekrevingFilter } from '@/lib/query-state/query-state';
 import { TILBAKEKREVINGINNSENDINGSHJEMLER } from '@/lib/types/tilbakekrevingshjemler';
 
 interface Props {
@@ -14,10 +13,7 @@ interface Props {
 }
 
 export const Tilbakekreving = ({ help }: Props) => {
-  const [tilbakekreving, setTilbakekreving] = useQueryState(
-    QueryParam.TILBAKEKREVING,
-    parseAsTilbakekrevingFilter.withDefault(TilbakekrevingFilter.MED),
-  );
+  const [tilbakekreving, setTilbakekreving] = useTilbakekrevingFilter();
 
   return (
     <ToggleGroup

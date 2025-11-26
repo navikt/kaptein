@@ -5,7 +5,7 @@ const TILDELT_FILTER_VALUES = Object.values(TildelingFilter);
 const TILBAKEKREVING_FILTER_VALUES = Object.values(TilbakekrevingFilter);
 const HJEMLER_MODE_FILTER_VALUES = Object.values(HjemlerModeFilter);
 
-export const isLedigeFilter = (value: string): value is TildelingFilter =>
+export const isTildelingFilter = (value: string): value is TildelingFilter =>
   TILDELT_FILTER_VALUES.some((v) => v === value);
 
 export const isTilbakekrevingFilter = (value: string): value is TilbakekrevingFilter =>
@@ -14,7 +14,7 @@ export const isTilbakekrevingFilter = (value: string): value is TilbakekrevingFi
 export const isHjemlerModeFilter = (value: string): value is HjemlerModeFilter =>
   HJEMLER_MODE_FILTER_VALUES.some((v) => v === value);
 
-export const parseAsLedigeFilter = createParser({
+export const parseAsTildelingFilter = createParser({
   parse: (value): TildelingFilter => {
     if (value === TildelingFilter.LEDIGE) {
       return TildelingFilter.LEDIGE;

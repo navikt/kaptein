@@ -42,14 +42,6 @@ describe('filterHjemler', () => {
     expect(result2).not.toContain(EF);
   });
 
-  test('null defaults to some', () => {
-    const result = filterHjemler(LIST, ['A', 'F'], null, getHjemler);
-
-    expect(result).toContain(AB);
-    expect(result).not.toContain(CD);
-    expect(result).toContain(EF);
-  });
-
   test('No hjemler selected', () => {
     const result1 = filterHjemler(LIST, [], HjemlerModeFilter.INCLUDE_FOR_SOME, getHjemler);
     const result2 = filterHjemler(LIST, [], HjemlerModeFilter.INCLUDE_ALL_SELECTED, getHjemler);

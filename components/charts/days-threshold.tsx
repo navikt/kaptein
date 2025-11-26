@@ -1,15 +1,14 @@
 'use client';
 
 import { VStack } from '@navikt/ds-react';
-import { parseAsInteger, useQueryState } from 'nuqs';
 import { type ReactNode, useMemo } from 'react';
 import { COMMON_PIE_CHART_SERIES_PROPS } from '@/components/charts/common/common-chart-props';
 import { DayPicker } from '@/components/charts/common/day-picker';
 import { NoData } from '@/components/no-data/no-data';
 import { PieChart } from '@/lib/echarts/pie-chart';
 import { percent } from '@/lib/percent';
+import { useAlderMaxDaysFilter } from '@/lib/query-state/query-state';
 import type { BaseBehandling } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props<T extends BaseBehandling> {
   title: string;
@@ -35,10 +34,7 @@ export const DaysThresholdPieChart = <T extends BaseBehandling>({
   withinName = 'Innenfor',
   helpText,
 }: Props<T>) => {
-  const [maxDays, setMaxDays] = useQueryState(
-    QueryParam.ALDER_MAX_DAYS,
-    parseAsInteger.withDefault(TWELVE_WEEKS_IN_DAYS),
-  );
+  const [maxDays, setMaxDays] = useAlderMaxDaysFilter();
 
   const { over, within } = useMemo(() => {
     let over = 0;

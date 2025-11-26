@@ -2,12 +2,11 @@
 
 import { ChevronDownIcon } from '@navikt/aksel-icons';
 import { ActionMenu, Button, Checkbox, CheckboxGroup, HStack, TextField, VStack } from '@navikt/ds-react';
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
-import { HjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
+import { RegistreringshjemlerMode } from '@/components/filters/ytelser-and-hjemler/hjemler-mode';
+import { useRegistreringshjemlerFilter } from '@/lib/query-state/query-state';
 import { sortWithOrdinals } from '@/lib/sort-with-ordinals/sort-with-ordinals';
 import type { IKodeverkSimpleValue, IYtelse } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   relevantYtelser: IYtelse[];
@@ -15,10 +14,7 @@ interface Props {
 }
 
 export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringshjemler }: Props) => {
-  const [selectedHjemler, setSelectedHjemler] = useQueryState(
-    QueryParam.REGISTRERINGSHJEMLER,
-    parseAsArrayOf(parseAsString),
-  );
+  const [selectedHjemler, setSelectedHjemler] = useRegistreringshjemlerFilter();
 
   const [value, setValue] = useState('');
 
@@ -104,7 +100,7 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
 
   return (
     <VStack gap="1" className="grow">
-      <HjemlerMode queryParam={QueryParam.REGISTRERINGSHJEMLER_MODE} />
+      <RegistreringshjemlerMode />
       <ActionMenu>
         <ActionMenu.Trigger>
           <Button

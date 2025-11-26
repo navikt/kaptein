@@ -1,13 +1,16 @@
 'use client';
 
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { SubFilter } from '@/components/filters/sub-filter';
 import { Innsendingshjemler } from '@/components/filters/ytelser-and-hjemler/innsendingshjemler';
 import { Registreringshjemler } from '@/components/filters/ytelser-and-hjemler/registreringshjemler';
+import {
+  useInnsendingshjemlerFilter,
+  useRegistreringshjemlerFilter,
+  useYtelserFilter,
+} from '@/lib/query-state/query-state';
 import type { IKodeverkValue, IYtelse } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   ytelser: IYtelse[] | undefined;
@@ -15,14 +18,11 @@ interface Props {
 }
 
 const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
-  const [selectedYtelser, setSelectedYtelser] = useQueryState(QueryParam.YTELSER, parseAsArrayOf(parseAsString));
+  const [selectedYtelser, setSelectedYtelser] = useYtelserFilter();
 
   const ytelserOptions = useMemo(() => ytelser.map(({ navn, id }) => ({ label: navn, value: id })), [ytelser]);
   const relevantKodeverk = useMemo(
-    () =>
-      selectedYtelser === null || selectedYtelser.length === 0
-        ? ytelser
-        : ytelser.filter((y) => selectedYtelser.includes(y.id)),
+    () => (selectedYtelser.length === 0 ? ytelser : ytelser.filter((y) => selectedYtelser.includes(y.id))),
     [selectedYtelser, ytelser],
   );
 
@@ -31,7 +31,7 @@ const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
 
 export const YtelserAndRegistreringshjemler = ({ ytelser = [], lovkildeToRegistreringshjemler = [] }: Props) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
-  const [, setSelectedHjemler] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [, setSelectedHjemler] = useRegistreringshjemlerFilter();
 
   return (
     <>
@@ -57,7 +57,7 @@ export const YtelserAndRegistreringshjemler = ({ ytelser = [], lovkildeToRegistr
 
 export const YtelserAndInnsendingshjemler = ({ ytelser = [] }: { ytelser: IYtelse[] | undefined }) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
-  const [, setSelectedHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
+  const [, setSelectedHjemler] = useInnsendingshjemlerFilter();
 
   return (
     <>
@@ -83,11 +83,8 @@ export const YtelserAndInnsendingsAndRegistreringshjemler = ({
   lovkildeToRegistreringshjemler = [],
 }: Props) => {
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
-  const [, setSelectedInnsendingsHjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [, setSelectedRegistreringsHjemler] = useQueryState(
-    QueryParam.REGISTRERINGSHJEMLER,
-    parseAsArrayOf(parseAsString),
-  );
+  const [, setSelectedInnsendingsHjemler] = useInnsendingshjemlerFilter();
+  const [, setSelectedRegistreringsHjemler] = useRegistreringshjemlerFilter();
 
   return (
     <>

@@ -1,19 +1,26 @@
 import { BodyLong, Heading, HelpText, HStack, ToggleGroup } from '@navikt/ds-react';
-import { useQueryState } from 'nuqs';
-import { isHjemlerModeFilter, parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
+import { isHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { HjemlerModeFilter } from '@/app/query-types';
-import type { QueryParam } from '@/lib/types/query-param';
+import { useInnsendingshjemlerModeFilter, useRegistreringshjemlerModeFilter } from '@/lib/query-state/query-state';
 
 interface Props {
-  queryParam: QueryParam;
+  mode: HjemlerModeFilter;
+  setMode: (mode: HjemlerModeFilter) => void;
 }
 
-export const HjemlerMode = ({ queryParam }: Props) => {
-  const [mode, setMode] = useQueryState(
-    queryParam,
-    parseAsHjemlerModeFilter.withDefault(HjemlerModeFilter.INCLUDE_FOR_SOME),
-  );
+export const RegistreringshjemlerMode = () => {
+  const [mode, setMode] = useRegistreringshjemlerModeFilter();
 
+  return <HjemlerMode mode={mode} setMode={setMode} />;
+};
+
+export const InnsendingshjemlerMode = () => {
+  const [mode, setMode] = useInnsendingshjemlerModeFilter();
+
+  return <HjemlerMode mode={mode} setMode={setMode} />;
+};
+
+const HjemlerMode = ({ mode, setMode }: Props) => {
   return (
     <HStack wrap={false} gap="4">
       <ToggleGroup

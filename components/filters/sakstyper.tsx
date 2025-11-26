@@ -1,17 +1,16 @@
 'use client';
 
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
+import { useSakstyperFilter } from '@/lib/query-state/query-state';
 import type { IKodeverkSimpleValue, Sakstype } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   sakstyper: IKodeverkSimpleValue<Sakstype>[] | undefined;
 }
 
 export const Sakstyper = ({ sakstyper = [] }: Props) => {
-  const [selected, setSelected] = useQueryState(QueryParam.SAKSTYPER, parseAsArrayOf(parseAsString));
+  const [selected, setSelected] = useSakstyperFilter();
 
   const options = useMemo(() => sakstyper.map(({ navn, id }) => ({ label: navn, value: id })), [sakstyper]);
 

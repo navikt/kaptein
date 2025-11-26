@@ -4,16 +4,15 @@ import type { BaseBehandling } from '@/lib/types';
 
 export const filterHjemler = <T extends BaseBehandling>(
   behandlinger: T[],
-  hjemlerFilter: string[] | null,
-  mode: HjemlerModeFilter | null,
+  hjemlerFilter: string[],
+  mode: HjemlerModeFilter,
   getHjemler: (b: T) => string[],
 ): T[] => {
-  if (hjemlerFilter === null || hjemlerFilter.length === 0) {
+  if (hjemlerFilter.length === 0) {
     return behandlinger;
   }
 
   switch (mode) {
-    case null:
     case HjemlerModeFilter.INCLUDE_FOR_SOME:
       return behandlinger.filter((b) => hjemlerFilter.some((h) => getHjemler(b).includes(h)));
     case HjemlerModeFilter.INCLUDE_ALL_SELECTED:

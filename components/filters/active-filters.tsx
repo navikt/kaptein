@@ -1,9 +1,15 @@
 'use client';
 import { Chips, type ChipsProps, HStack, VStack } from '@navikt/ds-react';
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
+import {
+  useInnsendingshjemlerFilter,
+  useKlageenheterFilter,
+  useRegistreringshjemlerFilter,
+  useSakstyperFilter,
+  useUtfallFilter,
+  useYtelserFilter,
+} from '@/lib/query-state/query-state';
 import type { IKodeverkSimpleValue, RegistreringshjemlerMap } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface Props {
   klageenheter?: IKodeverkSimpleValue[];
@@ -14,8 +20,6 @@ interface Props {
   innsendingshjemler?: Record<string, string>;
 }
 
-const parseQuery = parseAsArrayOf(parseAsString).withDefault([]);
-
 export const ActiveFilters = ({
   ytelser: ytelserKodeverk,
   klageenheter: klageenheterKodeverk,
@@ -24,12 +28,12 @@ export const ActiveFilters = ({
   registreringshjemler: registreringshjemlerKodeverk,
   innsendingshjemler: innsendingshjemlerKodeverk,
 }: Props) => {
-  const [klageenheter, setKlageenheter] = useQueryState(QueryParam.KLAGEENHETER, parseQuery);
-  const [sakstyper, setSakstyper] = useQueryState(QueryParam.SAKSTYPER, parseQuery);
-  const [utfall, setUtfall] = useQueryState(QueryParam.UTFALL, parseQuery);
-  const [ytelser, setYtelser] = useQueryState(QueryParam.YTELSER, parseQuery);
-  const [innsendingshjemler, setInnsendingshjemler] = useQueryState(QueryParam.INNSENDINGSHJEMLER, parseQuery);
-  const [registreringshjemler, setRegistreringshjemler] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseQuery);
+  const [klageenheter, setKlageenheter] = useKlageenheterFilter();
+  const [sakstyper, setSakstyper] = useSakstyperFilter();
+  const [utfall, setUtfall] = useUtfallFilter();
+  const [ytelser, setYtelser] = useYtelserFilter();
+  const [innsendingshjemler, setInnsendingshjemler] = useInnsendingshjemlerFilter();
+  const [registreringshjemler, setRegistreringshjemler] = useRegistreringshjemlerFilter();
 
   return (
     <VStack gap="2" width="100%">

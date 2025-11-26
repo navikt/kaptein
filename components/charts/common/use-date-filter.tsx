@@ -1,16 +1,10 @@
 'use client';
 
-import { useQueryState } from 'nuqs';
-import { parseAsDateString } from '@/app/custom-query-parsers';
-import { TODAY } from '@/lib/date';
-import { QueryParam } from '@/lib/types/query-param';
+import { useFromFilter, useToFilter } from '@/lib/query-state/query-state';
 
 export const useDateFilter = () => {
-  const [fromFilter] = useQueryState(QueryParam.FROM, parseAsDateString);
-  const [toFilter] = useQueryState(QueryParam.TO, parseAsDateString);
+  const [fromFilter] = useFromFilter();
+  const [toFilter] = useToFilter();
 
-  return {
-    fromFilter: fromFilter === null ? TODAY : fromFilter,
-    toFilter: toFilter === null ? TODAY : toFilter,
-  };
+  return { fromFilter, toFilter };
 };

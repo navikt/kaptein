@@ -1,9 +1,7 @@
 'use client';
 
 import { BodyShort } from '@navikt/ds-react';
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsHjemlerModeFilter } from '@/app/custom-query-parsers';
 import { Skeleton } from '@/app/ferdigstilte-saker-i-tr/skeleton';
 import { Card } from '@/components/cards';
 import { filterHjemler } from '@/components/charts/common/filter-hjemler';
@@ -20,6 +18,11 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { OmgjøringsprosentOverTid } from '@/components/key-stats/omgjøringsprosent';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
+import {
+  useRegistreringshjemlerFilter,
+  useRegistreringshjemlerModeFilter,
+  useUtfallFilter as useUtfallQueryStateFilter,
+} from '@/lib/query-state/query-state';
 import {
   type AnkeITRFerdigstilt,
   type AnkeITRLedig,
@@ -42,7 +45,6 @@ import {
   Sakstype,
   type Utfall,
 } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -278,8 +280,8 @@ const BEHANDLINGSTID_HELP_TEXT = (
 );
 
 const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
-  const [registreringshjemlerFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER, parseAsArrayOf(parseAsString));
-  const [hjemmelModeFilter] = useQueryState(QueryParam.REGISTRERINGSHJEMLER_MODE, parseAsHjemlerModeFilter);
+  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
+  const [hjemmelModeFilter] = useRegistreringshjemlerModeFilter();
 
   return useMemo(() => {
     return filterHjemler(
@@ -292,11 +294,13 @@ const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
 };
 
 const useUtfallFilter = <T extends FerdigstiltSakITR>(behandlinger: T[]) => {
-  const [utfallFilter] = useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString));
+  const [utfallFilter] = useUtfallQueryStateFilter();
 
-  return useMemo(() => {
-    return utfallFilter === null || utfallFilter.length === 0
-      ? behandlinger
-      : behandlinger.filter(({ resultat }) => resultat !== null && utfallFilter.includes(resultat.utfallId));
-  }, [behandlinger, utfallFilter]);
+  return useMemo(
+    () =>
+      utfallFilter.length === 0
+        ? behandlinger
+        : behandlinger.filter(({ resultat }) => resultat !== null && utfallFilter.includes(resultat.utfallId)),
+    [behandlinger, utfallFilter],
+  );
 };

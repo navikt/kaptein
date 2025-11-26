@@ -13,9 +13,7 @@ import {
   startOfDay,
 } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { useQueryState } from 'nuqs';
 import { useMemo } from 'react';
-import { parseAsLedigeFilter } from '@/app/custom-query-parsers';
 import { TildelingFilter } from '@/app/query-types';
 import { SkeletonSaksstrøm } from '@/app/saksstroem/skeleton';
 import { Card } from '@/components/cards';
@@ -33,6 +31,7 @@ import { RestanseOverTid } from '@/components/charts/restanse-over-tid';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { ISO_DATE_FORMAT, ISO_DATE_TIME_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
+import { useTildelingFilter } from '@/lib/query-state/query-state';
 import type {
   AnkerFerdigstilteResponse,
   AnkerLedigeResponse,
@@ -55,7 +54,6 @@ import type {
   OmgjøringskravTildelteResponse,
   Tildelt,
 } from '@/lib/types';
-import { QueryParam } from '@/lib/types/query-param';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
@@ -236,7 +234,7 @@ interface DataProps extends KodeverkProps {
 
 const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps) => {
   const { toFilter } = useDateFilter();
-  const [tildelingFilter] = useQueryState(QueryParam.TILDELING, parseAsLedigeFilter);
+  const [tildelingFilter] = useTildelingFilter();
 
   const uferdige = useMemo(() => {
     if (tildelingFilter === TildelingFilter.LEDIGE) {
