@@ -294,7 +294,7 @@ const getTooltip = ({ ytelseNavn, mottatt, ferdigstilt, diff, restanse }: Ytelse
     </tr>
     <tr>
       <td class="pr-1">Differanse:</td>
-      <td>${diffText(diff)} saker</td>
+      <td>${diffTextString(diff)} saker</td>
     </tr>
     <tr>
       <td class="pr-1">Restanse ved periodestart:</td>
@@ -308,7 +308,8 @@ const getTooltip = ({ ytelseNavn, mottatt, ferdigstilt, diff, restanse }: Ytelse
 </table>
 `.trim();
 
-const diffText = (n: number): ReactNode => {
-  const color = n > 0 ? 'var(--ax-text-danger)' : 'var(--ax-text-success)';
-  return <span style={{ color }}>{numberWithSign(n)}</span>;
-};
+const getColor = (n: number): string => (n > 0 ? 'var(--ax-text-danger)' : 'var(--ax-text-success)');
+
+const diffText = (n: number): ReactNode => <span style={{ color: getColor(n) }}>{numberWithSign(n)}</span>;
+
+const diffTextString = (n: number): string => `<span style="color: ${getColor(n)}">${numberWithSign(n)}</span>`;
