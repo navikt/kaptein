@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  // https://github.com/vercel/next.js/issues/86099#issuecomment-3542407508
+  serverExternalPackages: ['pino', 'pino-pretty', 'thread-stream'],
 };
 
 export default nextConfig;
