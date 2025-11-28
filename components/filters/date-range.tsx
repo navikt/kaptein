@@ -3,9 +3,7 @@
 import { ClockDashedIcon } from '@navikt/aksel-icons';
 import { Button, DatePicker, ErrorMessage, HGrid, HStack, useDatepicker, VStack } from '@navikt/ds-react';
 import { endOfMonth, endOfYear, format, parse, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
-import { usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
-import { RouteName } from '@/components/header/default-params';
 import { ISO_DATE_FORMAT, NOW, START_OF_KABAL_DATE, TODAY } from '@/lib/date';
 import { useFromFilter, useToFilter } from '@/lib/query-state/query-state';
 
@@ -21,16 +19,9 @@ const START_OF_THIS_YEAR = format(startOfYear(NOW), ISO_DATE_FORMAT);
 const START_OF_LAST_YEAR = format(startOfYear(subYears(NOW, 1)), ISO_DATE_FORMAT);
 const END_OF_LAST_YEAR = format(endOfYear(subYears(NOW, 1)), ISO_DATE_FORMAT);
 
-const DEFAULT_TO = TODAY;
-const DEFAULT_FROM = format(startOfMonth(NOW), ISO_DATE_FORMAT);
-const SAKSSTRØM_DEFAULT_FROM = format(startOfMonth(subMonths(NOW, 4)), ISO_DATE_FORMAT);
-const SAKSSTRØM_DEFAULT_TO = format(endOfMonth(subMonths(NOW, 1)), ISO_DATE_FORMAT);
-
 export const DateRange = () => {
-  const path = usePathname();
-
-  const [from, setFrom] = useFromFilter(path === RouteName.SAKSSTRØM ? SAKSSTRØM_DEFAULT_FROM : DEFAULT_FROM);
-  const [to, setTo] = useToFilter(path === RouteName.SAKSSTRØM ? SAKSSTRØM_DEFAULT_TO : DEFAULT_TO);
+  const [from, setFrom] = useFromFilter();
+  const [to, setTo] = useToFilter();
 
   const parsedFrom = parse(from, ISO_DATE_FORMAT, new Date());
   const parsedTo = parse(to, ISO_DATE_FORMAT, new Date());

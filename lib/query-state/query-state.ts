@@ -1,3 +1,5 @@
+import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
+import { usePathname } from 'next/navigation';
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import {
   parseAsHjemlerModeFilter,
@@ -5,7 +7,8 @@ import {
   parseAsTildelingFilter,
 } from '@/app/custom-query-parsers';
 import { HjemlerModeFilter, TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
-import { TODAY } from '@/lib/date';
+import { RouteName } from '@/components/header/default-params';
+import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
 export const useYtelserFilter = () =>
@@ -44,11 +47,27 @@ export const useTildelingFilter = () =>
     parseAsTildelingFilter.withDefault(TildelingFilter.ALL).withOptions({ clearOnDefault: false }),
   );
 
-export const useFromFilter = (defaultValue = TODAY) =>
-  useQueryState(QueryParam.FROM, parseAsString.withDefault(defaultValue).withOptions({ clearOnDefault: false }));
+export const useFromFilter = () => {
+  const path = usePathname();
 
-export const useToFilter = (defaultValue = TODAY) =>
-  useQueryState(QueryParam.TO, parseAsString.withDefault(defaultValue).withOptions({ clearOnDefault: false }));
+  return useQueryState(
+    QueryParam.FROM,
+    parseAsString
+      .withDefault(path === RouteName.SAKSSTRØM ? SAKSSTRØM_DEFAULT_FROM : DEFAULT_FROM)
+      .withOptions({ clearOnDefault: false }),
+  );
+};
+
+export const useToFilter = () => {
+  const path = usePathname();
+
+  return useQueryState(
+    QueryParam.TO,
+    parseAsString
+      .withDefault(path === RouteName.SAKSSTRØM ? SAKSSTRØM_DEFAULT_TO : DEFAULT_TO)
+      .withOptions({ clearOnDefault: false }),
+  );
+};
 
 export const useTilbakekrevingFilter = () =>
   useQueryState(
@@ -84,3 +103,7 @@ export const useRegistreringshjemlerModeFilter = () =>
   );
 
 const TWELVE_WEEKS_IN_DAYS = 12 * 7;
+const DEFAULT_TO = TODAY;
+const DEFAULT_FROM = format(startOfMonth(NOW), ISO_DATE_FORMAT);
+const SAKSSTRØM_DEFAULT_FROM = format(startOfMonth(subMonths(NOW, 4)), ISO_DATE_FORMAT);
+const SAKSSTRØM_DEFAULT_TO = format(endOfMonth(subMonths(NOW, 1)), ISO_DATE_FORMAT);
