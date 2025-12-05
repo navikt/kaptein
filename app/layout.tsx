@@ -6,6 +6,8 @@ import { getUser } from '@/lib/server/api';
 import '@navikt/ds-css/darkside';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
   children: React.ReactNode;
 }

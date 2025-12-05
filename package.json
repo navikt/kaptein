@@ -2,6 +2,7 @@
   "name": "kaptein",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack | pino-pretty",
     "build": "next build",

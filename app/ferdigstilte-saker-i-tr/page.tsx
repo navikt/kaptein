@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Behandlinger } from '@/app/ferdigstilte-saker-i-tr/behandlinger';
 import { getKlageenheter, getRegistreringshjemlerMap, getUtfall, getYtelser } from '@/lib/server/api';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Ferdigstilte saker - Kaptein',
 };

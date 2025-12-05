@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Behandlinger } from '@/app/aktive/behandlinger';
 import { getDefaultSakstyper, getKlageenheter, getPåVentReasons, getYtelser } from '@/lib/server/api';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Aktive saker - Kaptein',
 };
