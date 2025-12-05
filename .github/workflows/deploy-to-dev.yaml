@@ -45,6 +45,16 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: "@navikt"
 
+      - name: Setup cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-
+
       - name: Generate bunfig.toml
         run: |
           echo -e "[install.scopes]\n\"@navikt\" = { token = \"${{ secrets.READER_TOKEN }}\", url = \"https://npm.pkg.github.com/\" }" > bunfig.toml
