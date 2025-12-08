@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:24-slim@sha256:71774527f54c4625659fb31585c0628d5643fdda0fe1fd265a099d5359023ea1
 
 WORKDIR /app
 
@@ -18,4 +18,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-CMD ["node", "server.js"]
+CMD ["server.js"]
