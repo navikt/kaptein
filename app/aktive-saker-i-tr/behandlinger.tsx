@@ -4,9 +4,8 @@ import { BodyLong, BodyShort } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/aktive-saker-i-tr/skeleton';
 import { Card } from '@/components/cards';
-import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { useBaseFiltered } from '@/components/charts/common/use-data';
+import { useBaseFiltered, useSakITRFilter } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
@@ -16,13 +15,11 @@ import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { useRegistreringshjemlerFilter, useRegistreringshjemlerModeFilter } from '@/lib/query-state/query-state';
 import {
   type AnkeITRLedig,
   type AnkeITRTildelt,
   type AnkerITRLedigeResponse,
   type AnkerITRTildelteResponse,
-  type BaseSakITR,
   type BegjæringOmGjenopptakITRLedig,
   type BegjæringOmGjenopptakITRLedigeResponse,
   type BegjæringOmGjenopptakITRTildelt,
@@ -98,8 +95,8 @@ interface DataProps extends KodeverkProps {
 }
 
 const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, ytelser, klageenheter }: DataProps) => {
-  const ledigeFiltered = useAnkeITRFilter(useBaseFiltered([...ledigeAnker, ...ledigeGb]));
-  const tildelteFiltered = useAnkeITRFilter(useBaseFiltered([...tildelteAnker, ...tildelteGb]));
+  const ledigeFiltered = useSakITRFilter(useBaseFiltered([...ledigeAnker, ...ledigeGb]));
+  const tildelteFiltered = useSakITRFilter(useBaseFiltered([...tildelteAnker, ...tildelteGb]));
 
   const uferdige = useMemo(
     () => [...ledigeFiltered.map((b) => ({ ...b, tildeltEnhet: b.tildeltEnhet ?? '4293' })), ...tildelteFiltered],
@@ -189,19 +186,3 @@ const ALDER_HELP_TEXT = (
     -oppgaven ble opprettet til dagens dato.
   </BodyShort>
 );
-
-const useAnkeITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
-  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
-  const [hjemmelModeFilter] = useRegistreringshjemlerModeFilter();
-
-  return useMemo(
-    () =>
-      filterHjemler(
-        behandlinger,
-        registreringshjemlerFilter,
-        hjemmelModeFilter,
-        (b) => b.previousRegistreringshjemmelIdList ?? [],
-      ),
-    [behandlinger, registreringshjemlerFilter, hjemmelModeFilter],
-  );
-};

@@ -7,7 +7,7 @@ import {
   parseAsTildelingFilter,
 } from '@/app/custom-query-parsers';
 import { HjemlerModeFilter, TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
-import { RouteName } from '@/components/header/default-params';
+import { RouteName } from '@/components/header/route-name';
 import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
@@ -35,9 +35,15 @@ export const useInnsendingshjemlerFilter = () =>
     parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
   );
 
-export const useSakstyperFilter = () =>
+export const useKaSakstyperFilter = () =>
   useQueryState(
-    QueryParam.SAKSTYPER,
+    QueryParam.KA_SAKSTYPER,
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
+  );
+
+export const useTrSakstyperFilter = () =>
+  useQueryState(
+    QueryParam.TR_SAKSTYPER,
     parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
   );
 
@@ -75,8 +81,17 @@ export const useTilbakekrevingFilter = () =>
     parseAsTilbakekrevingFilter.withDefault(TilbakekrevingFilter.MED).withOptions({ clearOnDefault: false }),
   );
 
-export const useUtfallFilter = () =>
-  useQueryState(QueryParam.UTFALL, parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }));
+export const useKaUtfallFilter = () =>
+  useQueryState(
+    QueryParam.KA_UTFALL,
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
+  );
+
+export const useTrUtfallFilter = () =>
+  useQueryState(
+    QueryParam.TR_UTFALL,
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
+  );
 
 export const useAlderMaxDaysFilter = () =>
   useQueryState(

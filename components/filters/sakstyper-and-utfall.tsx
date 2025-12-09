@@ -3,17 +3,63 @@
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { SubFilter } from '@/components/filters/sub-filter';
-import { useSakstyperFilter, useUtfallFilter } from '@/lib/query-state/query-state';
+import {
+  useKaSakstyperFilter,
+  useKaUtfallFilter,
+  useTrSakstyperFilter,
+  useTrUtfallFilter,
+} from '@/lib/query-state/query-state';
 import type { SakstypeToUtfall } from '@/lib/types';
 
 interface Props {
   sakstyperToUtfall: SakstypeToUtfall[] | undefined;
 }
 
-export const SakstyperAndUtfall = ({ sakstyperToUtfall = [] }: Props) => {
-  const [selectedSakstyper, setSelectedSakstyper] = useSakstyperFilter();
-  const [selectedUtfall, setSelectedUtfall] = useUtfallFilter();
+export const KaSakstyperAndUtfall = ({ sakstyperToUtfall = [] }: Props) => {
+  const [selectedSakstyper, setSelectedSakstyper] = useKaSakstyperFilter();
+  const [selectedUtfall, setSelectedUtfall] = useKaUtfallFilter();
 
+  return (
+    <Filter
+      sakstyperToUtfall={sakstyperToUtfall}
+      selectedUtfall={selectedUtfall}
+      setSelectedUtfall={setSelectedUtfall}
+      selectedSakstyper={selectedSakstyper}
+      setSelectedSakstyper={setSelectedSakstyper}
+    />
+  );
+};
+
+export const TrSakstyperAndUtfall = ({ sakstyperToUtfall = [] }: Props) => {
+  const [selectedSakstyper, setSelectedSakstyper] = useTrSakstyperFilter();
+  const [selectedUtfall, setSelectedUtfall] = useTrUtfallFilter();
+
+  return (
+    <Filter
+      sakstyperToUtfall={sakstyperToUtfall}
+      selectedUtfall={selectedUtfall}
+      setSelectedUtfall={setSelectedUtfall}
+      selectedSakstyper={selectedSakstyper}
+      setSelectedSakstyper={setSelectedSakstyper}
+    />
+  );
+};
+
+interface FilterProps extends Props {
+  sakstyperToUtfall: SakstypeToUtfall[];
+  selectedSakstyper: string[];
+  setSelectedSakstyper: (sakstyper: string[] | null) => void;
+  selectedUtfall: string[];
+  setSelectedUtfall: (utfall: string[] | null) => void;
+}
+
+const Filter = ({
+  sakstyperToUtfall = [],
+  selectedUtfall,
+  setSelectedUtfall,
+  selectedSakstyper,
+  setSelectedSakstyper,
+}: FilterProps) => {
   const sakstyperOptions = useMemo(
     () => sakstyperToUtfall.map(({ navn, id }) => ({ label: navn, value: id })),
     [sakstyperToUtfall],

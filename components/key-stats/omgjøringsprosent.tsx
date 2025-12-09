@@ -8,7 +8,7 @@ import { ISO_DATE_FORMAT, ISO_MONTH_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import { formatPercent } from '@/lib/format';
 import { percent } from '@/lib/percent';
-import { useUtfallFilter } from '@/lib/query-state/query-state';
+import { useKaUtfallFilter } from '@/lib/query-state/query-state';
 import {
   type FerdigstiltSakITR,
   type IKodeverkSimpleValue,
@@ -33,7 +33,7 @@ interface Props {
 
 export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
-  const [utfallFilter] = useUtfallFilter();
+  const [utfallFilter] = useKaUtfallFilter();
 
   const ferdigstilteCount = ferdigstilte.filter((f) => f.resultat !== null).length;
   const totalCaseCount = uferdige.length + ferdigstilteCount;
