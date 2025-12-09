@@ -104,7 +104,8 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
   const description = (
     <>
       Basert på {totalCaseCount} saker sendt til TR i løpet av valgt periode. Fordelt på utfall.{' '}
-      <strong>Omgjort:</strong> {formatPercent(totalOmgjortPercent)} ({totalOmgjortCount} saker)
+      <strong>Omgjort:</strong> {formatPercent(totalOmgjortPercent)} ({totalOmgjortCount} av {ferdigstilteCount}{' '}
+      ferdigstilte saker)
     </>
   );
 
