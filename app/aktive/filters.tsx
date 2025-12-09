@@ -5,7 +5,7 @@ import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
-import { Sakstyper } from '@/components/filters/sakstyper';
+import { KaSakstyper } from '@/components/filters/sakstyper';
 import { HelpForAktive, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
@@ -49,7 +49,7 @@ const RenderFilters = ({ ytelser, innsendingshjemlerMap, klageenheter, sakstyper
         <ResetCacheButton />
       </HStack>
       <Klageenheter klageenheter={klageenheter} />
-      <Sakstyper sakstyper={sakstyper} />
+      <KaSakstyper sakstyper={sakstyper} />
     </VStack>
 
     <VStack gap="4" flexGrow="1">

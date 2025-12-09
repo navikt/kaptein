@@ -21,7 +21,7 @@ import { BelastningPerYtelse } from '@/components/charts/belastning-per-ytelse';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import {
   getRestanseAfterDate,
-  useBaseFiltered,
+  useAktiveFiltered,
   useFerdigstiltInPeriod,
   useMottattInPeriod,
 } from '@/components/charts/common/use-data';
@@ -248,8 +248,8 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
     return [...ledige, ...tildelte];
   }, [tildelingFilter, ledige, tildelte]);
 
-  const ferdigstilteBaseFiltered = useBaseFiltered(ferdigstilte);
-  const uferdigeBaseFiltered = useBaseFiltered(uferdige);
+  const ferdigstilteBaseFiltered = useAktiveFiltered(ferdigstilte);
+  const uferdigeBaseFiltered = useAktiveFiltered(uferdige);
 
   const ferdigstilteInPeriod = useFerdigstiltInPeriod(ferdigstilteBaseFiltered);
   const mottattInPeriod = useMottattInPeriod(uferdigeBaseFiltered);

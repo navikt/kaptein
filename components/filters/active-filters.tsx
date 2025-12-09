@@ -1,12 +1,16 @@
 'use client';
 import { Chips, type ChipsProps, HStack, VStack } from '@navikt/ds-react';
+import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
+import { RouteName } from '@/components/header/route-name';
 import {
   useInnsendingshjemlerFilter,
+  useKaSakstyperFilter,
+  useKaUtfallFilter,
   useKlageenheterFilter,
   useRegistreringshjemlerFilter,
-  useSakstyperFilter,
-  useUtfallFilter,
+  useTrSakstyperFilter,
+  useTrUtfallFilter,
   useYtelserFilter,
 } from '@/lib/query-state/query-state';
 import type { IKodeverkSimpleValue, RegistreringshjemlerMap } from '@/lib/types';
@@ -28,12 +32,18 @@ export const ActiveFilters = ({
   registreringshjemler: registreringshjemlerKodeverk,
   innsendingshjemler: innsendingshjemlerKodeverk,
 }: Props) => {
+  const pathname = usePathname();
+
   const [klageenheter, setKlageenheter] = useKlageenheterFilter();
-  const [sakstyper, setSakstyper] = useSakstyperFilter();
-  const [utfall, setUtfall] = useUtfallFilter();
+  const [kaSakstyper, setKaSakstyper] = useKaSakstyperFilter();
+  const [trSakstyper, setTrSakstyper] = useTrSakstyperFilter();
+  const [kaUtfall, setKaUtfall] = useKaUtfallFilter();
+  const [trUtfall, setTrUtfall] = useTrUtfallFilter();
   const [ytelser, setYtelser] = useYtelserFilter();
   const [innsendingshjemler, setInnsendingshjemler] = useInnsendingshjemlerFilter();
   const [registreringshjemler, setRegistreringshjemler] = useRegistreringshjemlerFilter();
+
+  const isTr = pathname === RouteName.AKTIVE_SAKER_I_TR || pathname === RouteName.FERDIGSTILTE_I_TR;
 
   return (
     <VStack gap="2" width="100%">
@@ -45,16 +55,25 @@ export const ActiveFilters = ({
           color="meta-purple"
         />
       )}
-      {sakstyperKodeverk === undefined ? null : (
+      {sakstyperKodeverk === undefined ? null : isTr ? (
         <Group
-          values={sakstyper}
-          setValues={setSakstyper}
+          values={trSakstyper}
+          setValues={setTrSakstyper}
+          getName={getKodeverkName(sakstyperKodeverk)}
+          color="success"
+        />
+      ) : (
+        <Group
+          values={kaSakstyper}
+          setValues={setKaSakstyper}
           getName={getKodeverkName(sakstyperKodeverk)}
           color="success"
         />
       )}
-      {utfallKodeverk === undefined ? null : (
-        <Group values={utfall} setValues={setUtfall} getName={getKodeverkName(utfallKodeverk)} color="danger" />
+      {utfallKodeverk === undefined ? null : isTr ? (
+        <Group values={trUtfall} setValues={setTrUtfall} getName={getKodeverkName(utfallKodeverk)} color="danger" />
+      ) : (
+        <Group values={kaUtfall} setValues={setKaUtfall} getName={getKodeverkName(utfallKodeverk)} color="danger" />
       )}
       {ytelserKodeverk === undefined ? null : (
         <Group

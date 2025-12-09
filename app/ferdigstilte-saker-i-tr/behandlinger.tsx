@@ -4,9 +4,8 @@ import { BodyShort } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/ferdigstilte-saker-i-tr/skeleton';
 import { Card } from '@/components/cards';
-import { filterHjemler } from '@/components/charts/common/filter-hjemler';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { useBaseFiltered, useFerdigstiltInPeriod, useSentInPeriod } from '@/components/charts/common/use-data';
+import { useFerdigstiltInPeriod, useSakITRFilter, useSentInPeriod } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
@@ -18,11 +17,7 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { OmgjøringsprosentOverTid } from '@/components/key-stats/omgjøringsprosent';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import {
-  useRegistreringshjemlerFilter,
-  useRegistreringshjemlerModeFilter,
-  useUtfallFilter as useUtfallQueryStateFilter,
-} from '@/lib/query-state/query-state';
+import { useTrUtfallFilter } from '@/lib/query-state/query-state';
 import {
   type AnkeITRFerdigstilt,
   type AnkeITRLedig,
@@ -30,7 +25,6 @@ import {
   type AnkerITRFerdigstilteResponse,
   type AnkerITRLedigeResponse,
   type AnkerITRTildelteResponse,
-  type BaseSakITR,
   type BegjæringOmGjenopptakITRFerdigstilt,
   type BegjæringOmGjenopptakITRFerdigstilteResponse,
   type BegjæringOmGjenopptakITRLedig,
@@ -156,13 +150,11 @@ const BehandlingerData = ({
   registreringshjemlerMap,
   utfall,
 }: DataProps) => {
-  const baseFilteredFerdigstilte = useSakITRFilter(
-    useUtfallFilter(useBaseFiltered([...ferdigstilteAnker, ...ferdigstilteGb])),
-  );
+  const baseFilteredFerdigstilte = useSakITRFilter(useUtfallFilter([...ferdigstilteAnker, ...ferdigstilteGb]));
   const ferdigstilteInPeriod = useFerdigstiltInPeriod(baseFilteredFerdigstilte);
   const sentInPeriodFerdigstilte = useSentInPeriod(baseFilteredFerdigstilte);
   const uferdige = [...ledigeAnker, ...tildelteAnker, ...ledigeGb, ...tildelteGb];
-  const baseFilteredUferdige = useSakITRFilter(useBaseFiltered(uferdige));
+  const baseFilteredUferdige = useSakITRFilter(uferdige);
   const sentInPeriodUferdige = useSentInPeriod(baseFilteredUferdige);
   const relevantYtelser = useRelevantYtelser(ferdigstilteInPeriod, ytelser);
 
@@ -279,22 +271,8 @@ const BEHANDLINGSTID_HELP_TEXT = (
   </>
 );
 
-const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
-  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
-  const [hjemmelModeFilter] = useRegistreringshjemlerModeFilter();
-
-  return useMemo(() => {
-    return filterHjemler(
-      behandlinger,
-      registreringshjemlerFilter,
-      hjemmelModeFilter,
-      (b) => b.previousRegistreringshjemmelIdList ?? [],
-    );
-  }, [behandlinger, registreringshjemlerFilter, hjemmelModeFilter]);
-};
-
 const useUtfallFilter = <T extends FerdigstiltSakITR>(behandlinger: T[]) => {
-  const [utfallFilter] = useUtfallQueryStateFilter();
+  const [utfallFilter] = useTrUtfallFilter();
 
   return useMemo(
     () =>

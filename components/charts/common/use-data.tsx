@@ -7,12 +7,12 @@ import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import {
   useInnsendingshjemlerFilter,
   useInnsendingshjemlerModeFilter,
+  useKaSakstyperFilter,
+  useKaUtfallFilter,
   useKlageenheterFilter,
   useRegistreringshjemlerFilter,
   useRegistreringshjemlerModeFilter,
-  useSakstyperFilter,
   useTilbakekrevingFilter,
-  useUtfallFilter,
   useYtelserFilter,
 } from '@/lib/query-state/query-state';
 import type { Avsluttet, BaseBehandling, BaseSakITR, Ferdigstilt, Frist } from '@/lib/types';
@@ -94,11 +94,9 @@ export const useMottattInPeriod = <T extends BaseBehandling>(behandlinger: T[]) 
   );
 };
 
-export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>(
-  ferdigstilteBehandlinger: T[],
-) => {
+const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>(ferdigstilteBehandlinger: T[]) => {
   const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
-  const [utfallFilter] = useUtfallFilter();
+  const [utfallFilter] = useKaUtfallFilter();
   const [hjemmelModeFilter] = useRegistreringshjemlerModeFilter();
 
   return useMemo(() => {
@@ -121,9 +119,7 @@ export const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avs
 export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelser] = useYtelserFilter();
   const [klageenheter] = useKlageenheterFilter();
-  const [innsendingshjemler] = useInnsendingshjemlerFilter();
-  const [sakstyper] = useSakstyperFilter();
-  const [hjemmelMode] = useInnsendingshjemlerModeFilter();
+  const [sakstyper] = useKaSakstyperFilter();
   const [tilbakekreving] = useTilbakekrevingFilter();
 
   return useMemo(() => {
@@ -145,13 +141,33 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
         ? filteredForYtelser
         : filteredForYtelser.filter((b) => b.tildeltEnhet !== null && klageenheter.includes(b.tildeltEnhet));
 
-    const filteredForInnsendingshjemler = filterHjemler(
-      filteredForKlageenheter,
-      innsendingshjemler,
-      hjemmelMode,
-      (b) => b.innsendingshjemmelIdList,
-    );
+    return filteredForKlageenheter;
+  }, [behandlinger, ytelser, klageenheter, sakstyper, tilbakekreving]);
+};
 
-    return filteredForInnsendingshjemler;
-  }, [behandlinger, ytelser, klageenheter, innsendingshjemler, sakstyper, tilbakekreving, hjemmelMode]);
+export const useAktiveFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+  const [innsendingshjemler] = useInnsendingshjemlerFilter();
+  const [hjemmelMode] = useInnsendingshjemlerModeFilter();
+
+  const baseFiltered = useBaseFiltered(behandlinger);
+
+  return filterHjemler(baseFiltered, innsendingshjemler, hjemmelMode, (b) => b.innsendingshjemmelIdList);
+};
+
+export const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
+  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
+  const [registreringshjemmelModeFilter] = useRegistreringshjemlerModeFilter();
+
+  const filteredForInnsendingshjemler = useAktiveFiltered(behandlinger);
+
+  return useMemo(
+    () =>
+      filterHjemler(
+        filteredForInnsendingshjemler,
+        registreringshjemlerFilter,
+        registreringshjemmelModeFilter,
+        (b) => b.previousRegistreringshjemmelIdList ?? [],
+      ),
+    [filteredForInnsendingshjemler, registreringshjemlerFilter, registreringshjemmelModeFilter],
+  );
 };

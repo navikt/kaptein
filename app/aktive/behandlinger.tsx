@@ -6,7 +6,7 @@ import { Skeleton } from '@/app/aktive/skeleton';
 import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { useBaseFiltered } from '@/components/charts/common/use-data';
+import { useAktiveFiltered } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
@@ -225,8 +225,8 @@ const BehandlingerData = ({
     return [...klagerLedige, ...ankerLedige, ...betongLedige, ...omgjøringskravLedige, ...gbLedige, ...tildelte];
   }, [tildelingFilter, klagerLedige, ankerLedige, betongLedige, omgjøringskravLedige, gbLedige, tildelte]);
 
-  const filteredBehandlinger = useBaseFiltered(behandlinger);
-  const filteredTildelte = useBaseFiltered(tildelte);
+  const filteredBehandlinger = useAktiveFiltered(behandlinger);
+  const filteredTildelte = useAktiveFiltered(tildelte);
   const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
 
   return (

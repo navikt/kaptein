@@ -6,7 +6,7 @@ import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
-import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
+import { KaSakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
@@ -79,7 +79,7 @@ const RenderFilters = ({
 
     <VStack gap="4" flexGrow="1">
       <Klageenheter klageenheter={klageenheter} />
-      <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
+      <KaSakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
       <YtelserAndRegistreringshjemler
         ytelser={ytelser}
         lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
