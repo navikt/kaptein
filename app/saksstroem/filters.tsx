@@ -6,19 +6,18 @@ import { FilterWrapper } from '@/components/filters/filter-wrapper';
 import { Klageenheter } from '@/components/filters/klageenheter';
 import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
-import { SakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
+import { Sakstyper } from '@/components/filters/sakstyper';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
 import {
-  getDefaultSakstyperToUtfall,
+  getDefaultSakstyper,
   getInnsendingshjemlerMap,
   getKlageenheter,
   getRegistreringshjemlerMap,
-  getUtfall,
   getYtelser,
 } from '@/lib/server/api';
-import type { IKodeverkSimpleValue, IYtelse, RegistreringshjemlerMap, SakstypeToUtfall } from '@/lib/types';
+import type { IKodeverkSimpleValue, IYtelse, RegistreringshjemlerMap, Sakstype } from '@/lib/types';
 
 export const Filters = async () => (
   <Suspense fallback={<RenderFilters />}>
@@ -28,41 +27,31 @@ export const Filters = async () => (
 
 const AsyncFilters = async () => {
   const ytelser = await getYtelser();
-  const sakstyperToUtfall = await getDefaultSakstyperToUtfall();
   const klageEnheter = await getKlageenheter();
-  const utfall = await getUtfall();
   const registreringshjemler = await getRegistreringshjemlerMap();
   const innsendingshjemler = await getInnsendingshjemlerMap();
+  const sakstyper = await getDefaultSakstyper();
 
   return (
     <RenderFilters
       ytelser={ytelser}
-      sakstyperToUtfall={sakstyperToUtfall}
       klageenheter={klageEnheter}
-      utfall={utfall}
       registreringshjemlerMap={registreringshjemler}
       innsendingshjemlerMap={innsendingshjemler}
+      sakstyper={sakstyper}
     />
   );
 };
 
 interface Props {
   ytelser?: IYtelse[];
-  sakstyperToUtfall?: SakstypeToUtfall[];
   klageenheter?: IKodeverkSimpleValue<string>[];
-  utfall?: IKodeverkSimpleValue<string>[];
   registreringshjemlerMap?: RegistreringshjemlerMap;
   innsendingshjemlerMap?: Record<string, string>;
+  sakstyper?: IKodeverkSimpleValue<Sakstype>[];
 }
 
-const RenderFilters = ({
-  ytelser,
-  sakstyperToUtfall,
-  klageenheter,
-  utfall,
-  registreringshjemlerMap,
-  innsendingshjemlerMap,
-}: Props) => (
+const RenderFilters = ({ ytelser, klageenheter, registreringshjemlerMap, innsendingshjemlerMap, sakstyper }: Props) => (
   <FilterWrapper>
     <VStack gap="4" flexGrow="1">
       <HStack justify="space-between" gap="4" wrap={false}>
@@ -74,7 +63,7 @@ const RenderFilters = ({
 
     <VStack gap="4" flexGrow="1">
       <Klageenheter klageenheter={klageenheter} />
-      <SakstyperAndUtfall sakstyperToUtfall={sakstyperToUtfall} />
+      <Sakstyper sakstyper={sakstyper} />
       <YtelserAndInnsendingshjemler ytelser={ytelser} />
       <Tildeling />
     </VStack>
@@ -84,8 +73,7 @@ const RenderFilters = ({
       <ActiveFilters
         ytelser={ytelser}
         klageenheter={klageenheter}
-        sakstyper={sakstyperToUtfall}
-        utfall={utfall}
+        sakstyper={sakstyper}
         registreringshjemler={registreringshjemlerMap}
         innsendingshjemler={innsendingshjemlerMap}
       />
