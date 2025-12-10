@@ -13,12 +13,13 @@ import {
   useRegistreringshjemlerFilter,
   useRegistreringshjemlerModeFilter,
   useTilbakekrevingFilter,
+  useTrSakstyperFilter,
   useYtelserFilter,
 } from '@/lib/query-state/query-state';
 import type { Avsluttet, BaseBehandling, BaseSakITR, Ferdigstilt, Frist } from '@/lib/types';
 
 export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Avsluttet & Ferdigstilt & Frist)[]) => {
-  const baseFiltered = useBaseFiltered(behandlinger);
+  const baseFiltered = useNonTrFiltered(behandlinger);
   const ferdigstiltInPeriod = useFerdigstiltInPeriod(baseFiltered);
   const resultatFiltered = useResultatFiltered(ferdigstiltInPeriod);
 
@@ -116,10 +117,9 @@ const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>
   }, [ferdigstilteBehandlinger, registreringshjemlerFilter, utfallFilter, hjemmelModeFilter]);
 };
 
-export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelser] = useYtelserFilter();
   const [klageenheter] = useKlageenheterFilter();
-  const [sakstyper] = useKaSakstyperFilter();
   const [tilbakekreving] = useTilbakekrevingFilter();
 
   return useMemo(() => {
@@ -128,13 +128,10 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
         ? behandlinger
         : behandlinger.filter((b) => b.tilbakekreving === (tilbakekreving === TilbakekrevingFilter.KUN));
 
-    const filteredForSakstyper =
-      sakstyper.length === 0
-        ? filteredForTilbakekreving
-        : filteredForTilbakekreving.filter((b) => sakstyper.includes(b.typeId));
-
     const filteredForYtelser =
-      ytelser.length === 0 ? filteredForSakstyper : filteredForSakstyper.filter((b) => ytelser.includes(b.ytelseId));
+      ytelser.length === 0
+        ? filteredForTilbakekreving
+        : filteredForTilbakekreving.filter((b) => ytelser.includes(b.ytelseId));
 
     const filteredForKlageenheter =
       klageenheter.length === 0
@@ -142,23 +139,55 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
         : filteredForYtelser.filter((b) => b.tildeltEnhet !== null && klageenheter.includes(b.tildeltEnhet));
 
     return filteredForKlageenheter;
-  }, [behandlinger, ytelser, klageenheter, sakstyper, tilbakekreving]);
+  }, [behandlinger, ytelser, klageenheter, tilbakekreving]);
+};
+
+export const useNonTrFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+  const [sakstyper] = useKaSakstyperFilter();
+  const baseFiltered = useBaseFiltered(behandlinger);
+
+  return useMemo(
+    () => (sakstyper.length === 0 ? baseFiltered : baseFiltered.filter((b) => sakstyper.includes(b.typeId))),
+    [baseFiltered, sakstyper],
+  );
 };
 
 export const useAktiveFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [innsendingshjemler] = useInnsendingshjemlerFilter();
   const [hjemmelMode] = useInnsendingshjemlerModeFilter();
 
-  const baseFiltered = useBaseFiltered(behandlinger);
+  const baseFiltered = useNonTrFiltered(behandlinger);
 
   return filterHjemler(baseFiltered, innsendingshjemler, hjemmelMode, (b) => b.innsendingshjemmelIdList);
+};
+
+const useBaseFilteredTr = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+  const [sakstyper] = useTrSakstyperFilter();
+  const [innsendingshjemler] = useInnsendingshjemlerFilter();
+  const [hjemmelMode] = useInnsendingshjemlerModeFilter();
+
+  const baseFiltered = useBaseFiltered(behandlinger);
+
+  return useMemo(() => {
+    const filteredForSakstyper =
+      sakstyper.length === 0 ? baseFiltered : baseFiltered.filter((b) => sakstyper.includes(b.typeId));
+
+    const filteredForInnsendingshjemler = filterHjemler(
+      filteredForSakstyper,
+      innsendingshjemler,
+      hjemmelMode,
+      (b) => b.innsendingshjemmelIdList,
+    );
+
+    return filteredForInnsendingshjemler;
+  }, [baseFiltered, sakstyper, innsendingshjemler, hjemmelMode]);
 };
 
 export const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
   const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
   const [registreringshjemmelModeFilter] = useRegistreringshjemlerModeFilter();
 
-  const filteredForInnsendingshjemler = useAktiveFiltered(behandlinger);
+  const filteredForInnsendingshjemler = useBaseFilteredTr(behandlinger);
 
   return useMemo(
     () =>

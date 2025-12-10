@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { Skeleton } from '@/app/aktive-saker-i-tr/skeleton';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { useBaseFiltered, useSakITRFilter } from '@/components/charts/common/use-data';
+import { useSakITRFilter } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
@@ -95,8 +95,8 @@ interface DataProps extends KodeverkProps {
 }
 
 const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, ytelser, klageenheter }: DataProps) => {
-  const ledigeFiltered = useSakITRFilter(useBaseFiltered([...ledigeAnker, ...ledigeGb]));
-  const tildelteFiltered = useSakITRFilter(useBaseFiltered([...tildelteAnker, ...tildelteGb]));
+  const ledigeFiltered = useSakITRFilter([...ledigeAnker, ...ledigeGb]);
+  const tildelteFiltered = useSakITRFilter([...tildelteAnker, ...tildelteGb]);
 
   const uferdige = useMemo(
     () => [...ledigeFiltered.map((b) => ({ ...b, tildeltEnhet: b.tildeltEnhet ?? '4293' })), ...tildelteFiltered],
