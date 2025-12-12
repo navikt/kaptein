@@ -1,5 +1,6 @@
 'use client';
 
+import { BodyLong, Tag } from '@navikt/ds-react';
 import { Skeleton } from '@/app/ferdigstilte/skeleton';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
@@ -7,10 +8,12 @@ import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
+import { FerdigstilteOverTid } from '@/components/charts/ferdigstilte-over-tid';
 import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
 import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/charts/saker-per-ytelse-og-sakstype';
+import { SendtTilTROverTid } from '@/components/charts/sendt-til-tr-over-tid';
 import { TildelteSakerPerKlageenhet } from '@/components/charts/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
 import { VarsletFrist } from '@/components/charts/varslet-frist';
@@ -29,7 +32,9 @@ import type {
   KlageFerdigstilt,
   OmgjøringskravFerdigstilt,
   OmgjøringskravFerdigstilteResponse,
+  SakITRUtfall,
   Sakstype,
+  Utfall,
 } from '@/lib/types';
 
 type KlageResponse = KapteinApiResponse<KlageFerdigstilt>;
@@ -39,6 +44,7 @@ interface KodeverkProps {
   ytelser: IYtelse[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
   klageenheter: IKodeverkSimpleValue[];
+  utfall: IKodeverkSimpleValue<Utfall | SakITRUtfall>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -127,6 +133,7 @@ const BehandlingerData = ({
   sakstyper,
   ytelser,
   klageenheter,
+  utfall,
 }: DataProps) => {
   const filteredKlager = useFerdigstilteInPeriod(klager);
   const filteredAnker = useFerdigstilteInPeriod(anker);
@@ -145,6 +152,23 @@ const BehandlingerData = ({
 
   return (
     <ChartsWrapper>
+      <Card span={4}>
+        <FerdigstilteOverTid
+          title="Ferdigstilte over tid"
+          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          ferdigstilte={behandlinger}
+        />
+      </Card>
+
+      <Card span={4}>
+        <SendtTilTROverTid
+          title="Anker sendt til Trygderetten"
+          helpText={SENT_TIL_TR_OVER_TID_HELP_TEXT}
+          ferdigstilte={behandlinger}
+          utfall={utfall}
+        />
+      </Card>
+
       <Card span={4}>
         <SakerPerYtelseOgSakstype
           title="Ferdigstilte saker per ytelse og sakstype"
@@ -245,6 +269,33 @@ const BehandlingerData = ({
   );
 };
 
+const SENT_TIL_TR_OVER_TID_HELP_TEXT = (
+  <>
+    <BodyLong spacing>
+      Viser antall{' '}
+      <Tag variant="success" size="xsmall">
+        anker
+      </Tag>{' '}
+      sendt til Trygderetten per måned, og fordeling av utfallene som innebærer at anken går til Trygderetten.
+    </BodyLong>
+
+    <BodyLong>
+      Trykk på{' '}
+      <Tag variant="info" size="xsmall">
+        Prosent
+      </Tag>{' '}
+      for å se andel{' '}
+      <Tag variant="success" size="xsmall">
+        anker
+      </Tag>{' '}
+      sendt til Trygderetten av totalt ferdigstilte{' '}
+      <Tag variant="success" size="xsmall">
+        anker
+      </Tag>{' '}
+      per måned, med fordeling av utfall som innebærer at saken går til Trygderetten.
+    </BodyLong>
+  </>
+);
 const VARSLET_FRIST_HELP_TEXT =
   'Varslet frist regnes som overskredet dersom saken ble ferdigstilt i Kabal etter dato for varslet frist. Varslet frist regnes som innenfor dersom saken ble ferdigstilt i Kabal samme dag som varslet frist eller før.';
 const FRIST_I_KABAL_HELP_TEXT =
