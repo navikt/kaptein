@@ -187,7 +187,7 @@ export const getTRSaksttyper = async () => {
   return sakstyper.filter(({ id }) => TR_SAKSTYPER.includes(id));
 };
 
-const STYRINGSENHETEN: IKodeverkSimpleValue = { id: '4200', navn: 'Nav klageinstans styringsenhet' };
+const STYRINGSENHETEN: IKodeverkSimpleValue = { id: '4200', navn: 'Klageinstans styringsenhet' };
 
 const DEFAULT_SAKSTYPER = [
   Sakstype.KLAGE,
