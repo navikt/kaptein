@@ -64,13 +64,14 @@ export interface CommonChartProps {
   description?: ReactNode;
   helpText?: ReactNode;
   getInstance?: (instance: ECharts) => void;
+  headerContent?: ReactNode;
 }
 
 interface EChartProps extends CommonChartProps {
   option: Omit<ECBasicOption, 'title'>;
 }
 
-export const EChart = ({ option, title, description, getInstance, helpText }: EChartProps) => {
+export const EChart = ({ option, title, description, getInstance, helpText, headerContent }: EChartProps) => {
   const theme = useAppTheme();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
@@ -165,6 +166,7 @@ export const EChart = ({ option, title, description, getInstance, helpText }: EC
         <Heading size="xsmall" level="2" className="font-normal!">
           {description}
         </Heading>
+        {headerContent}
       </VStack>
 
       <div ref={ref} className="grow" />
