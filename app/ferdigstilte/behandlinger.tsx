@@ -11,8 +11,10 @@ import { FristIKabal } from '@/components/charts/frist-i-kabal';
 import { FristPerYtelse } from '@/components/charts/frist-per-ytelse';
 import { SakerPerSakstype } from '@/components/charts/saker-per-sakstype';
 import { SakerPerYtelseOgSakstype } from '@/components/charts/saker-per-ytelse-og-sakstype';
+import { SendtTilTROverTid } from '@/components/charts/sendt-til-tr-over-tid';
 import { TildelteSakerPerKlageenhet } from '@/components/charts/tildelte-saker-per-klageenhet';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
+import { UtfallOverTid } from '@/components/charts/utfall-over-tid';
 import { VarsletFrist } from '@/components/charts/varslet-frist';
 import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
@@ -29,7 +31,9 @@ import type {
   KlageFerdigstilt,
   OmgjøringskravFerdigstilt,
   OmgjøringskravFerdigstilteResponse,
+  SakITRUtfall,
   Sakstype,
+  Utfall,
 } from '@/lib/types';
 
 type KlageResponse = KapteinApiResponse<KlageFerdigstilt>;
@@ -39,6 +43,7 @@ interface KodeverkProps {
   ytelser: IYtelse[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
   klageenheter: IKodeverkSimpleValue[];
+  utfall: IKodeverkSimpleValue<Utfall | SakITRUtfall>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -127,6 +132,7 @@ const BehandlingerData = ({
   sakstyper,
   ytelser,
   klageenheter,
+  utfall,
 }: DataProps) => {
   const filteredKlager = useFerdigstilteInPeriod(klager);
   const filteredAnker = useFerdigstilteInPeriod(anker);
@@ -145,6 +151,14 @@ const BehandlingerData = ({
 
   return (
     <ChartsWrapper>
+      <Card span={4}>
+        <UtfallOverTid title="Utfall over tid" ferdigstilte={behandlinger} utfall={utfall} />
+      </Card>
+
+      <Card span={4}>
+        <SendtTilTROverTid title="Sent til Trygderetten" ferdigstilte={behandlinger} utfall={utfall} />
+      </Card>
+
       <Card span={4}>
         <SakerPerYtelseOgSakstype
           title="Ferdigstilte saker per ytelse og sakstype"
