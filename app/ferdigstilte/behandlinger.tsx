@@ -4,7 +4,12 @@ import { BodyLong, Tag } from '@navikt/ds-react';
 import { Skeleton } from '@/app/ferdigstilte/skeleton';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import { useFerdigstilteInPeriod } from '@/components/charts/common/use-data';
+import {
+  useBaseFiltered,
+  useFerdigstilteInPeriod,
+  useFerdigstiltInPeriod,
+  useRegistreringshjemlerFiltered,
+} from '@/components/charts/common/use-data';
 import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytelser';
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
@@ -135,28 +140,20 @@ const BehandlingerData = ({
   klageenheter,
   utfall,
 }: DataProps) => {
-  const filteredKlager = useFerdigstilteInPeriod(klager);
-  const filteredAnker = useFerdigstilteInPeriod(anker);
-  const filteredBetong = useFerdigstilteInPeriod(betong);
-  const filteredOmgjøringskrav = useFerdigstilteInPeriod(omgjøringskrav);
-  const filteredBegjæringerOmGjenopptak = useFerdigstilteInPeriod(begjæringerOmGjenopptak);
+  const behandlinger = [...klager, ...anker, ...betong, ...omgjøringskrav, ...begjæringerOmGjenopptak];
+  const filteredBehandlinger = useFerdigstilteInPeriod(behandlinger);
 
-  const behandlinger = [
-    ...filteredKlager,
-    ...filteredAnker,
-    ...filteredBetong,
-    ...filteredOmgjøringskrav,
-    ...filteredBegjæringerOmGjenopptak,
-  ];
-  const relevantYtelser = useRelevantYtelser(behandlinger, ytelser);
+  const filteredAnker = useRegistreringshjemlerFiltered(useFerdigstiltInPeriod(useBaseFiltered(anker)));
+
+  const relevantYtelser = useRelevantYtelser(filteredBehandlinger, ytelser);
 
   return (
     <ChartsWrapper>
       <Card span={4}>
         <FerdigstilteOverTid
           title="Ferdigstilte over tid"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
-          ferdigstilte={behandlinger}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
+          ferdigstilte={filteredBehandlinger}
         />
       </Card>
 
@@ -164,7 +161,7 @@ const BehandlingerData = ({
         <SendtTilTROverTid
           title="Anker sendt til Trygderetten"
           helpText={SENT_TIL_TR_OVER_TID_HELP_TEXT}
-          ferdigstilte={behandlinger}
+          ferdigstilte={filteredAnker}
           utfall={utfall}
         />
       </Card>
@@ -172,8 +169,8 @@ const BehandlingerData = ({
       <Card span={4}>
         <SakerPerYtelseOgSakstype
           title="Ferdigstilte saker per ytelse og sakstype"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
-          behandlinger={behandlinger}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
+          behandlinger={filteredBehandlinger}
           sakstyper={sakstyper}
           relevantYtelser={relevantYtelser}
         />
@@ -182,8 +179,8 @@ const BehandlingerData = ({
       <Card>
         <SakerPerSakstype
           title="Ferdigstilte saker per sakstype"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
-          behandlinger={behandlinger}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
+          behandlinger={filteredBehandlinger}
           sakstyper={sakstyper}
         />
       </Card>
@@ -191,8 +188,8 @@ const BehandlingerData = ({
       <Card>
         <TildelteSakerPerKlageenhet
           title="Ferdigstilte saker per klageenhet"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
-          behandlinger={behandlinger}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
+          behandlinger={filteredBehandlinger}
           klageenheter={klageenheter}
         />
       </Card>
@@ -200,8 +197,8 @@ const BehandlingerData = ({
       <Card span={4}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Ferdigstilte saker per ytelse og klageenhet"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
-          behandlinger={behandlinger}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
+          behandlinger={filteredBehandlinger}
           klageenheter={klageenheter}
           relevantYtelser={relevantYtelser}
         />
@@ -210,27 +207,27 @@ const BehandlingerData = ({
       <Card>
         <VarsletFrist
           title="Varslet frist"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
           helpText={VARSLET_FRIST_HELP_TEXT}
-          behandlinger={behandlinger}
+          behandlinger={filteredBehandlinger}
         />
       </Card>
 
       <Card>
         <FristIKabal
           title="Frist i Kabal"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
           helpText={FRIST_I_KABAL_HELP_TEXT}
-          behandlinger={behandlinger}
+          behandlinger={filteredBehandlinger}
         />
       </Card>
 
       <Card span={4}>
         <VarsletFristPerYtelse
           title="Varslet frist per ytelse"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
           helpText={VARSLET_FRIST_HELP_TEXT}
-          behandlinger={behandlinger}
+          behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
         />
       </Card>
@@ -238,9 +235,9 @@ const BehandlingerData = ({
       <Card span={4}>
         <FristPerYtelse
           title="Frist per ytelse"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
           helpText={FRIST_I_KABAL_HELP_TEXT}
-          behandlinger={behandlinger}
+          behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
         />
       </Card>
@@ -248,9 +245,9 @@ const BehandlingerData = ({
       <Card span={2}>
         <DaysThresholdPieChart
           title="Behandlingstid"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
           helpText={BEHANDLINGSTID_HELP_TEXT}
-          behandlinger={behandlinger}
+          behandlinger={filteredBehandlinger}
           getDays={(b) => b.behandlingstid}
         />
       </Card>
@@ -258,9 +255,9 @@ const BehandlingerData = ({
       <Card span={4}>
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
-          description={`Viser data for ${behandlinger.length} ferdigstilte saker`}
+          description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
           helpText={BEHANDLINGSTID_HELP_TEXT}
-          behandlinger={behandlinger}
+          behandlinger={filteredBehandlinger}
           relevantYtelser={relevantYtelser}
           getDays={(b) => b.behandlingstid}
         />
@@ -279,7 +276,7 @@ const SENT_TIL_TR_OVER_TID_HELP_TEXT = (
       sendt til Trygderetten per måned, og fordeling av utfallene som innebærer at anken går til Trygderetten.
     </BodyLong>
 
-    <BodyLong>
+    <BodyLong spacing>
       Trykk på{' '}
       <Tag variant="info" size="xsmall">
         Prosent
@@ -294,6 +291,8 @@ const SENT_TIL_TR_OVER_TID_HELP_TEXT = (
       </Tag>{' '}
       per måned, med fordeling av utfall som innebærer at saken går til Trygderetten.
     </BodyLong>
+
+    <BodyLong className="italic">Ikke påvirket av filtere for sakstype eller utfall.</BodyLong>
   </>
 );
 const VARSLET_FRIST_HELP_TEXT =

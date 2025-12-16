@@ -117,7 +117,7 @@ const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>
   }, [ferdigstilteBehandlinger, registreringshjemlerFilter, utfallFilter, hjemmelModeFilter]);
 };
 
-const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelser] = useYtelserFilter();
   const [klageenheter] = useKlageenheterFilter();
   const [tilbakekreving] = useTilbakekrevingFilter();
@@ -181,6 +181,22 @@ const useBaseFilteredTr = <T extends BaseBehandling>(behandlinger: T[]): T[] => 
 
     return filteredForInnsendingshjemler;
   }, [baseFiltered, sakstyper, innsendingshjemler, hjemmelMode]);
+};
+
+export const useRegistreringshjemlerFiltered = <T extends BaseBehandling & Ferdigstilt>(behandlinger: T[]) => {
+  const [registreringshjemlerFilter] = useRegistreringshjemlerFilter();
+  const [registreringshjemmelModeFilter] = useRegistreringshjemlerModeFilter();
+
+  return useMemo(
+    () =>
+      filterHjemler(
+        behandlinger,
+        registreringshjemlerFilter,
+        registreringshjemmelModeFilter,
+        (b) => b.resultat.registreringshjemmelIdList,
+      ),
+    [behandlinger, registreringshjemlerFilter, registreringshjemmelModeFilter],
+  );
 };
 
 export const useSakITRFilter = <T extends BaseSakITR>(behandlinger: T[]) => {
