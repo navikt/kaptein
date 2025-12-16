@@ -9,6 +9,7 @@ import { NoData } from '@/components/no-data/no-data';
 import { browserLog } from '@/lib/browser-log';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
+import { formatDecimal } from '@/lib/format';
 import type { Behandling } from '@/lib/types';
 
 type Bucket = { label: string; values: number[] };
@@ -93,8 +94,50 @@ export const IntervalOverTime = <T extends Behandling>({
         xAxis: { type: 'category', data: labels, axisLabel: { rotate: 45 }, name: xAxisLabel },
         tooltip: { trigger: 'axis', valueFormatter: (p: number) => NUBMER_FORMAT.format(p) },
         series: [
-          { type: 'line', smooth: true, data: avg, name: 'Gjennomsnitt' },
-          { type: 'line', smooth: true, data: median, name: 'Median' },
+          {
+            type: 'line',
+            smooth: true,
+            data: avg,
+            name: 'Gjennomsnitt',
+            color: 'var(--ax-brand-blue-500)',
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              data: [
+                {
+                  yAxis: globalAvg,
+                  label: {
+                    show: true,
+                    formatter: `Snitt: ${formatDecimal((globalAvg ?? 0) / 7)} uker / ${Math.round(globalAvg ?? 0)} dager`,
+                    color: 'var(--ax-text-neutral)',
+                    position: 'insideEndTop',
+                  },
+                },
+              ],
+            },
+          },
+          {
+            type: 'line',
+            smooth: true,
+            data: median,
+            name: 'Median',
+            color: 'var(--ax-success-500)',
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              data: [
+                {
+                  yAxis: globalMedian,
+                  label: {
+                    show: true,
+                    formatter: `Median: ${formatDecimal((globalMedian ?? 0) / 7)} uker / ${Math.round(globalMedian ?? 0)} dager`,
+                    color: 'var(--ax-text-neutral)',
+                    position: 'insideEndBottom',
+                  },
+                },
+              ],
+            },
+          },
         ],
       }}
     />
@@ -106,5 +149,5 @@ const getStatText = (stat: number | null) => {
     return '-';
   }
 
-  return `${NUBMER_FORMAT.format(stat / 7)} uker / ${NUBMER_FORMAT.format(stat)} dager`;
+  return `${formatDecimal(stat / 7)} uker / ${Math.round(stat)} dager`;
 };
