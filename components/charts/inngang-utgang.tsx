@@ -45,7 +45,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   const { fromFilter, toFilter } = useDateFilter();
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
-  const { labels, inn, ut, pressure, innTotal, utTotal, diffTotal } = useMemo<Data>(() => {
+  const { labels, inn, ut, pressure, innTotal, utTotal, diffTotal, innAverage, utAverage } = useMemo<Data>(() => {
     const buckets = createBuckets(fromFilter, toFilter);
 
     for (const b of ferdigstilte) {
@@ -215,6 +215,24 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             areaStyle: {
               color: 'var(--ax-bg-accent-softA)',
             },
+            markLine: {
+              symbol: ['none', 'none'],
+              animation: false,
+              data: [
+                {
+                  type: 'average',
+                  name: 'Gjennomsnitt mottatt',
+                  label: {
+                    show: true,
+                    formatter: ({ value }: { value: number }) => {
+                      return `Snitt mottatt: ${Math.round(value)}`;
+                    },
+                    color: 'var(--ax-text-neutral)',
+                    position: innAverage >= utAverage ? 'insideEndTop' : 'insideEndBottom',
+                  },
+                },
+              ],
+            },
           },
           {
             id: 'out',
@@ -226,6 +244,22 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             lineStyle: { type: 'solid', width: 2 },
             areaStyle: {
               color: 'var(--ax-bg-success-soft)',
+            },
+            markLine: {
+              symbol: ['none', 'none'],
+              animation: false,
+              data: [
+                {
+                  type: 'average',
+                  name: 'Gjennomsnitt ferdigstilt',
+                  label: {
+                    show: true,
+                    formatter: ({ value }: { value: number }) => `Snitt ferdigstilt: ${Math.round(value)}`,
+                    color: 'var(--ax-text-neutral)',
+                    position: utAverage > innAverage ? 'insideEndTop' : 'insideEndBottom',
+                  },
+                },
+              ],
             },
           },
           {
