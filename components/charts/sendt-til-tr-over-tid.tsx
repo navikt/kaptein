@@ -12,11 +12,10 @@ import { ISO_DATE_FORMAT } from '@/lib/date';
 import { EChart } from '@/lib/echarts/echarts';
 import { formatPercent } from '@/lib/format';
 import {
+  type AnkeFerdigstilt,
   type Avsluttet,
-  type BaseBehandling,
   type IKodeverkSimpleValue,
   type SakITRUtfall,
-  Sakstype,
   type Utfall,
   Utfall as UtfallEnum,
 } from '@/lib/types';
@@ -40,7 +39,7 @@ const SENDT_TIL_TR_UTFALL: Utfall[] = [
 ];
 
 interface Props {
-  ferdigstilte: (BaseBehandling & Avsluttet & { resultat: { utfallId: Utfall } })[];
+  ferdigstilte: AnkeFerdigstilt[];
   title: string;
   helpText?: ReactNode;
   utfall: IKodeverkSimpleValue<Utfall | SakITRUtfall>[];
@@ -67,14 +66,11 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
 
   const utfallMap = useMemo(() => new Map(utfall.map((u) => [u.id, u])), [utfall]);
 
-  // Filter to only anke cases
-  const ankeFerdigstilte = useMemo(() => ferdigstilte.filter((b) => b.typeId === Sakstype.ANKE), [ferdigstilte]);
-
   const { labels, bucketValues, totalPerUtfall, usedUtfall } = useMemo(() => {
     const buckets = createMonthBuckets(fromFilter, toFilter);
 
     // Count all anke cases and those sent to TR per month
-    for (const behandling of ankeFerdigstilte) {
+    for (const behandling of ferdigstilte) {
       const bucketIndex = getMonthBucketIndex(behandling, fromFilter);
       const bucket = buckets[bucketIndex];
 
@@ -109,10 +105,10 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
     const usedUtfall = SENDT_TIL_TR_UTFALL.filter((utfallId) => (totalPerUtfall.get(utfallId) ?? 0) > 0);
 
     return { labels, bucketValues, totalPerUtfall, usedUtfall };
-  }, [ankeFerdigstilte, fromFilter, toFilter]);
+  }, [ferdigstilte, fromFilter, toFilter]);
 
   const totalSentToTR = Array.from(totalPerUtfall.values()).reduce((sum, count) => sum + count, 0);
-  const totalAnkeFerdigstilte = ankeFerdigstilte.length;
+  const totalAnkeFerdigstilte = ferdigstilte.length;
   const totalSentToTRPercent = totalAnkeFerdigstilte === 0 ? 0 : totalSentToTR / totalAnkeFerdigstilte;
   const avgSentToTRPerMonth = labels.length === 0 ? 0 : totalSentToTR / labels.length;
 
