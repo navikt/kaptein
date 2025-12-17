@@ -1,4 +1,5 @@
 import { eachMonthOfInterval, format, parse } from 'date-fns';
+import { nb } from 'date-fns/locale';
 import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
@@ -46,6 +47,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
 
     const months = eachMonthOfInterval({ start: from, end: to }).map((d) => format(d, ISO_MONTH_FORMAT));
     const perMonth = calculateCountPerMonthPerUtfall(months, uferdige, ferdigstilte);
+    const labels = months.map(getMonthLabel);
 
     const values = perMonth.values().toArray();
 
@@ -94,7 +96,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
       createSerie({ id: HOS_TR, name: 'Hos TR', data: unfinishedData, yAxisIndex: 1, color: 'var(--ax-neutral-500)' }),
     );
 
-    return { labels: months, series, perMonth, unfinishedData, totalOmgjortCount, totalOmgjortPercent };
+    return { labels, series, perMonth, unfinishedData, totalOmgjortCount, totalOmgjortPercent };
   }, [ferdigstilte, fromFilter, toFilter, uferdige, ferdigstilteCount, utfallMap, utfallFilter]);
 
   if (labels.length === 0) {
@@ -236,6 +238,11 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
       }}
     />
   );
+};
+
+const getMonthLabel = (dateString: string): string => {
+  const date = parse(dateString, 'yyyy-MM', new Date());
+  return format(date, 'MMM yy', { locale: nb });
 };
 
 interface UtfallData {
