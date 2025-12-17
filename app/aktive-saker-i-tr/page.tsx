@@ -5,7 +5,7 @@ import { getKlageenheter, getYtelser } from '@/lib/server/api';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Ferdigstilte saker - Kaptein',
+  title: 'Aktive saker i TR - Kaptein',
 };
 
 export default async function Page() {

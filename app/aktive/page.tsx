@@ -5,7 +5,7 @@ import { getDefaultSakstyper, getKlageenheter, getPåVentReasons, getYtelser } f
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Aktive saker - Kaptein',
+  title: 'Aktive saker i KA - Kaptein',
 };
 
 export default async function Page() {
