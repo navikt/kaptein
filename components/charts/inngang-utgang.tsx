@@ -154,7 +154,6 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
           type: 'category',
           data: labels,
           axisLabel: { rotate: 45 },
-          name: 'Fra og med - til og med',
         },
         legend: { bottom: 60, data: ['Mottatt', 'Ferdigstilt'] },
         tooltip: {

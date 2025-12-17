@@ -287,6 +287,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
                 <code>+</code>. Dersom det er mottatt færre saker enn det er ferdigstilt, vises endringen i restanse som{' '}
                 <code>-</code>.
               </BodyLong>
+
               <BodyLong>
                 I X-aksen vises antall aktive saker per tidspunkt, slik at du kan se hvordan restansen endrer seg over
                 tid.
@@ -302,12 +303,16 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
         <AntallSakerInnTilKabalFerdigstiltIKabal
           title="Antall saker mottatt / ferdigstilt i Kabal per uke"
           helpText={
-            <BodyLong>
-              Viser antall saker mottatt og antall saker ferdigstilt per uke i valgt periode. Dersom det er mottatt
-              flere saker enn det er ferdigstilt, vises endringen i restanse som <code>+</code> og er markert i rødt.
-              Dersom det er mottatt færre saker enn det er ferdigstilt, vises endringen i restanse som <code>-</code> og
-              er markert i grønt.
-            </BodyLong>
+            <>
+              <BodyLong spacing>
+                Viser antall saker mottatt og antall saker ferdigstilt per uke i valgt periode. Dersom det er mottatt
+                flere saker enn det er ferdigstilt, vises endringen i restanse som <code>+</code> og er markert i rødt.
+                Dersom det er mottatt færre saker enn det er ferdigstilt, vises endringen i restanse som <code>-</code>{' '}
+                og er markert i grønt.
+              </BodyLong>
+
+              <BodyLong className="italic">Datoene gjelder fra og med - til og med</BodyLong>
+            </>
           }
           ferdigstilte={ferdigstilteInPeriod}
           uferdigeList={mottattInPeriod}
