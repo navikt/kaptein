@@ -1,4 +1,5 @@
 import { eachMonthOfInterval, format, parse } from 'date-fns';
+import { nb } from 'date-fns/locale';
 import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
 import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
@@ -147,19 +148,19 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
               return '';
             }
 
-            const monthLabel = params[0]?.axisValue;
+            const month = params[0]?.axisValue;
 
-            if (monthLabel === undefined) {
+            if (month === undefined) {
               return '';
             }
 
-            const monthData = perMonth.get(monthLabel);
+            const monthData = perMonth.get(month);
 
             if (monthData === undefined) {
               return '';
             }
 
-            let result = `<strong>${monthLabel}</strong><br/><table class="w-full mt-2">`;
+            let result = `<strong>${getMonthTitle(month)}</strong><br/><table class="w-full mt-2">`;
             result +=
               '<thead><tr><th class="text-left" colspan="2">Utfall</th><th class="text-right pl-3">Prosent</th><th class="text-right pl-3">Antall</th></tr></thead>';
             result += '<tbody>';
@@ -231,11 +232,22 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
             max,
           },
         ],
-        xAxis: { type: 'category', boundaryGap: false, data: labels, axisLabel: { rotate: 45 } },
+        xAxis: { type: 'category', boundaryGap: false, data: labels, axisLabel: { rotate: 45, formatter: getMonthLabel } },
         series,
       }}
     />
   );
+};
+
+const getMonthLabel = (dateString: string): string => {
+  const date = parse(dateString, 'yyyy-MM', new Date());
+  return format(date, 'MMM yy', { locale: nb });
+};
+
+const getMonthTitle = (dateString: string): string => {
+  const date = parse(dateString, 'yyyy-MM', new Date());
+  const formatted = format(date, 'MMMM yyyy', { locale: nb });
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
 interface UtfallData {
