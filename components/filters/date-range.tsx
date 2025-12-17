@@ -103,7 +103,7 @@ export const DateRange = () => {
   return (
     <VStack gap="4">
       <VStack gap="1">
-        <HGrid columns={2} align="start" gap="2" className="!auto-cols-max">
+        <HGrid columns={2} align="start" gap="2" className="auto-cols-max!">
           <DatePicker {...fromDatePickerProps} dropdownCaption wrapperClassName="w-full">
             <DatePicker.Input
               {...fromInputProps}
