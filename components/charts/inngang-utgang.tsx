@@ -1,6 +1,7 @@
 'use client';
 
 import { type ReactNode, useMemo } from 'react';
+import type { Axis } from '@/components/charts/common/axis';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
@@ -17,6 +18,8 @@ interface Props {
   getInBucketIndex: (b: BaseBehandling, from: string) => number;
   getOutBucketIndex: (b: Avsluttet, from: string) => number;
   createBuckets: (from: string, to: string) => Buckets;
+  shortLabelFormatter?: (label: string) => string;
+  fullLabelFormatter?: (label: string) => string;
   title: string;
   helpText: ReactNode;
 }
@@ -40,6 +43,8 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   createBuckets,
   getInBucketIndex,
   getOutBucketIndex,
+  shortLabelFormatter = (label) => label,
+  fullLabelFormatter = (label) => label,
   helpText,
 }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
@@ -152,19 +157,25 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
         xAxis: {
           type: 'category',
           data: labels,
-          axisLabel: { rotate: 45 },
+          axisLabel: { rotate: 45, formatter: shortLabelFormatter },
         },
         legend: { bottom: 60, data: ['Mottatt', 'Ferdigstilt'] },
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'cross' },
+          axisPointer: {
+            type: 'cross',
+            label: {
+              formatter: ({ axisDimension, value }: Axis) =>
+                axisDimension === 'y' ? value : fullLabelFormatter(value),
+            },
+          },
           formatter: (params: unknown) => {
             if (!Array.isArray(params) || params.length === 0) {
               return '';
             }
 
             const axisValue = params[0].axisValue;
-            let result = `<strong>${axisValue}</strong><br/>`;
+            let result = `<strong>${fullLabelFormatter(axisValue)}</strong><br/>`;
             result += '<table class="w-full mt-2">';
 
             for (const param of params) {
@@ -179,7 +190,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
               result += `<tr>
                 <td>${marker}</td>
                 <td>${seriesName}</td>
-                <td class="font-bold">${formattedValue}</td>
+                <td class="font-bold pl-2">${formattedValue}</td>
               </tr>`;
             }
 

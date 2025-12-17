@@ -1,7 +1,8 @@
 import { eachMonthOfInterval, format, parse } from 'date-fns';
-import { nb } from 'date-fns/locale';
 import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
 import { useMemo } from 'react';
+import type { Axis } from '@/components/charts/common/axis';
+import { formatMonthFullLabel, formatMonthShortLabel } from '@/components/charts/common/labels';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
@@ -130,7 +131,8 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
             type: 'cross',
             snap: true,
             label: {
-              formatter: ({ axisDimension, value }: Axis) => (axisDimension === 'y' ? formatPercent(value) : value),
+              formatter: ({ axisDimension, value }: Axis) =>
+                axisDimension === 'y' ? formatPercent(value) : formatMonthFullLabel(value),
             },
           },
           formatter: (
@@ -160,7 +162,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
               return '';
             }
 
-            let result = `<strong>${getMonthTitle(month)}</strong><br/><table class="w-full mt-2">`;
+            let result = `<strong>${formatMonthFullLabel(month)}</strong><br/><table class="w-full mt-2">`;
             result +=
               '<thead><tr><th class="text-left" colspan="2">Utfall</th><th class="text-right pl-3">Prosent</th><th class="text-right pl-3">Antall</th></tr></thead>';
             result += '<tbody>';
@@ -217,8 +219,6 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
 
             result += '</tbody></table>';
 
-            result += `<div role="progressbar" aria-valuenow="${finishedPercent}" aria-valuemin="0" aria-valuemax="100" class="w-full aksel-progress-bar aksel-progress-bar--small"><div style="width: ${finishedPercent}%" class="h-full bg-ax-accent-500" /></div>`;
-
             return result;
           },
         },
@@ -232,22 +232,16 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
             max,
           },
         ],
-        xAxis: { type: 'category', boundaryGap: false, data: labels, axisLabel: { rotate: 45, formatter: getMonthLabel } },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: labels,
+          axisLabel: { rotate: 45, formatter: formatMonthShortLabel },
+        },
         series,
       }}
     />
   );
-};
-
-const getMonthLabel = (dateString: string): string => {
-  const date = parse(dateString, 'yyyy-MM', new Date());
-  return format(date, 'MMM yy', { locale: nb });
-};
-
-const getMonthTitle = (dateString: string): string => {
-  const date = parse(dateString, 'yyyy-MM', new Date());
-  const formatted = format(date, 'MMMM yyyy', { locale: nb });
-  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
 interface UtfallData {
@@ -387,17 +381,3 @@ const createSerie = ({
   emphasis: { focus: 'series' },
   markLine,
 });
-
-interface YAxis {
-  axisDimension: 'y';
-  axisIndex: 1;
-  value: number;
-}
-
-interface XAxis {
-  axisDimension: 'x';
-  axisIndex: 0;
-  value: string;
-}
-
-type Axis = YAxis | XAxis;

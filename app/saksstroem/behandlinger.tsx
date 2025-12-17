@@ -12,12 +12,12 @@ import {
   parse,
   startOfDay,
 } from 'date-fns';
-import { nb } from 'date-fns/locale';
 import { useMemo } from 'react';
 import { TildelingFilter } from '@/app/query-types';
 import { SkeletonSaksstrøm } from '@/app/saksstroem/skeleton';
 import { Card } from '@/components/cards';
 import { BelastningPerYtelse } from '@/components/charts/belastning-per-ytelse';
+import { formatMonthFullLabel, formatMonthShortLabel } from '@/components/charts/common/labels';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import {
   getRestanseAfterDate,
@@ -337,6 +337,8 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
           createBuckets={createMonthBuckets}
           getInBucketIndex={getMonthInBucketIndex}
           getOutBucketIndex={getMonthOutBucketIndex}
+          shortLabelFormatter={formatMonthShortLabel}
+          fullLabelFormatter={formatMonthFullLabel}
         />
       </Card>
     </ChartsWrapper>
@@ -379,7 +381,11 @@ const createMonthBuckets = (from: string, to: string) => {
   for (const monthStart of monthStarts) {
     const relativeMonthNumber = differenceInCalendarMonths(monthStart, parse(from, ISO_DATE_FORMAT, new Date()));
 
-    buckets[relativeMonthNumber] = { inn: 0, ut: 0, label: format(monthStart, 'LLL yy', { locale: nb }) };
+    buckets[relativeMonthNumber] = {
+      inn: 0,
+      ut: 0,
+      label: `${monthStart.getFullYear()}-${(monthStart.getMonth() + 1).toString(10).padStart(2, '0')}`,
+    };
   }
 
   return buckets;

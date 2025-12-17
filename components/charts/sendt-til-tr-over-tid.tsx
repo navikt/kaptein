@@ -1,10 +1,11 @@
 'use client';
 
 import { ToggleGroup } from '@navikt/ds-react';
-import { differenceInMonths, endOfMonth, format, parse, startOfMonth } from 'date-fns';
-import { nb } from 'date-fns/locale';
+import { differenceInMonths, endOfMonth, parse, startOfMonth } from 'date-fns';
 import type { LineSeriesOption } from 'echarts/charts';
 import { type ReactNode, useMemo, useState } from 'react';
+import type { Axis } from '@/components/charts/common/axis';
+import { formatMonthFullLabel, formatMonthShortLabel } from '@/components/charts/common/labels';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
@@ -200,7 +201,7 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
               snap: true,
               label: {
                 formatter: ({ value }: { value: number }) =>
-                  mode === Mode.PERCENT ? formatPercent(value, 1) : String(Math.round(value)),
+                  mode === Mode.PERCENT ? formatPercent(value, 1) : Math.round(value).toString(10),
               },
             },
           },
@@ -209,7 +210,7 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
           type: 'category',
           boundaryGap: false,
           data: labels,
-          axisLabel: { rotate: 45 },
+          axisLabel: { rotate: 45, formatter: formatMonthShortLabel },
           name: 'Måned',
         },
         legend: {
@@ -218,7 +219,13 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
         },
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'cross' },
+          axisPointer: {
+            type: 'cross',
+            label: {
+              formatter: ({ axisDimension, value }: Axis) =>
+                axisDimension === 'y' ? value : formatMonthFullLabel(value),
+            },
+          },
           formatter: (
             params: {
               seriesId: string;
@@ -234,10 +241,10 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
               return '';
             }
 
-            const monthLabel = params[0]?.axisValue;
+            const month = params[0]?.axisValue;
             const dataIndex = params[0]?.dataIndex;
 
-            if (monthLabel === undefined || dataIndex === undefined) {
+            if (month === undefined || dataIndex === undefined) {
               return '';
             }
 
@@ -247,7 +254,7 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
               return '';
             }
 
-            let result = `<strong>${monthLabel}</strong><br/><table class="w-full mt-2">`;
+            let result = `<strong>${formatMonthFullLabel(month)}</strong><br/><table class="w-full mt-2">`;
             result +=
               '<thead><tr><th class="text-left" colspan="2">Utfall</th><th class="text-right pl-3">Antall</th><th class="text-right pl-3">Prosent</th></tr></thead>';
             result += '<tbody>';
@@ -293,7 +300,7 @@ const createMonthBuckets = (from: string, to: string): MonthBuckets => {
 
   while (currentDate <= endDate) {
     buckets[monthIndex] = {
-      label: getMonthLabel(currentDate),
+      label: `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString(10).padStart(2, '0')}`,
       totalFerdigstilte: 0,
       sentToTR: 0,
       perUtfall: new Map<Utfall, number>(),
@@ -306,8 +313,6 @@ const createMonthBuckets = (from: string, to: string): MonthBuckets => {
 
   return buckets;
 };
-
-const getMonthLabel = (date: Date): string => format(date, 'MMM yy', { locale: nb });
 
 const getMonthBucketIndex = (b: Avsluttet, from: string): number => {
   const behandlingDate = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());

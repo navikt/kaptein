@@ -10,11 +10,11 @@ import { useRelevantYtelser } from '@/components/charts/common/use-relevant-ytel
 import { DaysThresholdPieChart } from '@/components/charts/days-threshold';
 import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-ytelse';
 import { HjemlerOmgjort } from '@/components/charts/hjemler-omgjort';
+import { OmgjøringsprosentOverTid } from '@/components/charts/omgjøringsprosent';
 import { Tidsfordeling } from '@/components/charts/tidsfordeling';
 import { TildelteSakerPerKlageenhetOgYtelse } from '@/components/charts/tildelte-saker-per-klageenhet-og-ytelse';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
-import { OmgjøringsprosentOverTid } from '@/components/key-stats/omgjøringsprosent';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { useTrUtfallFilter } from '@/lib/query-state/query-state';

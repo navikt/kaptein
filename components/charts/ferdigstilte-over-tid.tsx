@@ -1,8 +1,9 @@
 'use client';
 
-import { differenceInMonths, endOfMonth, format, parse, startOfMonth } from 'date-fns';
-import { nb } from 'date-fns/locale';
+import { differenceInMonths, endOfMonth, parse, startOfMonth } from 'date-fns';
 import { type ReactNode, useMemo } from 'react';
+import type { Axis } from '@/components/charts/common/axis';
+import { formatMonthFullLabel, formatMonthShortLabel } from '@/components/charts/common/labels';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
@@ -71,7 +72,7 @@ export const FerdigstilteOverTid = ({ ferdigstilte, title, description, helpText
             axisPointer: {
               snap: true,
               label: {
-                formatter: ({ value }: { value: number }) => String(Math.round(value)),
+                formatter: ({ value }: { value: number }) => Math.round(value).toString(10),
               },
             },
           },
@@ -80,12 +81,18 @@ export const FerdigstilteOverTid = ({ ferdigstilte, title, description, helpText
           type: 'category',
           boundaryGap: false,
           data: labels,
-          axisLabel: { rotate: 45 },
+          axisLabel: { rotate: 45, formatter: formatMonthShortLabel },
           name: 'Måned',
         },
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'cross' },
+          axisPointer: {
+            type: 'cross',
+            label: {
+              formatter: ({ axisDimension, value }: Axis) =>
+                axisDimension === 'y' ? value : formatMonthFullLabel(value),
+            },
+          },
           formatter: (
             params: {
               dataIndex: number;
@@ -99,14 +106,14 @@ export const FerdigstilteOverTid = ({ ferdigstilte, title, description, helpText
               return '';
             }
 
-            const monthLabel = params[0]?.axisValue;
+            const month = params[0]?.axisValue;
             const param = params[0];
 
-            if (monthLabel === undefined || param === undefined) {
+            if (month === undefined || param === undefined) {
               return '';
             }
 
-            return `<strong>${monthLabel}</strong><br/>${param.marker} ${param.seriesName}: <strong>${param.value}</strong>`;
+            return `<strong>${formatMonthFullLabel(month)}</strong><br/>${param.marker} ${param.seriesName}: <strong>${param.value}</strong>`;
           },
         },
         series: [
@@ -160,7 +167,7 @@ const createMonthBuckets = (from: string, to: string): MonthBuckets => {
 
   while (currentDate <= endDate) {
     buckets[monthIndex] = {
-      label: getMonthLabel(currentDate),
+      label: `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString(10).padStart(2, '0')}`,
       total: 0,
     };
     monthIndex += 1;
@@ -171,8 +178,6 @@ const createMonthBuckets = (from: string, to: string): MonthBuckets => {
 
   return buckets;
 };
-
-const getMonthLabel = (date: Date): string => format(date, 'MMM yy', { locale: nb });
 
 const getMonthBucketIndex = (b: Avsluttet, from: string): number => {
   const behandlingDate = parse(b.avsluttetAvSaksbehandlerDate, ISO_DATE_FORMAT, new Date());
