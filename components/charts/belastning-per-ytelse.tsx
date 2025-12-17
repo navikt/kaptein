@@ -3,6 +3,7 @@
 import { type ReactNode, useMemo } from 'react';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
+import { DiffNumber, diffNumberHtml } from '@/components/numbers/diff-number';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
@@ -106,7 +107,7 @@ export const BelastningPerYtelse = ({
       description={
         <>
           <strong>Mottatt:</strong> {totalMottatt}. <strong>Ferdigstilt:</strong> {totalFerdigstilt}.{' '}
-          <strong>Endring i restanse:</strong> {diffText(totalDiff)}.
+          <strong>Endring i restanse:</strong> <DiffNumber>{totalDiff}</DiffNumber>.
         </>
       }
       helpText={helpText}
@@ -226,18 +227,6 @@ export const BelastningPerYtelse = ({
   );
 };
 
-const numberWithSign = (n: number): string => `${sign(n)}${Math.abs(n)}`;
-
-const sign = (n: number): string => {
-  if (n > 0) {
-    return '+';
-  }
-  if (n < 0) {
-    return '-';
-  }
-  return '';
-};
-
 const countMottattInPeriod = (
   behandlinger: BaseBehandling[],
   fromFilter: string,
@@ -294,7 +283,7 @@ const getTooltip = ({ ytelseNavn, mottatt, ferdigstilt, diff, restanse }: Ytelse
     </tr>
     <tr>
       <td class="pr-1">Differanse:</td>
-      <td>${diffTextString(diff)} saker</td>
+      <td>${diffNumberHtml(diff)} saker</td>
     </tr>
     <tr>
       <td class="pr-1">Restanse ved periodestart:</td>
@@ -307,9 +296,3 @@ const getTooltip = ({ ytelseNavn, mottatt, ferdigstilt, diff, restanse }: Ytelse
   </tbody>
 </table>
 `.trim();
-
-const getColor = (n: number): string => (n > 0 ? 'var(--ax-text-danger)' : 'var(--ax-text-success)');
-
-const diffText = (n: number): ReactNode => <span style={{ color: getColor(n) }}>{numberWithSign(n)}</span>;
-
-const diffTextString = (n: number): string => `<span style="color: ${getColor(n)}">${numberWithSign(n)}</span>`;
