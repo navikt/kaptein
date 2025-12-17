@@ -1,6 +1,6 @@
 'use client';
 
-import { BodyShort } from '@navikt/ds-react';
+import { BodyLong } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/ferdigstilte-saker-i-tr/skeleton';
 import { Card } from '@/components/cards';
@@ -164,13 +164,19 @@ const BehandlingerData = ({
         span={4}
         helpContent={
           <>
-            <BodyShort spacing>
+            <BodyLong spacing>
               Sakene er filtrert etter når de ble sendt til Trygderetten, uavhengig av når de ble ferdigstilt.
-            </BodyShort>
-            <BodyShort>
+            </BodyLong>
+
+            <BodyLong spacing>
               Den grå linjen er saker som er sendt til Trygderetten i valgt periode, men som fortsatt er aktive. Den grå
               linjen indikerer hvor ufullstendig omgjøringsprosenten er for hver måned.
-            </BodyShort>
+            </BodyLong>
+
+            <BodyLong>
+              Saker som er sendt til Trygderetten, men senere avbrutt fordi klageinstansen har startet ny behandling i
+              saken, er ikke med.
+            </BodyLong>
           </>
         }
       >
