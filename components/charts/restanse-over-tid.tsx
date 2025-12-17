@@ -6,10 +6,10 @@ import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-z
 import { getRestanseAfterDate } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
+import { DiffNumber } from '@/components/numbers/diff-number';
 import { ISO_DATE_FORMAT } from '@/lib/date';
 import { YTELSE_COLOR_MAP } from '@/lib/echarts/color-token';
 import { EChart } from '@/lib/echarts/echarts';
-import { sign } from '@/lib/sign';
 import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
 interface Props {
@@ -70,8 +70,7 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpTe
       description={
         <>
           <strong>Restanse ved periodestart:</strong> {startRestanse} <strong>Restanse ved periodeslutt:</strong>{' '}
-          {endRestanse} <strong>Endring:</strong> {sign(diff)}
-          {Math.abs(diff)}
+          {endRestanse} <strong>Endring:</strong> <DiffNumber>{diff}</DiffNumber>.
         </>
       }
       helpText={helpText}

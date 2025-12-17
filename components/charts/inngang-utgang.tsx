@@ -4,8 +4,8 @@ import { type ReactNode, useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { NoData } from '@/components/no-data/no-data';
+import { DiffNumber } from '@/components/numbers/diff-number';
 import { EChart } from '@/lib/echarts/echarts';
-import { sign } from '@/lib/sign';
 import type { Avsluttet, BaseBehandling, Ledig, Tildelt } from '@/lib/types';
 
 export type Bucket = { inn: number; ut: number; label: string };
@@ -121,8 +121,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       description={
         <>
           <strong>Mottatt:</strong> {innTotal}. <strong>Ferdigstilt:</strong> {utTotal}.{' '}
-          <strong>Endring i restanse:</strong> {sign(diffTotal)}
-          {Math.abs(diffTotal)}.
+          <strong>Endring i restanse:</strong> <DiffNumber>{diffTotal}</DiffNumber>.
         </>
       }
       helpText={helpText}
