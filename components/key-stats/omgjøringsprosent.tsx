@@ -202,7 +202,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
               const percentage = formatPercent(utfallData.percent);
               const rawCount = utfallData.count;
 
-              result += `<tr><td><span style="border-color: ${UTFALL_COLORS[utfallId]};" class="inline-block mr-1 border border-dashed rounded-full w-[10px] h-[10px]" /></td><td class="text-left">${utfallMap.get(utfallId)?.navn ?? 'Ukjent'}</td><td class="text-right">${percentage}</td><td class="text-right pl-3">${rawCount}</td></tr>`;
+              result += `<tr><td><span style="border-color: ${UTFALL_COLORS[utfallId]};" class="inline-block mr-1 border border-dashed rounded-full w-2.5 h-2.5" /></td><td class="text-left">${utfallMap.get(utfallId)?.navn ?? 'Ukjent'}</td><td class="text-right">${percentage}</td><td class="text-right pl-3">${rawCount}</td></tr>`;
             }
 
             // Add "Total" row
@@ -210,11 +210,11 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
 
             // Add "Ferdigstilte" row
             const finishedPercent = percent(monthData.finished, monthData.total);
-            result += `<tr class="border-ax-border-neutral-strong"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] border border-dashed border-ax-accent-500" /></td><td class="text-left">Ferdigstilte</td><td class="text-right pl-3">${finishedPercent}</td><td class="text-right pl-3">${monthData.finished}</td></tr>`;
+            result += `<tr class="border-ax-border-neutral-strong"><td><span class="inline-block mr-1 rounded-full w-2.5 h-2.5 border border-dashed border-ax-accent-500" /></td><td class="text-left">Ferdigstilte</td><td class="text-right pl-3">${finishedPercent}</td><td class="text-right pl-3">${monthData.finished}</td></tr>`;
 
             // Add "Hos TR" row
             const hosTRPercentage = percent(monthData.unfinished, monthData.total);
-            result += `<tr class="border-ax-border-neutral-strong italic"><td><span class="inline-block mr-1 rounded-full w-[10px] h-[10px] bg-ax-neutral-500" /></td><td class="text-left py-1">Hos TR</td><td class="text-right pl-3">${hosTRPercentage}</td><td class="text-right pl-3">${monthData.unfinished}</td></tr>`;
+            result += `<tr class="border-ax-border-neutral-strong italic"><td><span class="inline-block mr-1 rounded-full w-2.5 h-2.5 bg-ax-neutral-500" /></td><td class="text-left py-1">Hos TR</td><td class="text-right pl-3">${hosTRPercentage}</td><td class="text-right pl-3">${monthData.unfinished}</td></tr>`;
 
             result += '</tbody></table>';
 
