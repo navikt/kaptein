@@ -31,9 +31,10 @@ interface Props {
   uferdige: (LedigSakITR | TildeltSakITR)[];
   ferdigstilte: FerdigstiltSakITR[];
   utfall: IKodeverkSimpleValue<Utfall | SakITRUtfall>[];
+  helpContent?: React.ReactNode;
 }
 
-export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Props) => {
+export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall, helpContent }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
   const [utfallFilter] = useKaUtfallFilter();
 
@@ -117,7 +118,9 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall }: Pr
     <EChart
       title="Omgjøringsprosent over tid"
       description={description}
+      helpText={helpContent}
       getInstance={resetDataZoomOnDblClick}
+      isPercentage
       option={{
         grid: { bottom: 150 },
         dataZoom: [{ type: 'slider' }],

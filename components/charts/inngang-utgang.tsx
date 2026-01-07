@@ -28,7 +28,7 @@ interface Data {
   labels: string[];
   inn: number[];
   ut: number[];
-  pressure: number[];
+  diff: number[];
   innTotal: number;
   utTotal: number;
   diffTotal: number;
@@ -50,7 +50,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   const { fromFilter, toFilter } = useDateFilter();
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
-  const { labels, inn, ut, pressure, innTotal, utTotal, diffTotal, innAverage, utAverage } = useMemo<Data>(() => {
+  const { labels, inn, ut, diff, innTotal, utTotal, diffTotal, innAverage, utAverage } = useMemo<Data>(() => {
     const buckets = createBuckets(fromFilter, toFilter);
 
     for (const b of ferdigstilte) {
@@ -90,7 +90,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     const labels: string[] = [];
     const inn: number[] = [];
     const ut: number[] = [];
-    const pressure: number[] = [];
+    const diff: number[] = [];
     let innTotal = 0;
     let utTotal = 0;
 
@@ -101,11 +101,11 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       innTotal += v.inn;
       utTotal += v.ut;
       if (v.ut === 0 && v.inn === 0) {
-        pressure.push(0);
+        diff.push(0);
       } else if (v.ut === 0) {
-        pressure.push(1_000); // Arbitrary high value to indicate overload when no cases are completed
+        diff.push(v.inn);
       } else {
-        pressure.push(Math.round((v.inn / v.ut) * 100)); // Real value otherwise
+        diff.push(v.inn - v.ut);
       }
     }
 
@@ -113,7 +113,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     const utAverage = Math.round(utTotal / values.length);
     const innAverage = Math.round(innTotal / values.length);
 
-    return { labels, inn, ut, pressure: pressure, diffTotal, innTotal, utTotal, innAverage, utAverage };
+    return { labels, inn, ut, diff, diffTotal, innTotal, utTotal, innAverage, utAverage };
   }, [ferdigstilte, fromFilter, toFilter, createBuckets, getInBucketIndex, getOutBucketIndex, uferdigeList]);
 
   if ((ferdigstilte.length === 0 && uferdigeList.length === 0) || labels.length === 0) {
@@ -147,6 +147,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             type: 'value',
             name: 'Inn ift. ferdigstilte',
             inverse: true, // This makes the axis grow downwards
+            min: 0, // Ensures 0 is always at the top
             position: 'right',
             show: false, // Hide the axis
             axisPointer: {
@@ -272,10 +273,10 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
             },
           },
           {
-            id: 'pressure',
+            id: 'diff',
             type: 'custom',
-            data: pressure,
-            name: 'Trykk ift. ferdigstilte',
+            data: diff,
+            name: 'Endring',
             yAxisIndex: 1,
             emphasis: {
               disabled: true,
@@ -302,7 +303,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
                   height: 4,
                 },
                 style: {
-                  fill: value > 100 ? 'var(--ax-danger-400A)' : 'var(--ax-success-400A)',
+                  fill: value < 0 ? 'var(--ax-danger-400A)' : 'var(--ax-success-400A)',
                 },
                 emphasisDisabled: true,
               };

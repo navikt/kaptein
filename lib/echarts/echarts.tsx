@@ -1,6 +1,7 @@
 'use client';
 
-import { Heading, HelpText, HStack, VStack } from '@navikt/ds-react';
+import { DownloadIcon, TableIcon } from '@navikt/aksel-icons';
+import { Button, Heading, HelpText, HStack, Modal, Tooltip, VStack } from '@navikt/ds-react';
 import { BarChart, CustomChart, LineChart, PieChart, SankeyChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
   AriaComponent,
@@ -27,6 +28,8 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { ECBasicOption } from 'echarts/types/dist/shared';
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
+import { downloadChartDataAsCsv } from '@/lib/echarts/csv-download';
+import { DataViewTable } from '@/lib/echarts/data-view-table';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
 echarts.use([
@@ -60,21 +63,32 @@ echarts.registerTheme(AppTheme.LIGHT, LIGHT_THEME);
 echarts.registerLocale('nb-NO', nbNO);
 
 export interface CommonChartProps {
-  title: ReactNode;
+  title: string;
   description?: ReactNode;
   helpText?: ReactNode;
   getInstance?: (instance: ECharts) => void;
   headerContent?: ReactNode;
+  /** If true, numeric values are treated as decimals and formatted as percentages in the data table */
+  isPercentage?: boolean;
 }
 
 interface EChartProps extends CommonChartProps {
   option: Omit<ECBasicOption, 'title'>;
 }
 
-export const EChart = ({ option, title, description, getInstance, helpText, headerContent }: EChartProps) => {
+export const EChart = ({
+  option,
+  title,
+  description,
+  getInstance,
+  helpText,
+  headerContent,
+  isPercentage,
+}: EChartProps) => {
   const theme = useAppTheme();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const optionWithAria = useMemo(() => ({ ...option, aria: { show: true } }), [option]);
@@ -155,21 +169,49 @@ export const EChart = ({ option, title, description, getInstance, helpText, head
 
   return (
     <VStack height="100%" width="100%" gap="4">
-      <VStack align="center">
-        <HStack gap="2" align="center">
+      <VStack align="center" position="relative">
+        <HStack gap="2" align="center" paddingInline="6">
           <Heading size="small" level="1">
             {title}
           </Heading>
 
           {helpText !== undefined && <HelpText>{helpText}</HelpText>}
         </HStack>
+
+        <Tooltip content="Vis data som tabell" describesChild>
+          <Button
+            variant="tertiary-neutral"
+            size="xsmall"
+            onClick={() => modalRef.current?.showModal()}
+            icon={<TableIcon aria-hidden />}
+            className="absolute top-0 right-0"
+          />
+        </Tooltip>
+
         <Heading size="xsmall" level="2" className="font-normal!">
           {description}
         </Heading>
+
         {headerContent}
       </VStack>
 
       <div ref={ref} className="grow" />
+
+      <Modal ref={modalRef} header={{ heading: title }} className="w-fit! min-w-xl! max-w-[95vw]!" closeOnBackdropClick>
+        <Modal.Body>
+          <DataViewTable option={optionWithAria} isPercentage={isPercentage} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            size="small"
+            icon={<DownloadIcon aria-hidden />}
+            onClick={() => downloadChartDataAsCsv(optionWithAria, title)}
+          >
+            Last ned som CSV (Excel)
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </VStack>
   );
 };
