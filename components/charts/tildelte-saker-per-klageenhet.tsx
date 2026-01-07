@@ -57,7 +57,7 @@ export const TildelteSakerPerKlageenhet = ({ behandlinger, klageenheter, title, 
       option={{
         ...COMMON_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },
-        series: [{ data: values, type: 'bar' }],
+        series: [{ data: values, type: 'bar', name: 'Tildelte saker' }],
       }}
     />
   );

@@ -160,30 +160,28 @@ const BehandlingerData = ({
 
   return (
     <ChartsWrapper>
-      <Card
-        span={4}
-        helpContent={
-          <>
-            <BodyLong spacing>
-              Sakene er filtrert etter når de ble sendt til Trygderetten, uavhengig av når de ble ferdigstilt.
-            </BodyLong>
-
-            <BodyLong spacing>
-              Den grå linjen er saker som er sendt til Trygderetten i valgt periode, men som fortsatt er aktive. Den grå
-              linjen indikerer hvor ufullstendig omgjøringsprosenten er for hver måned.
-            </BodyLong>
-
-            <BodyLong>
-              Saker som er sendt til Trygderetten, men senere avbrutt fordi klageinstansen har startet ny behandling i
-              saken, er ikke med.
-            </BodyLong>
-          </>
-        }
-      >
+      <Card span={4}>
         <OmgjøringsprosentOverTid
           uferdige={sentInPeriodUferdige}
           ferdigstilte={sentInPeriodFerdigstilte}
           utfall={utfall}
+          helpContent={
+            <>
+              <BodyLong spacing>
+                Sakene er filtrert etter når de ble sendt til Trygderetten, uavhengig av når de ble ferdigstilt.
+              </BodyLong>
+
+              <BodyLong spacing>
+                Den grå linjen er saker som er sendt til Trygderetten i valgt periode, men som fortsatt er aktive. Den
+                grå linjen indikerer hvor ufullstendig omgjøringsprosenten er for hver måned.
+              </BodyLong>
+
+              <BodyLong>
+                Saker som er sendt til Trygderetten, men senere avbrutt fordi klageinstansen har startet ny behandling i
+                saken, er ikke med.
+              </BodyLong>
+            </>
+          }
         />
       </Card>
 
