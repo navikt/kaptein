@@ -267,5 +267,13 @@ const cleanHtml = (element: Element): string => {
     }
   }
 
+  if (tagName === 'table') {
+    return `<table style="border-collapse: collapse;" cellspacing="0" cellpadding="4">${innerHTML}</table>`;
+  }
+
+  if (tagName === 'td' || tagName === 'th') {
+    return `<${tagName} style="border: 1px solid gray; padding: 4px;">${innerHTML}</${tagName}>`;
+  }
+
   return `<${tagName}>${innerHTML}</${tagName}>`;
 };
