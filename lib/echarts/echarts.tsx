@@ -1,6 +1,6 @@
 'use client';
 
-import { DownloadIcon, TableIcon } from '@navikt/aksel-icons';
+import { DownloadIcon, FilesIcon, TableIcon } from '@navikt/aksel-icons';
 import { Button, Heading, HelpText, HStack, Modal, Tooltip, VStack } from '@navikt/ds-react';
 import { BarChart, CustomChart, LineChart, PieChart, SankeyChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
@@ -167,6 +167,8 @@ export const EChart = ({
     };
   }, []);
 
+  const tableRef = useRef<HTMLTableElement>(null);
+
   return (
     <VStack height="100%" width="100%" gap="4">
       <VStack align="center" position="relative">
@@ -199,9 +201,42 @@ export const EChart = ({
 
       <Modal ref={modalRef} header={{ heading: title }} className="w-fit! min-w-xl! max-w-[95vw]!" closeOnBackdropClick>
         <Modal.Body>
-          <DataViewTable option={optionWithAria} isPercentage={isPercentage} />
+          <DataViewTable option={optionWithAria} isPercentage={isPercentage} ref={tableRef} />
         </Modal.Body>
+
         <Modal.Footer>
+          <Button
+            variant="secondary"
+            size="small"
+            icon={<FilesIcon aria-hidden />}
+            onClick={async () => {
+              if (tableRef.current === null) {
+                return;
+              }
+
+              // Extract plaintext from table - tab-separated values
+              const rows = tableRef.current.querySelectorAll('tr');
+              const plaintext = Array.from(rows)
+                .map((row) => {
+                  const cells = row.querySelectorAll('th, td');
+                  return Array.from(cells)
+                    .map((cell) => cell.textContent?.trim() ?? '')
+                    .join('\t');
+                })
+                .join('\n');
+
+              const clipboardItemData = {
+                'text/html': cleanHtml(tableRef.current),
+                'text/plain': plaintext,
+              };
+
+              const clipboardItem = new ClipboardItem(clipboardItemData);
+              await navigator.clipboard.write([clipboardItem]);
+            }}
+          >
+            Kopier tabell
+          </Button>
+
           <Button
             variant="secondary"
             size="small"
@@ -214,4 +249,23 @@ export const EChart = ({
       </Modal>
     </VStack>
   );
+};
+
+/**
+ * Recursively strips all attributes from HTML elements,
+ * returning clean HTML with only tag names and text content.
+ */
+const cleanHtml = (element: Element): string => {
+  const tagName = element.tagName.toLowerCase();
+
+  let innerHTML = '';
+  for (const child of element.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      innerHTML += child.textContent ?? '';
+    } else if (child instanceof Element) {
+      innerHTML += cleanHtml(child);
+    }
+  }
+
+  return `<${tagName}>${innerHTML}</${tagName}>`;
 };

@@ -29,16 +29,17 @@ const formatValue = (value: string | number, isPercentage: boolean): string | nu
 interface PieTableProps {
   series: Series[];
   isPercentage: boolean;
+  ref?: React.Ref<HTMLTableElement>;
 }
 
 /**
  * Renders a pie chart style table (name/value pairs)
  */
-const PieTable = ({ series, isPercentage }: PieTableProps) => {
+const PieTable = ({ series, isPercentage, ref }: PieTableProps) => {
   const rows = extractPieRows(series);
 
   return (
-    <Table size="small" zebraStripes>
+    <Table size="small" zebraStripes ref={ref}>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Navn</Table.HeaderCell>
@@ -61,12 +62,13 @@ interface CategoryTableProps {
   labels: (string | number)[];
   series: Series[];
   isPercentage: boolean;
+  ref?: React.Ref<HTMLTableElement>;
 }
 
 /**
  * Renders a category-based table (bar/line chart style)
  */
-const CategoryTable = ({ labels, series, isPercentage }: CategoryTableProps) => {
+const CategoryTable = ({ labels, series, isPercentage, ref }: CategoryTableProps) => {
   const visibleSeries = getVisibleSeries(series);
 
   if (visibleSeries.length === 0) {
@@ -76,7 +78,7 @@ const CategoryTable = ({ labels, series, isPercentage }: CategoryTableProps) => 
   const rows = extractCategoryRows(labels, series);
 
   return (
-    <Table size="small" zebraStripes>
+    <Table size="small" zebraStripes ref={ref}>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Kategori</Table.HeaderCell>
@@ -111,12 +113,13 @@ interface DataViewTableProps {
   option: ChartOption;
   /** If true, numeric values are treated as decimals and formatted as percentages (e.g., 0.25 → "25,0 %") */
   isPercentage?: boolean;
+  ref?: React.Ref<HTMLTableElement>;
 }
 
 /**
  * Component for displaying chart data as a table
  */
-export const DataViewTable = ({ option, isPercentage = false }: DataViewTableProps) => {
+export const DataViewTable = ({ option, isPercentage = false, ref }: DataViewTableProps) => {
   const series = normalizeSeries(option);
 
   if (series.length === 0) {
@@ -126,10 +129,10 @@ export const DataViewTable = ({ option, isPercentage = false }: DataViewTablePro
   const dataType = getChartDataType(option);
 
   if (dataType === 'pie') {
-    return <PieTable series={series} isPercentage={isPercentage} />;
+    return <PieTable series={series} isPercentage={isPercentage} ref={ref} />;
   }
 
   const labels = getCategoryLabels(option);
 
-  return <CategoryTable labels={labels} series={series} isPercentage={isPercentage} />;
+  return <CategoryTable labels={labels} series={series} isPercentage={isPercentage} ref={ref} />;
 };
