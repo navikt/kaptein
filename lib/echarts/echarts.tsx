@@ -199,7 +199,7 @@ export const EChart = ({
 
       <div ref={ref} className="grow" />
 
-      <Modal ref={modalRef} header={{ heading: title }} className="w-fit! min-w-xl! max-w-[95vw]!" closeOnBackdropClick>
+      <Modal ref={modalRef} header={{ heading: title }} className="w-fit! min-w-xl max-w-[95vw]!" closeOnBackdropClick>
         <Modal.Body>
           <DataViewTable option={optionWithAria} isPercentage={isPercentage} ref={tableRef} />
         </Modal.Body>
