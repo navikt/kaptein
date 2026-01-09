@@ -31,6 +31,7 @@ import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { copyTable } from '@/lib/echarts/copy-table';
 import { downloadChartDataAsCsv } from '@/lib/echarts/csv-download';
 import { DataViewTable } from '@/lib/echarts/data-view-table';
+import { downloadChartAsPng } from '@/lib/echarts/png-download';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
 echarts.use([
@@ -183,19 +184,29 @@ export const EChart = ({
           {helpText !== undefined && <HelpText>{helpText}</HelpText>}
         </HStack>
 
-        <Tooltip content="Vis data som tabell" describesChild>
-          <Button
-            variant="tertiary-neutral"
-            size="xsmall"
-            onClick={() => modalRef.current?.showModal()}
-            icon={<TableIcon aria-hidden />}
-            className="absolute top-0 right-0"
-          />
-        </Tooltip>
-
         <BodyLong size="small" ref={descriptionRef}>
           {description}
         </BodyLong>
+
+        <HStack gap="1" position="absolute" top="0" right="0">
+          <Tooltip content="Last ned som PNG" describesChild>
+            <Button
+              variant="tertiary-neutral"
+              size="xsmall"
+              onClick={() => downloadChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current)}
+              icon={<DownloadIcon aria-hidden />}
+            />
+          </Tooltip>
+
+          <Tooltip content="Vis data som tabell" describesChild>
+            <Button
+              variant="tertiary-neutral"
+              size="xsmall"
+              onClick={() => modalRef.current?.showModal()}
+              icon={<TableIcon aria-hidden />}
+            />
+          </Tooltip>
+        </HStack>
 
         {headerContent}
       </VStack>
