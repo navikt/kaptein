@@ -7,8 +7,10 @@ import {
   getVisibleSeries,
   normalizeSeries,
 } from '@/lib/echarts/chart-data';
+import { formatFileName } from '@/lib/format';
 
 const DELIMITER = ';'; // Excel requires semicolon as delimiter for CSV.
+const DOUBLE_QUOTE_REGEX = /"/g;
 
 /**
  * Escapes a value for CSV format
@@ -22,7 +24,7 @@ const escapeCsvValue = (value: string | number | null | undefined): string => {
 
   // If the value contains double quote, escape quotes
   if (stringValue.includes('"')) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
+    return `"${stringValue.replace(DOUBLE_QUOTE_REGEX, '""')}"`;
   }
 
   // If the value contains semicolon, or newline, wrap in quotes
@@ -119,10 +121,8 @@ const downloadCsv = (csvContent: string, filename: string): void => {
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = filename.endsWith('.csv') ? filename : `${filename}.csv`;
-  document.body.appendChild(link);
+  link.download = filename;
   link.click();
-  document.body.removeChild(link);
 
   URL.revokeObjectURL(url);
 };
@@ -137,7 +137,5 @@ export const downloadChartDataAsCsv = (option: ChartOption, title: string): void
     return;
   }
 
-  // Sanitize title for filename
-  const sanitizedTitle = title.replace(/[^a-zA-Z0-9æøåÆØÅ\s-]/g, '').replace(/\s+/g, '_');
-  downloadCsv(csvContent, `${sanitizedTitle}.csv`);
+  downloadCsv(csvContent, formatFileName(title, 'csv'));
 };
