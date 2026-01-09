@@ -28,6 +28,7 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { ECBasicOption } from 'echarts/types/dist/shared';
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { AppTheme, useAppTheme } from '@/lib/app-theme';
+import { copyTable } from '@/lib/echarts/copy-table';
 import { downloadChartDataAsCsv } from '@/lib/echarts/csv-download';
 import { DataViewTable } from '@/lib/echarts/data-view-table';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
@@ -207,30 +208,7 @@ export const EChart = ({
             variant="secondary"
             size="small"
             icon={<FilesIcon aria-hidden />}
-            onClick={async () => {
-              if (tableRef.current === null) {
-                return;
-              }
-
-              // Extract plaintext from table - tab-separated values
-              const rows = tableRef.current.querySelectorAll('tr');
-              const plaintext = Array.from(rows)
-                .map((row) => {
-                  const cells = row.querySelectorAll('th, td');
-                  return Array.from(cells)
-                    .map((cell) => cell.textContent?.trim() ?? '')
-                    .join('\t');
-                })
-                .join('\n');
-
-              const clipboardItemData = {
-                'text/html': cleanHtml(tableRef.current),
-                'text/plain': plaintext,
-              };
-
-              const clipboardItem = new ClipboardItem(clipboardItemData);
-              await navigator.clipboard.write([clipboardItem]);
-            }}
+            onClick={() => copyTable(tableRef.current)}
           >
             Kopier tabell
           </Button>
@@ -247,31 +225,4 @@ export const EChart = ({
       </Modal>
     </VStack>
   );
-};
-
-/**
- * Recursively strips all attributes from HTML elements,
- * returning clean HTML with only tag names and text content.
- */
-const cleanHtml = (element: Element): string => {
-  const tagName = element.tagName.toLowerCase();
-
-  let innerHTML = '';
-  for (const child of element.childNodes) {
-    if (child.nodeType === Node.TEXT_NODE) {
-      innerHTML += child.textContent ?? '';
-    } else if (child instanceof Element) {
-      innerHTML += cleanHtml(child);
-    }
-  }
-
-  if (tagName === 'table') {
-    return `<table style="border-collapse: collapse;" cellspacing="0" cellpadding="4">${innerHTML}</table>`;
-  }
-
-  if (tagName === 'td' || tagName === 'th') {
-    return `<${tagName} style="border: 1px solid gray; padding: 4px;">${innerHTML}</${tagName}>`;
-  }
-
-  return `<${tagName}>${innerHTML}</${tagName}>`;
 };
