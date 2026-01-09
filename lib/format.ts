@@ -9,3 +9,9 @@ export const formatPercent = (value: number, decimals = 1) =>
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(value);
+
+export const formatFileName = (name: string, ext: string): string =>
+  `${name.replaceAll(DISALLOWED_FILENAME_CHARS, '').replaceAll(WHITESPACE_CHARS, '_')}.${ext}`;
+
+const DISALLOWED_FILENAME_CHARS = /[^a-zA-Z0-9æøåÆØÅ\s-]/g;
+const WHITESPACE_CHARS = /\s+/g;
