@@ -31,6 +31,7 @@ import { AppTheme, useAppTheme } from '@/lib/app-theme';
 import { copyTable } from '@/lib/echarts/copy-table';
 import { downloadChartDataAsCsv } from '@/lib/echarts/csv-download';
 import { DataViewTable } from '@/lib/echarts/data-view-table';
+import { copyChartAsPng } from '@/lib/echarts/png-clipboard';
 import { downloadChartAsPng } from '@/lib/echarts/png-download';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
 
@@ -189,6 +190,15 @@ export const EChart = ({
         </BodyLong>
 
         <HStack gap="1" position="absolute" top="0" right="0">
+          <Tooltip content="Kopier som PNG" describesChild>
+            <Button
+              variant="tertiary-neutral"
+              size="xsmall"
+              onClick={() => copyChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current)}
+              icon={<FilesIcon aria-hidden />}
+            />
+          </Tooltip>
+
           <Tooltip content="Last ned som PNG" describesChild>
             <Button
               variant="tertiary-neutral"
