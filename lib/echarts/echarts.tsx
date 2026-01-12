@@ -169,12 +169,14 @@ export const EChart = ({
   }, []);
 
   const tableRef = useRef<HTMLTableElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   return (
     <VStack height="100%" width="100%" gap="4">
       <VStack align="center" position="relative">
         <HStack gap="2" align="center" paddingInline="6">
-          <Heading size="small" level="1">
+          <Heading size="small" level="1" ref={titleRef}>
             {title}
           </Heading>
 
@@ -191,7 +193,9 @@ export const EChart = ({
           />
         </Tooltip>
 
-        <BodyLong size="small">{description}</BodyLong>
+        <BodyLong size="small" ref={descriptionRef}>
+          {description}
+        </BodyLong>
 
         {headerContent}
       </VStack>
@@ -208,7 +212,7 @@ export const EChart = ({
             variant="secondary"
             size="small"
             icon={<FilesIcon aria-hidden />}
-            onClick={() => copyTable(tableRef.current)}
+            onClick={() => copyTable(tableRef.current, titleRef.current, descriptionRef.current)}
           >
             Kopier tabell
           </Button>
