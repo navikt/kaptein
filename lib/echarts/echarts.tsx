@@ -225,6 +225,10 @@ export const EChart = ({
 
       <Modal ref={modalRef} header={{ heading: title }} className="w-fit! min-w-xl max-w-[95vw]!" closeOnBackdropClick>
         <Modal.Body>
+          <BodyLong size="small" spacing>
+            {description}
+          </BodyLong>
+
           <DataViewTable option={optionWithAria} isPercentage={isPercentage} ref={tableRef} />
         </Modal.Body>
 
