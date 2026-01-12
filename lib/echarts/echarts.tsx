@@ -1,7 +1,7 @@
 'use client';
 
 import { DownloadIcon, FilesIcon, TableIcon } from '@navikt/aksel-icons';
-import { Button, Heading, HelpText, HStack, Modal, Tooltip, VStack } from '@navikt/ds-react';
+import { BodyLong, Button, Heading, HelpText, HStack, Modal, Tooltip, VStack } from '@navikt/ds-react';
 import { BarChart, CustomChart, LineChart, PieChart, SankeyChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
   AriaComponent,
@@ -190,9 +190,7 @@ export const EChart = ({
           />
         </Tooltip>
 
-        <Heading size="xsmall" level="2" className="font-normal!">
-          {description}
-        </Heading>
+        <BodyLong size="small">{description}</BodyLong>
 
         {headerContent}
       </VStack>
