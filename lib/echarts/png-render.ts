@@ -10,7 +10,7 @@ const PADDING = 20;
 
 /**
  * Renders an ECharts chart to a canvas element.
- * Combines title, description, and chart into a single SVG, then renders to canvas.
+ * Combines title, description, and chart into a single canvas image.
  * Returns the canvas and title text, or null if rendering fails.
  */
 export const renderChartToCanvas = async (
@@ -35,6 +35,10 @@ export const renderChartToCanvas = async (
   const hasTitle = titleRect !== undefined && titleRect.height > 0;
   const hasDescription = descriptionRect !== undefined && descriptionRect.height > 0;
 
+  // Get computed styles for title and description
+  const titleStyles = titleElement !== null ? getComputedStyle(titleElement) : null;
+  const descriptionStyles = descriptionElement !== null ? getComputedStyle(descriptionElement) : null;
+
   // Calculate dimensions
   const contentWidth = chartRect.width;
   const titleHeight = hasTitle ? titleRect.height : 0;
@@ -45,65 +49,27 @@ export const renderChartToCanvas = async (
   const totalHeight = headerHeight + chartRect.height;
   const totalWidth = contentWidth;
 
-  // Create combined SVG
-  const combinedSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  combinedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  combinedSvg.setAttribute('width', (totalWidth * SCALE_FACTOR).toString(10));
-  combinedSvg.setAttribute('height', (totalHeight * SCALE_FACTOR).toString(10));
-  combinedSvg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
-
-  // Add background
-  const chartDom = chart.getDom();
-  const computedBackgroundColor = getComputedStyle(chartDom).getPropertyValue('--ax-bg-neutral-soft').trim();
-  const backgroundColor = computedBackgroundColor.length === 0 ? '#ffffff' : computedBackgroundColor;
-
-  const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  bgRect.setAttribute('width', '100%');
-  bgRect.setAttribute('height', '100%');
-  bgRect.setAttribute('fill', backgroundColor);
-  combinedSvg.appendChild(bgRect);
-
-  let currentY = PADDING;
-
-  // Add title via foreignObject
-  if (hasTitle && titleElement instanceof HTMLElement) {
-    const titleForeignObject = createForeignObject(titleElement, titleRect.height, currentY);
-    combinedSvg.appendChild(titleForeignObject);
-    currentY += titleHeight;
-
-    if (!hasDescription) {
-      currentY += PADDING;
-    }
-  }
-
-  // Add description via foreignObject
-  if (hasDescription && descriptionElement instanceof HTMLElement) {
-    const descriptionForeignObject = createForeignObject(descriptionElement, descriptionRect.height, currentY);
-    combinedSvg.appendChild(descriptionForeignObject);
-    currentY += descriptionHeight + PADDING;
-  }
-
-  // Clone and add chart SVG
+  // Clone the chart SVG and resolve CSS variables
   const chartSvgClone = chartSvgElement.cloneNode(true) as SVGSVGElement;
-
-  // Resolve CSS variables in the chart SVG
+  const chartDom = chart.getDom();
   const computedStyle = getComputedStyle(chartDom);
   resolveCssVariables(chartSvgClone, computedStyle);
 
-  // Wrap chart in a group with translation
-  const chartGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  chartGroup.setAttribute('transform', `translate(0, ${currentY})`);
+  // Create standalone SVG for the chart only (no foreignObject)
+  const chartOnlySvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  chartOnlySvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  chartOnlySvg.setAttribute('width', (chartRect.width * SCALE_FACTOR).toString(10));
+  chartOnlySvg.setAttribute('height', (chartRect.height * SCALE_FACTOR).toString(10));
+  chartOnlySvg.setAttribute('viewBox', `0 0 ${chartRect.width} ${chartRect.height}`);
 
-  // Copy all children from the cloned SVG to the group
+  // Copy all children from the cloned SVG
   while (chartSvgClone.firstChild) {
-    chartGroup.appendChild(chartSvgClone.firstChild);
+    chartOnlySvg.appendChild(chartSvgClone.firstChild);
   }
 
-  combinedSvg.appendChild(chartGroup);
-
-  // Render combined SVG to canvas
+  // Render chart SVG to image
   const serializer = new XMLSerializer();
-  const svgString = serializer.serializeToString(combinedSvg);
+  const svgString = serializer.serializeToString(chartOnlySvg);
   const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const svgUrl = URL.createObjectURL(svgBlob);
 
@@ -115,6 +81,7 @@ export const renderChartToCanvas = async (
     img.onerror = reject;
   });
 
+  // Create the final canvas
   const canvas = document.createElement('canvas');
   canvas.width = totalWidth * SCALE_FACTOR;
   canvas.height = totalHeight * SCALE_FACTOR;
@@ -126,101 +93,59 @@ export const renderChartToCanvas = async (
     return null;
   }
 
-  ctx.drawImage(img, 0, 0);
+  // Scale context for high resolution
+  ctx.scale(SCALE_FACTOR, SCALE_FACTOR);
+
+  // Draw background
+  const computedBackgroundColor = computedStyle.getPropertyValue('--ax-bg-neutral-soft').trim();
+  const backgroundColor = computedBackgroundColor.length === 0 ? '#ffffff' : computedBackgroundColor;
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+  let currentY = PADDING;
+
+  // Draw title text directly on canvas
+  if (hasTitle && titleElement !== null && titleStyles !== null) {
+    const titleText = titleElement.textContent.trim();
+
+    if (titleText.length !== 0) {
+      ctx.font = `${titleStyles.fontWeight} ${titleStyles.fontSize} ${titleStyles.fontFamily}`;
+      ctx.fillStyle = titleStyles.color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(titleText, totalWidth / 2, currentY);
+    }
+
+    currentY += titleHeight;
+
+    if (!hasDescription) {
+      currentY += PADDING;
+    }
+  }
+
+  // Draw description text directly on canvas
+  if (hasDescription && descriptionElement !== null && descriptionStyles !== null) {
+    const descriptionText = descriptionElement.textContent.trim();
+
+    if (descriptionText.length !== 0) {
+      ctx.font = `${descriptionStyles.fontWeight} ${descriptionStyles.fontSize} ${descriptionStyles.fontFamily}`;
+      ctx.fillStyle = descriptionStyles.color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(descriptionText, totalWidth / 2, currentY);
+    }
+
+    currentY += descriptionHeight + PADDING;
+  }
+
+  // Draw the chart image
+  ctx.drawImage(img, 0, currentY, chartRect.width, chartRect.height);
 
   URL.revokeObjectURL(svgUrl);
 
   const title = titleElement?.textContent?.trim() ?? 'chart';
 
   return { canvas, title };
-};
-
-/**
- * Creates a foreignObject element containing a cloned HTML element with inlined styles.
- */
-const createForeignObject = (element: HTMLElement, height: number, y: number): SVGForeignObjectElement => {
-  const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-  foreignObject.setAttribute('x', '0');
-  foreignObject.setAttribute('y', y.toString(10));
-  foreignObject.setAttribute('width', '100%');
-  foreignObject.setAttribute('height', height.toString(10));
-
-  const clone = element.cloneNode(true) as HTMLElement;
-  inlineComputedStyles(element, clone);
-  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-  clone.style.width = '100%';
-  clone.style.textAlign = 'center';
-
-  foreignObject.appendChild(clone);
-
-  return foreignObject;
-};
-
-// Key style properties to inline for text rendering
-const TEXT_STYLE_PROPERTIES = [
-  'font-family',
-  'font-size',
-  'font-weight',
-  'font-style',
-  'color',
-  'text-align',
-  'line-height',
-  'letter-spacing',
-  'text-decoration',
-  'text-transform',
-  'display',
-  'flex-direction',
-  'align-items',
-  'justify-content',
-  'gap',
-  'padding',
-  'margin',
-  'box-sizing',
-  'white-space',
-];
-
-/**
- * Recursively inlines computed styles from the source element to the clone.
- * This ensures the clone renders identically when embedded in SVG foreignObject.
- */
-const inlineComputedStyles = (source: Element, clone: Element): void => {
-  if (source instanceof HTMLElement && clone instanceof HTMLElement) {
-    const computedStyle = getComputedStyle(source);
-
-    const inlineStyles: string[] = [];
-
-    for (const prop of TEXT_STYLE_PROPERTIES) {
-      const value = computedStyle.getPropertyValue(prop).trim();
-
-      if (value.length !== 0) {
-        inlineStyles.push(`${prop}: ${value}`);
-      }
-    }
-
-    // Append to existing inline styles
-    const existingStyle = clone.getAttribute('style')?.trim();
-
-    clone.setAttribute(
-      'style',
-      (existingStyle !== undefined && existingStyle.length !== 0
-        ? [existingStyle, ...inlineStyles]
-        : inlineStyles
-      ).join('; '),
-    );
-  }
-
-  // Recursively process children
-  const sourceChildren = source.children;
-  const cloneChildren = clone.children;
-
-  for (let i = 0; i < sourceChildren.length && i < cloneChildren.length; i++) {
-    const sourceChild = sourceChildren[i];
-    const cloneChild = cloneChildren[i];
-
-    if (sourceChild !== undefined && cloneChild !== undefined) {
-      inlineComputedStyles(sourceChild, cloneChild);
-    }
-  }
 };
 
 const COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color'];
