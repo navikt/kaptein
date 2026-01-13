@@ -2,6 +2,11 @@ import type { ECharts } from 'echarts/core';
 import { renderChartToCanvas } from '@/lib/echarts/png-render';
 import { formatFileName } from '@/lib/format';
 
+interface DownloadOptions {
+  fromDate: string;
+  toDate: string;
+}
+
 /**
  * Downloads the ECharts chart as a high-resolution PNG image.
  */
@@ -9,6 +14,7 @@ export const downloadChartAsPng = async (
   chart: ECharts | null,
   titleElement: HTMLElement | null,
   descriptionElement: HTMLElement | null,
+  options: DownloadOptions,
 ): Promise<void> => {
   const result = await renderChartToCanvas(chart, titleElement, descriptionElement);
 
@@ -20,7 +26,7 @@ export const downloadChartAsPng = async (
 
   const pngUrl = canvas.toDataURL('image/png');
   const link = document.createElement('a');
-  link.download = formatFileName(title, 'png');
+  link.download = formatFileName(title, 'png', options);
   link.href = pngUrl;
   link.click();
 };

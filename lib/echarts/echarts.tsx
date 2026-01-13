@@ -34,6 +34,7 @@ import { DataViewTable } from '@/lib/echarts/data-view-table';
 import { copyChartAsPng } from '@/lib/echarts/png-clipboard';
 import { downloadChartAsPng } from '@/lib/echarts/png-download';
 import { DARK_THEME, LIGHT_THEME } from '@/lib/echarts/theme';
+import { useFromFilter, useToFilter } from '@/lib/query-state/query-state';
 
 echarts.use([
   AriaComponent,
@@ -89,6 +90,8 @@ export const EChart = ({
   isPercentage,
 }: EChartProps) => {
   const theme = useAppTheme();
+  const [fromDate] = useFromFilter();
+  const [toDate] = useToFilter();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
@@ -203,7 +206,9 @@ export const EChart = ({
             <Button
               variant="tertiary-neutral"
               size="xsmall"
-              onClick={() => downloadChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current)}
+              onClick={() =>
+                downloadChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current, { fromDate, toDate })
+              }
               icon={<DownloadIcon aria-hidden />}
             />
           </Tooltip>
@@ -246,7 +251,7 @@ export const EChart = ({
             variant="secondary"
             size="small"
             icon={<DownloadIcon aria-hidden />}
-            onClick={() => downloadChartDataAsCsv(optionWithAria, title)}
+            onClick={() => downloadChartDataAsCsv(optionWithAria, title, { fromDate, toDate })}
           >
             Last ned som CSV (Excel)
           </Button>

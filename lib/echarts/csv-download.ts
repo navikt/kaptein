@@ -127,15 +127,20 @@ const downloadCsv = (csvContent: string, filename: string): void => {
   URL.revokeObjectURL(url);
 };
 
+interface DownloadOptions {
+  fromDate: string;
+  toDate: string;
+}
+
 /**
  * Generates and downloads CSV from chart option
  */
-export const downloadChartDataAsCsv = (option: ChartOption, title: string): void => {
+export const downloadChartDataAsCsv = (option: ChartOption, title: string, options: DownloadOptions): void => {
   const csvContent = generateCsvContent(option);
 
   if (csvContent === null) {
     return;
   }
 
-  downloadCsv(csvContent, formatFileName(title, 'csv'));
+  downloadCsv(csvContent, formatFileName(title, 'csv', options));
 };
