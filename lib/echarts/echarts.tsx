@@ -193,7 +193,7 @@ export const EChart = ({
         </BodyLong>
 
         <HStack gap="1" position="absolute" top="0" right="0">
-          <Tooltip content="Kopier som PNG" describesChild>
+          <Tooltip content="Kopier som bilde" describesChild>
             <Button
               variant="tertiary-neutral"
               size="xsmall"
@@ -202,7 +202,7 @@ export const EChart = ({
             />
           </Tooltip>
 
-          <Tooltip content="Last ned som PNG" describesChild>
+          <Tooltip content="Last ned som bilde" describesChild>
             <Button
               variant="tertiary-neutral"
               size="xsmall"
