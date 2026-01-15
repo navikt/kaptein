@@ -78,7 +78,7 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
   }
 
   return (
-    <VStack justify="center" align="center" gap="4" className="h-full">
+    <VStack justify="center" align="center" gap="space-16" className="h-full">
       <DayPicker value={maxDays} setValue={setMaxDays} title={title} options={DAY_PICKER_OPTIONS} />
       <EChart
         title={title}

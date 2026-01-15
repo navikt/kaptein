@@ -1,4 +1,4 @@
-import { Alert, BoxNew, Button } from '@navikt/ds-react';
+import { Alert, Box, Button } from '@navikt/ds-react';
 import { MetricEvent } from '@/components/metrics';
 import { getCurrentPath } from '@/lib/server/current-path';
 
@@ -6,7 +6,7 @@ export default async function Unauthorized() {
   const path = await getCurrentPath();
 
   return (
-    <BoxNew padding="8">
+    <Box padding="space-32">
       <MetricEvent eventName="unauthorized" domain="unauthorized" context={{ path, page: 'unauthorized' }} />
 
       <Alert variant="error">
@@ -17,6 +17,6 @@ export default async function Unauthorized() {
           </Button>
         </div>
       </Alert>
-    </BoxNew>
+    </Box>
   );
 }

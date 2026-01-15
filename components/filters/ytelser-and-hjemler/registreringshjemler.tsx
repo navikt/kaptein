@@ -99,12 +99,13 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
   const all = useMemo(() => options.flatMap(({ hjemler }) => hjemler.map(({ value }) => value)), [options]);
 
   return (
-    <VStack gap="1" className="grow">
+    <VStack gap="space-4" className="grow">
       <RegistreringshjemlerMode />
       <ActionMenu>
         <ActionMenu.Trigger>
           <Button
-            variant="secondary-neutral"
+            variant="secondary"
+            data-color="neutral"
             icon={<ChevronDownIcon aria-hidden />}
             iconPosition="right"
             className="justify-between! grow"
@@ -129,14 +130,20 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
               Velg alle
             </Button>
 
-            <Button onClick={() => setSelectedHjemler(null)} size="small" variant="danger" style={{ marginLeft: 8 }}>
+            <Button
+              onClick={() => setSelectedHjemler(null)}
+              size="small"
+              variant="primary"
+              data-color="danger"
+              style={{ marginLeft: 8 }}
+            >
               Fjern alle
             </Button>
           </HStack>
 
           <ActionMenu.Divider />
 
-          <VStack gap="4">{filteredItems}</VStack>
+          <VStack gap="space-16">{filteredItems}</VStack>
         </ActionMenu.Content>
       </ActionMenu>
     </VStack>

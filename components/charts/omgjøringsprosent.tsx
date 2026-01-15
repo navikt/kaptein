@@ -170,7 +170,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall, help
               '<thead><tr><th class="text-left" colspan="2">Utfall</th><th class="text-right pl-3">Prosent</th><th class="text-right pl-3">Antall</th></tr></thead>';
             result += '<tbody>';
 
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Omgjort</td><td class="text-right pl-3">${formatPercent(monthData.omgjortPercent)}</td><td class="text-right pl-3">${monthData.omgjortCount}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-ax-bold"><td class="text-left py-1" colspan="2">Omgjort</td><td class="text-right pl-3">${formatPercent(monthData.omgjortPercent)}</td><td class="text-right pl-3">${monthData.omgjortCount}</td></tr>`;
 
             for (const param of params) {
               if (param.seriesId === HOS_TR || !isSakITRUtfall(param.seriesId)) {
@@ -194,7 +194,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall, help
               monthData.finished === 0 ? 0 : ikkeOmgjortCount / monthData.finished,
             );
 
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Ikke omgjort</td><td class="text-right pl-3">${ikkeOmgjortPercentage}</td><td class="text-right pl-3">${ikkeOmgjortCount}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-ax-bold"><td class="text-left py-1" colspan="2">Ikke omgjort</td><td class="text-right pl-3">${ikkeOmgjortPercentage}</td><td class="text-right pl-3">${ikkeOmgjortCount}</td></tr>`;
 
             for (const utfallId of SAK_I_TR_IKKE_OMGJØRINGSUTFALL) {
               const utfallData = monthData.perUtfall.get(utfallId);
@@ -210,7 +210,7 @@ export const OmgjøringsprosentOverTid = ({ uferdige, ferdigstilte, utfall, help
             }
 
             // Add "Total" row
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Total</td><td class="text-right pl-3">100,0 %</td><td class="text-right pl-3">${monthData.total}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-ax-bold"><td class="text-left py-1" colspan="2">Total</td><td class="text-right pl-3">100,0 %</td><td class="text-right pl-3">${monthData.total}</td></tr>`;
 
             // Add "Ferdigstilte" row
             const finishedPercent = percent(monthData.finished, monthData.total);

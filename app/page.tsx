@@ -1,4 +1,4 @@
-import { BodyShort, BoxNew, Heading, VStack } from '@navikt/ds-react';
+import { BodyShort, Box, Heading, VStack } from '@navikt/ds-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import logo from './logo_small.png';
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function KapteinPage() {
   return (
-    <BoxNew padding="4" width="100%" height="100vh">
-      <VStack align="center" justify="center" padding="8" gap="8" height="100%">
+    <Box padding="space-16" width="100%" height="100vh">
+      <VStack align="center" justify="center" padding="space-32" gap="space-32" height="100%">
         <Heading level="1" size="xlarge" className="mb-4">
           Velkommen til Kaptein
         </Heading>
@@ -20,6 +20,6 @@ export default function KapteinPage() {
           man det i gjennomsnitt ganske skjønt.
         </BodyShort>
       </VStack>
-    </BoxNew>
+    </Box>
   );
 }

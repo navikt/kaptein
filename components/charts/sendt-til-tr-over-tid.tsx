@@ -176,7 +176,7 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
       title={title}
       description={
         <>
-          <span className="font-bold">Sendt til TR:</span> {totalSentToTR} av {totalAnkeFerdigstilte} anker (
+          <span className="font-ax-bold">Sendt til TR:</span> {totalSentToTR} av {totalAnkeFerdigstilte} anker (
           {formatPercent(totalSentToTRPercent, 1)})
         </>
       }
@@ -274,7 +274,7 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
             }
 
             const totalSentPercent = bucket.totalFerdigstilte === 0 ? 0 : totalSent / bucket.totalFerdigstilte;
-            result += `<tr class="border-t border-ax-border-neutral-strong font-bold"><td class="text-left py-1" colspan="2">Sendt til TR</td><td class="text-right pl-3">${totalSent}</td><td class="text-right pl-3">${formatPercent(totalSentPercent, 1)}</td></tr>`;
+            result += `<tr class="border-t border-ax-border-neutral-strong font-ax-bold"><td class="text-left py-1" colspan="2">Sendt til TR</td><td class="text-right pl-3">${totalSent}</td><td class="text-right pl-3">${formatPercent(totalSentPercent, 1)}</td></tr>`;
             result += `<tr class="text-ax-text-subtle"><td class="text-left py-1" colspan="2">Ferdigstilte anker</td><td class="text-right pl-3">${bucket.totalFerdigstilte}</td><td class="text-right pl-3">100,0 %</td></tr>`;
             result += '</tbody></table>';
 

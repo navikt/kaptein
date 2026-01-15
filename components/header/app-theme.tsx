@@ -11,7 +11,7 @@ export const AppThemeSwitcher = () => {
       value={userTheme}
       onChange={(value) => setUserTheme(isValidUserTheme(value) ? value : UserTheme.SYSTEM)}
       size="small"
-      variant="neutral"
+      data-color="neutral"
       className="whitespace-nowrap"
       aria-label="Velg tema"
     >

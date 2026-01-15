@@ -34,7 +34,8 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
     <ActionMenu>
       <ActionMenu.Trigger>
         <Button
-          variant="secondary-neutral"
+          variant="secondary"
+          data-color="neutral"
           icon={<ChevronDownIcon aria-hidden />}
           iconPosition="right"
           className="justify-between! w-full"
@@ -59,7 +60,13 @@ export const MultiselectFilter = ({ selected, setSelected, options, label }: Mul
             Velg alle
           </Button>
 
-          <Button onClick={() => setSelected(null)} size="small" variant="danger" style={{ marginLeft: 8 }}>
+          <Button
+            onClick={() => setSelected(null)}
+            size="small"
+            variant="primary"
+            data-color="danger"
+            style={{ marginLeft: 8 }}
+          >
             Fjern alle
           </Button>
         </HStack>

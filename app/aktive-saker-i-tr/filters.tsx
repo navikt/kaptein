@@ -62,8 +62,8 @@ const RenderFilters = ({
   sakstyper,
 }: Props) => (
   <FilterWrapper>
-    <VStack gap="4" flexGrow="1">
-      <HStack justify="space-between" gap="4" wrap={false}>
+    <VStack gap="space-16" flexGrow="1">
+      <HStack justify="space-between" gap="space-16" wrap={false}>
         <Reset />
         <ResetCacheButton />
       </HStack>
@@ -77,7 +77,7 @@ const RenderFilters = ({
       />
     </VStack>
 
-    <VStack gap="4" flexGrow="1">
+    <VStack gap="space-16" flexGrow="1">
       <Tilbakekreving help={<HelpForFerdigstilte />} />
       <ActiveFilters
         ytelser={ytelser}

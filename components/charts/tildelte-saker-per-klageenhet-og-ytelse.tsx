@@ -80,11 +80,11 @@ export const TildelteSakerPerKlageenhetOgYtelse = ({
 
             for (const { value, marker, seriesName } of params) {
               if (value !== null && value > 0) {
-                rows += `<tr><td>${marker} ${seriesName}</td><td class="text-left pl-5 font-bold">${value}</td></tr>`;
+                rows += `<tr><td>${marker} ${seriesName}</td><td class="text-left pl-5 font-ax-bold">${value}</td></tr>`;
               }
             }
 
-            const title = `<h1 class="pb-1 text-base font-bold">${axisValue}</h1>`;
+            const title = `<h1 class="pb-1 text-base font-ax-bold">${axisValue}</h1>`;
 
             if (rows.length === 0) {
               return `${title}<p>Ingen saker</p>`;

@@ -191,7 +191,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
               result += `<tr>
                 <td>${marker}</td>
                 <td>${seriesName}</td>
-                <td class="font-bold pl-2">${formattedValue}</td>
+                <td class="font-ax-bold pl-2">${formattedValue}</td>
               </tr>`;
             }
 

@@ -1,4 +1,4 @@
-import { BoxNew } from '@navikt/ds-react';
+import { Box } from '@navikt/ds-react';
 
 interface Props {
   children: React.ReactNode;
@@ -9,11 +9,11 @@ interface Props {
 
 export const Card = ({ children, span = 2, fullWidth = false }: Props) => {
   return (
-    <BoxNew
-      padding="4"
+    <Box
+      padding="space-16"
       shadow="dialog"
       background="neutral-soft"
-      borderRadius="medium"
+      borderRadius="4"
       position="relative"
       style={{
         gridRowEnd: `span ${span}`,
@@ -21,6 +21,6 @@ export const Card = ({ children, span = 2, fullWidth = false }: Props) => {
       }}
     >
       {children}
-    </BoxNew>
+    </Box>
   );
 };

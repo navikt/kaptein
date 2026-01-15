@@ -101,9 +101,9 @@ export const DateRange = () => {
   );
 
   return (
-    <VStack gap="4">
-      <VStack gap="1">
-        <HGrid columns={2} align="start" gap="2" className="auto-cols-max!">
+    <VStack gap="space-16">
+      <VStack gap="space-4">
+        <HGrid columns={2} align="start" gap="space-8" className="auto-cols-max!">
           <DatePicker {...fromDatePickerProps} dropdownCaption wrapperClassName="w-full">
             <DatePicker.Input
               {...fromInputProps}
@@ -125,7 +125,7 @@ export const DateRange = () => {
         ) : null}
       </VStack>
 
-      <HGrid columns={2} gap="2">
+      <HGrid columns={2} gap="space-8">
         <Button variant={isDenneMåneden ? 'primary' : 'secondary'} onClick={() => setSelected(START_OF_MONTH, TODAY)}>
           Denne måneden
         </Button>
@@ -167,7 +167,7 @@ export const DateRange = () => {
 };
 
 const LabelWithReset = ({ onClick, label, resetLabel }: { onClick: () => void; label: string; resetLabel: string }) => (
-  <HStack align="center" gap="1">
+  <HStack align="center" gap="space-4">
     <span>{label}</span>
     <Button
       variant="tertiary"

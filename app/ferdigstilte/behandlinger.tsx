@@ -270,7 +270,7 @@ const SENT_TIL_TR_OVER_TID_HELP_TEXT = (
   <>
     <BodyLong spacing>
       Viser antall{' '}
-      <Tag variant="success" size="xsmall">
+      <Tag data-color="success" variant="outline" size="xsmall">
         anker
       </Tag>{' '}
       sendt til Trygderetten per måned, og fordeling av utfallene som innebærer at anken går til Trygderetten.
@@ -278,15 +278,15 @@ const SENT_TIL_TR_OVER_TID_HELP_TEXT = (
 
     <BodyLong spacing>
       Trykk på{' '}
-      <Tag variant="info" size="xsmall">
+      <Tag data-color="info" variant="outline" size="xsmall">
         Prosent
       </Tag>{' '}
       for å se andel{' '}
-      <Tag variant="success" size="xsmall">
+      <Tag data-color="success" variant="outline" size="xsmall">
         anker
       </Tag>{' '}
       sendt til Trygderetten av totalt ferdigstilte{' '}
-      <Tag variant="success" size="xsmall">
+      <Tag data-color="success" variant="outline" size="xsmall">
         anker
       </Tag>{' '}
       per måned, med fordeling av utfall som innebærer at saken går til Trygderetten.

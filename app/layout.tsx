@@ -1,10 +1,9 @@
 import '@/app/globals.css';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Faro } from '@/components/faro';
 import { Header } from '@/components/header/header';
 import { Themed } from '@/components/themed';
 import { getUser } from '@/lib/server/api';
-import '@navikt/ds-css/darkside';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 export const dynamic = 'force-dynamic';
 

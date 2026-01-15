@@ -178,9 +178,9 @@ export const EChart = ({
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   return (
-    <VStack height="100%" width="100%" gap="4">
+    <VStack height="100%" width="100%" gap="space-16">
       <VStack align="center" position="relative">
-        <HStack gap="2" align="center" paddingInline="6">
+        <HStack gap="space-8" align="center" paddingInline="space-24">
           <Heading size="small" level="1" ref={titleRef}>
             {title}
           </Heading>
@@ -192,7 +192,7 @@ export const EChart = ({
           {description}
         </BodyLong>
 
-        <HStack gap="1" position="absolute" top="0" right="0">
+        <HStack gap="space-4" position="absolute" top="space-0" right="space-0">
           <Tooltip content="Kopier som bilde" describesChild>
             <Button
               variant="tertiary-neutral"

@@ -46,7 +46,7 @@ export const ActiveFilters = ({
   const isTr = pathname === RouteName.AKTIVE_SAKER_I_TR || pathname === RouteName.FERDIGSTILTE_I_TR;
 
   return (
-    <VStack gap="2" width="100%">
+    <VStack gap="space-8" width="100%">
       {klageenheterKodeverk === undefined ? null : (
         <Group
           values={klageenheter}
@@ -136,7 +136,7 @@ const Group = ({ getName, color, values, setValues }: GroupProps) => {
   }
 
   return (
-    <HStack gap="1" asChild>
+    <HStack gap="space-4" asChild>
       <Chips data-color={color}>{children}</Chips>
     </HStack>
   );

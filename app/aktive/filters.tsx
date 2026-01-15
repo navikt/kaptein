@@ -43,8 +43,8 @@ interface Props {
 
 const RenderFilters = ({ ytelser, innsendingshjemlerMap, klageenheter, sakstyper }: Props) => (
   <FilterWrapper>
-    <VStack gap="4" flexGrow="1">
-      <HStack justify="space-between" gap="4" wrap={false}>
+    <VStack gap="space-16" flexGrow="1">
+      <HStack justify="space-between" gap="space-16" wrap={false}>
         <Reset />
         <ResetCacheButton />
       </HStack>
@@ -52,12 +52,12 @@ const RenderFilters = ({ ytelser, innsendingshjemlerMap, klageenheter, sakstyper
       <KaSakstyper sakstyper={sakstyper} />
     </VStack>
 
-    <VStack gap="4" flexGrow="1">
+    <VStack gap="space-16" flexGrow="1">
       <YtelserAndInnsendingshjemler ytelser={ytelser} />
       <Tildeling />
     </VStack>
 
-    <VStack gap="4" flexGrow="2" width="100%">
+    <VStack gap="space-16" flexGrow="2" width="100%">
       <Tilbakekreving help={<HelpForAktive innsendingshjemlerMap={innsendingshjemlerMap} />} />
       <ActiveFilters
         ytelser={ytelser}

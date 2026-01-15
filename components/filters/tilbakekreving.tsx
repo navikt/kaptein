@@ -29,7 +29,7 @@ export const Tilbakekreving = ({ help }: Props) => {
 };
 
 export const HelpForFerdigstilte = () => (
-  <HStack gap="2">
+  <HStack gap="space-8">
     Tilbakekreving
     <HelpText placement="right">
       <Label>Med tilbakekreving</Label>
@@ -56,10 +56,10 @@ export const HelpForAktive = ({ innsendingshjemlerMap = {} }: HelpForAktiveProps
   );
 
   return (
-    <HStack gap="2">
+    <HStack gap="space-8">
       Tilbakekreving
       <HelpText placement="right">
-        <BodyShort>
+        <BodyShort spacing>
           Sak satt med minst én av følgende innsendingshjemler regnes som aktiv tilbakekrevingssak i Kaptein:
         </BodyShort>
         <List>{listItems}</List>

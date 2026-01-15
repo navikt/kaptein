@@ -28,7 +28,7 @@ export const Innsendingshjemler = ({ relevantYtelser }: Props) => {
   }, [relevantYtelser]);
 
   return (
-    <VStack gap="1" className="grow">
+    <VStack gap="space-4" className="grow">
       <InnsendingshjemlerMode />
       <MultiselectFilter label="Innsendingshjemler" selected={selected} setSelected={setSelected} options={options} />
     </VStack>
