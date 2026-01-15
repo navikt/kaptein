@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Card } from '@/components/cards';
-import { Histogram, OtherChart } from '@/components/charts/common/skeletonc-components';
+import { Histogram, OtherChart } from '@/components/charts/common/skeleton-components';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 
 export const Skeleton = memo(() => (
