@@ -12,8 +12,10 @@ import {
   useTrSakstyperFilter,
   useTrUtfallFilter,
   useYtelserFilter,
+  useYtelsesgrupperFilter,
 } from '@/lib/query-state/query-state';
 import type { IKodeverkSimpleValue, RegistreringshjemlerMap } from '@/lib/types';
+import { YTELSESGRUPPE_KODEVERK } from '@/lib/types/ytelsesgrupper';
 
 interface Props {
   klageenheter?: IKodeverkSimpleValue[];
@@ -39,6 +41,7 @@ export const ActiveFilters = ({
   const [trSakstyper, setTrSakstyper] = useTrSakstyperFilter();
   const [kaUtfall, setKaUtfall] = useKaUtfallFilter();
   const [trUtfall, setTrUtfall] = useTrUtfallFilter();
+  const [ytelsesgrupper, setYtelsesgrupper] = useYtelsesgrupperFilter();
   const [ytelser, setYtelser] = useYtelserFilter();
   const [innsendingshjemler, setInnsendingshjemler] = useInnsendingshjemlerFilter();
   const [registreringshjemler, setRegistreringshjemler] = useRegistreringshjemlerFilter();
@@ -75,6 +78,12 @@ export const ActiveFilters = ({
       ) : (
         <Group values={kaUtfall} setValues={setKaUtfall} getName={getKodeverkName(utfallKodeverk)} color="danger" />
       )}
+      <Group
+        values={ytelsesgrupper}
+        setValues={setYtelsesgrupper}
+        getName={getKodeverkName(YTELSESGRUPPE_KODEVERK)}
+        color="accent"
+      />
       {ytelserKodeverk === undefined ? null : (
         <Group
           values={ytelser}

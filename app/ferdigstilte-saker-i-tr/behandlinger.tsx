@@ -208,7 +208,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Ferdigstilte saker i TR per ytelse og klageenhet"
           description={`Viser data for ${ferdigstilteInPeriod.length} ferdigstilte saker i TR`}
@@ -239,7 +239,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
           helpText={BEHANDLINGSTID_HELP_TEXT}

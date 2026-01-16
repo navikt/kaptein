@@ -5,6 +5,7 @@ import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { SubFilter } from '@/components/filters/sub-filter';
 import { Innsendingshjemler } from '@/components/filters/ytelser-and-hjemler/innsendingshjemler';
 import { Registreringshjemler } from '@/components/filters/ytelser-and-hjemler/registreringshjemler';
+import { Ytelsesgrupper } from '@/components/filters/ytelsesgrupper';
 import {
   useInnsendingshjemlerFilter,
   useRegistreringshjemlerFilter,
@@ -35,6 +36,8 @@ export const YtelserAndRegistreringshjemler = ({ ytelser = [], lovkildeToRegistr
 
   return (
     <>
+      <Ytelsesgrupper />
+
       <MultiselectFilter
         label="Ytelser"
         selected={selectedYtelser}
@@ -61,6 +64,8 @@ export const YtelserAndInnsendingshjemler = ({ ytelser = [] }: { ytelser: IYtels
 
   return (
     <>
+      <Ytelsesgrupper />
+
       <MultiselectFilter
         label="Ytelser"
         selected={selectedYtelser}
@@ -88,6 +93,8 @@ export const YtelserAndInnsendingsAndRegistreringshjemler = ({
 
   return (
     <>
+      <Ytelsesgrupper />
+
       <MultiselectFilter
         label="Ytelser"
         selected={selectedYtelser}

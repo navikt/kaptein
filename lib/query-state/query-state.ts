@@ -11,6 +11,12 @@ import { RouteName } from '@/components/header/route-name';
 import { ISO_DATE_FORMAT, NOW, TODAY } from '@/lib/date';
 import { QueryParam } from '@/lib/types/query-param';
 
+export const useYtelsesgrupperFilter = () =>
+  useQueryState(
+    QueryParam.YTELSESGRUPPER,
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
+  );
+
 export const useYtelserFilter = () =>
   useQueryState(
     QueryParam.YTELSER,

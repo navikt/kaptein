@@ -5,6 +5,7 @@ import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
 } from '@/components/charts/common/common-chart-props';
+import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/common/use-ytelse-chart-data';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { getSakstypeColor } from '@/lib/echarts/get-colors';
@@ -19,30 +20,30 @@ interface Props {
 }
 
 export const SakerPerYtelseOgSakstype = ({ title, description, behandlinger, relevantYtelser, sakstyper }: Props) => {
+  const entries = useYtelseChartData(behandlinger, relevantYtelser);
+
   const series = useMemo(
     () =>
       sakstyper.map((type) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: type.navn,
         color: getSakstypeColor(type.id),
-        data: relevantYtelser
-          .map(({ id }) =>
-            behandlinger.reduce((acc, curr) => (curr.ytelseId === id && curr.typeId === type.id ? acc + 1 : acc), 0),
-          )
+        data: entries
+          .map((entry) => countSakstype(behandlinger, getYtelseIdsForEntry(entry), type.id))
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, relevantYtelser, sakstyper],
+    [behandlinger, entries, sakstyper],
   );
 
   const labels = useMemo(
     () =>
-      relevantYtelser.map(
-        (y, i) =>
-          `${y.navn} (${series
+      entries.map(
+        (entry, i) =>
+          `${entry.navn} (${series
             .filter(({ data }) => data.some((d) => d !== null))
             .reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`,
       ),
-    [relevantYtelser, series],
+    [entries, series],
   );
 
   if (behandlinger.length === 0) {
@@ -61,3 +62,12 @@ export const SakerPerYtelseOgSakstype = ({ title, description, behandlinger, rel
     />
   );
 };
+
+/**
+ * Count behandlinger for a list of ytelseIds with a specific sakstype
+ */
+const countSakstype = (behandlinger: BaseBehandling[], ytelseIds: string[], sakstypeId: string): number =>
+  behandlinger.reduce(
+    (acc, curr) => (ytelseIds.includes(curr.ytelseId) && curr.typeId === sakstypeId ? acc + 1 : acc),
+    0,
+  );

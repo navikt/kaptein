@@ -1,4 +1,5 @@
 export enum QueryParam {
+  YTELSESGRUPPER = 'yg',
   YTELSER = 'y',
   KLAGEENHETER = 'ke',
   REGISTRERINGSHJEMLER = 'rh',
