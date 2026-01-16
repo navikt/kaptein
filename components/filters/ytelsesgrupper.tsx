@@ -8,7 +8,10 @@ import { YTELSESGRUPPE_OPTIONS } from '@/lib/types/ytelsesgrupper';
 export const Ytelsesgrupper = () => {
   const [selectedYtelsesgrupper, setSelectedYtelsesgrupper] = useYtelsesgrupperFilter();
 
-  const options = useMemo(() => YTELSESGRUPPE_OPTIONS.map(({ id, label }) => ({ label, value: id })), []);
+  const options = useMemo(
+    () => YTELSESGRUPPE_OPTIONS.map(({ id, label }) => ({ label: removeLastWord(label), value: id })),
+    [],
+  );
 
   return (
     <MultiselectFilter
@@ -19,3 +22,5 @@ export const Ytelsesgrupper = () => {
     />
   );
 };
+
+const removeLastWord = (text: string) => text.split(' ').slice(0, -1).join(' ');
