@@ -8,7 +8,7 @@ import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { TrSakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
-import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
+import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and-hjemler';
 import {
   getInnsendingshjemlerMap,
   getKlageenheter,

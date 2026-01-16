@@ -9,7 +9,7 @@ import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { KaSakstyper } from '@/components/filters/sakstyper';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { Tildeling } from '@/components/filters/tildeling';
-import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
+import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and-hjemler';
 import {
   getDefaultSakstyper,
   getInnsendingshjemlerMap,
