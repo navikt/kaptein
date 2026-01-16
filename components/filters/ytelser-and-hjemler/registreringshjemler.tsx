@@ -87,7 +87,7 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
         >
           {hjemler.map(({ label: hjemmelLabel, value: hjemmelId }) => (
             // <Checkbox> renders much faster than <ActionMenu.CheckboxItem>
-            <Checkbox size="small" value={hjemmelId}>
+            <Checkbox key={`${lovkildeId}-${hjemmelId}`} size="small" value={hjemmelId}>
               {hjemmelLabel}
             </Checkbox>
           ))}
