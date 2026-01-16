@@ -2,10 +2,16 @@
 import { HStack, Skeleton, VStack } from '@navikt/ds-react';
 import { Fragment } from 'react';
 
-const randomPercentage = () => Math.floor(Math.random() * 100);
+// Deterministic pseudo-random functions to avoid hydration mismatches
+const seededRandom = (seed: number): number => {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+};
 
-const randomLegendTextWidth = () => Math.floor(Math.random() * 250) + 50;
-const randomTextWidth = () => Math.floor(Math.random() * 50) + 50;
+const seededPercentage = (seed: number) => Math.floor(seededRandom(seed) * 100);
+
+const seededLegendTextWidth = (seed: number) => Math.floor(seededRandom(seed) * 250) + 50;
+const seededTextWidth = (seed: number) => Math.floor(seededRandom(seed) * 50) + 50;
 
 export const BarChart = ({ bars = 20 }: { bars?: number }) => (
   <VStack justify="space-between" padding="space-8" className="h-full">
@@ -16,10 +22,10 @@ export const BarChart = ({ bars = 20 }: { bars?: number }) => (
         .map((_, i) => (
           <Fragment key={i}>
             <div className="flex items-center justify-end">
-              <Skeleton variant="rectangle" height="10px" width={`${randomPercentage()}%`} />
+              <Skeleton variant="rectangle" height="10px" width={`${seededPercentage(i)}%`} />
             </div>
 
-            <Skeleton variant="rectangle" height="25px" width={`${randomPercentage()}%`} />
+            <Skeleton variant="rectangle" height="25px" width={`${seededPercentage(i + 1000)}%`} />
           </Fragment>
         ))}
     </div>
@@ -35,7 +41,7 @@ const generateHistogram = (count: number): number[] => {
   return Array.from({ length: count }, (_, i) => {
     const x = i - mean;
     const baseValue = Math.exp(-(x * x) / (2 * stdDev * stdDev));
-    const randomFactor = 0.8 + Math.random() * 0.4;
+    const randomFactor = 0.8 + seededRandom(i) * 0.4;
 
     return Math.min(max, Math.round(max * baseValue * randomFactor));
   });
@@ -55,8 +61,8 @@ export const Histogram = ({ bars = 50 }: { bars?: number }) => (
 
 const Title = () => (
   <div className="flex w-150 flex-col items-center self-center">
-    <Skeleton variant="text" width={`${randomTextWidth()}%`} height="30px" />
-    <Skeleton variant="text" width={`${randomTextWidth()}%`} height="20px" />
+    <Skeleton variant="text" width={`${seededTextWidth(1)}%`} height="30px" />
+    <Skeleton variant="text" width={`${seededTextWidth(2)}%`} height="20px" />
   </div>
 );
 
@@ -78,7 +84,7 @@ const Legend = () => (
         .map((_, i) => (
           <HStack key={i} gap="space-4" justify="start" align="center">
             <Skeleton variant="rectangle" width="30px" height="20px" />
-            <Skeleton variant="text" width={`${randomLegendTextWidth()}px`} height="20px" />
+            <Skeleton variant="text" width={`${seededLegendTextWidth(i)}px`} height="20px" />
           </HStack>
         ))}
     </HStack>
