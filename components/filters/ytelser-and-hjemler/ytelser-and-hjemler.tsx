@@ -1,5 +1,7 @@
 'use client';
 
+import { ChevronRightLastIcon } from '@navikt/aksel-icons';
+import { Button, HStack, Tooltip } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { SubFilter } from '@/components/filters/sub-filter';
@@ -10,8 +12,10 @@ import {
   useInnsendingshjemlerFilter,
   useRegistreringshjemlerFilter,
   useYtelserFilter,
+  useYtelsesgrupperFilter,
 } from '@/lib/query-state/query-state';
 import type { IKodeverkValue, IYtelse } from '@/lib/types';
+import { getYtelsesgruppeForYtelse } from '@/lib/types/ytelsesgrupper';
 
 interface Props {
   ytelser: IYtelse[] | undefined;
@@ -38,14 +42,11 @@ export const YtelserAndRegistreringshjemler = ({ ytelser = [], lovkildeToRegistr
     <>
       <Ytelsesgrupper />
 
-      <MultiselectFilter
-        label="Ytelser"
-        selected={selectedYtelser}
-        setSelected={(v) => {
-          setSelectedYtelser(v);
-          setSelectedHjemler(null);
-        }}
-        options={ytelserOptions}
+      <YtelserFilter
+        selectedYtelser={selectedYtelser}
+        setSelectedYtelser={setSelectedYtelser}
+        ytelserOptions={ytelserOptions}
+        onYtelserChange={() => setSelectedHjemler(null)}
       />
 
       <SubFilter>
@@ -66,14 +67,11 @@ export const YtelserAndInnsendingshjemler = ({ ytelser = [] }: { ytelser: IYtels
     <>
       <Ytelsesgrupper />
 
-      <MultiselectFilter
-        label="Ytelser"
-        selected={selectedYtelser}
-        setSelected={(v) => {
-          setSelectedYtelser(v);
-          setSelectedHjemler(null);
-        }}
-        options={ytelserOptions}
+      <YtelserFilter
+        selectedYtelser={selectedYtelser}
+        setSelectedYtelser={setSelectedYtelser}
+        ytelserOptions={ytelserOptions}
+        onYtelserChange={() => setSelectedHjemler(null)}
       />
 
       <SubFilter>
@@ -95,15 +93,14 @@ export const YtelserAndInnsendingsAndRegistreringshjemler = ({
     <>
       <Ytelsesgrupper />
 
-      <MultiselectFilter
-        label="Ytelser"
-        selected={selectedYtelser}
-        setSelected={(v) => {
-          setSelectedYtelser(v);
+      <YtelserFilter
+        selectedYtelser={selectedYtelser}
+        setSelectedYtelser={setSelectedYtelser}
+        ytelserOptions={ytelserOptions}
+        onYtelserChange={() => {
           setSelectedInnsendingsHjemler(null);
           setSelectedRegistreringsHjemler(null);
         }}
-        options={ytelserOptions}
       />
 
       <SubFilter>
@@ -117,5 +114,72 @@ export const YtelserAndInnsendingsAndRegistreringshjemler = ({
         />
       </SubFilter>
     </>
+  );
+};
+
+interface YtelseOption {
+  label: string;
+  value: string;
+}
+
+interface YtelserFilterProps {
+  selectedYtelser: string[];
+  setSelectedYtelser: (value: string[] | null) => void;
+  ytelserOptions: YtelseOption[];
+  onYtelserChange?: (value: string[] | null) => void;
+}
+
+const YtelserFilter = ({
+  selectedYtelser,
+  setSelectedYtelser,
+  ytelserOptions,
+  onYtelserChange,
+}: YtelserFilterProps) => (
+  <HStack gap="space-8" wrap={false}>
+    <MultiselectFilter
+      label="Ytelser"
+      selected={selectedYtelser}
+      setSelected={(v) => {
+        setSelectedYtelser(v);
+        onYtelserChange?.(v);
+      }}
+      options={ytelserOptions}
+    />
+    {selectedYtelser.length === 0 ? null : <AddYtelsesgrupperButton selectedYtelser={selectedYtelser} />}
+  </HStack>
+);
+
+interface AddYtelsesgrupperButtonProps {
+  selectedYtelser: string[];
+}
+
+const AddYtelsesgrupperButton = ({ selectedYtelser }: AddYtelsesgrupperButtonProps) => {
+  const [selectedYtelsesgrupper, setSelectedYtelsesgrupper] = useYtelsesgrupperFilter();
+
+  const ytelsesgrupperToAdd = useMemo(() => {
+    const groupsFromYtelser = selectedYtelser
+      .map(getYtelsesgruppeForYtelse)
+      .filter((group): group is NonNullable<typeof group> => group !== null);
+
+    const uniqueGroups = [...new Set(groupsFromYtelser)];
+    return uniqueGroups.filter((group) => !selectedYtelsesgrupper.includes(group));
+  }, [selectedYtelser, selectedYtelsesgrupper]);
+
+  if (ytelsesgrupperToAdd.length === 0) {
+    return null;
+  }
+
+  const handleAddAllYtelsesgrupper = () =>
+    setSelectedYtelsesgrupper([...selectedYtelsesgrupper, ...ytelsesgrupperToAdd]);
+
+  return (
+    <Tooltip content="Legg til ytelsesgrupper for valgte ytelser" describesChild>
+      <Button
+        variant="tertiary"
+        size="small"
+        onClick={handleAddAllYtelsesgrupper}
+        icon={<ChevronRightLastIcon aria-hidden className="-rotate-90" />}
+      />
+    </Tooltip>
   );
 };
