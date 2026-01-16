@@ -8,7 +8,7 @@ import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { KaSakstyperAndUtfall } from '@/components/filters/sakstyper-and-utfall';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
-import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and.hjemler';
+import { YtelserAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and-hjemler';
 import {
   getDefaultSakstyperToUtfall,
   getKlageenheter,
