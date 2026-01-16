@@ -53,8 +53,8 @@ export const Histogram = ({ bars = 50 }: { bars?: number }) => (
   </VStack>
 );
 
-export const Title = () => (
-  <div className="flex w-[600px] flex-col items-center self-center">
+const Title = () => (
+  <div className="flex w-150 flex-col items-center self-center">
     <Skeleton variant="text" width={`${randomTextWidth()}%`} height="30px" />
     <Skeleton variant="text" width={`${randomTextWidth()}%`} height="20px" />
   </div>
@@ -70,7 +70,7 @@ export const PieChart = () => (
   </VStack>
 );
 
-export const Legend = () => (
+const Legend = () => (
   <div className="w-full">
     <HStack justify="center" align="start" gap="space-8">
       {Array.from({ length: 4 })

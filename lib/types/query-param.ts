@@ -17,5 +17,3 @@ export enum QueryParam {
   INNSENDINGSHJEMLER_MODE = 'ihm',
   REGISTRERINGSHJEMLER_MODE = 'rhm',
 }
-
-export const ALL_QUERY_PARAMS = Object.values(QueryParam);

@@ -26,7 +26,7 @@ import {
   useMottattInPeriod,
 } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
-import { AntallSakerInnTilKabalFerdigstiltIKabal, type Buckets } from '@/components/charts/inngang-utgang';
+import { AntallSakerInnTilKabalFerdigstiltIKabal } from '@/components/charts/inngang-utgang';
 import { RestanseOverTid } from '@/components/charts/restanse-over-tid';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
@@ -54,6 +54,9 @@ import type {
   OmgjøringskravTildelteResponse,
   Tildelt,
 } from '@/lib/types';
+
+type Bucket = { inn: number; ut: number; label: string };
+type Buckets = Record<number, Bucket>;
 
 interface KodeverkProps {
   ytelser: IYtelse[];

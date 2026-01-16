@@ -8,9 +8,6 @@ import { DiffNumber, diffNumberHtml } from '@/components/numbers/diff-number';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
-export type Bucket = { inn: number; ut: number; label: string };
-export type Buckets = Record<number, Bucket>;
-
 interface Props {
   title: string;
   helpText: ReactNode;

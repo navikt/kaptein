@@ -9,8 +9,8 @@ import { DiffNumber } from '@/components/numbers/diff-number';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Avsluttet, BaseBehandling, Ledig, Tildelt } from '@/lib/types';
 
-export type Bucket = { inn: number; ut: number; label: string };
-export type Buckets = Record<number, Bucket>;
+type Bucket = { inn: number; ut: number; label: string };
+type Buckets = Record<number, Bucket>;
 
 interface Props {
   ferdigstilte: (BaseBehandling & Avsluttet)[];

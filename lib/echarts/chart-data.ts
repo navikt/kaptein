@@ -1,6 +1,6 @@
 import type { ECBasicOption } from 'echarts/types/dist/shared';
 
-export interface SeriesData {
+interface SeriesData {
   name?: string;
   value?: number | string;
 }
@@ -47,7 +47,7 @@ export const normalizeSeries = (option: ChartOption): Series[] => {
 /**
  * Checks if series data is in {name, value} format (pie chart style)
  */
-export const isNameValueData = (data: Series['data']): data is SeriesData[] => {
+const isNameValueData = (data: Series['data']): data is SeriesData[] => {
   if (data === null || data === undefined || data.length === 0) {
     return false;
   }
@@ -76,7 +76,7 @@ export const getVisibleSeries = (series: Series[]): Series[] => {
 /**
  * Gets the display value from a series data item
  */
-export const getDisplayValue = (value: SeriesDataItem): string | number => {
+const getDisplayValue = (value: SeriesDataItem): string | number => {
   if (value === null || value === undefined) {
     return '';
   }
@@ -88,7 +88,7 @@ export const getDisplayValue = (value: SeriesDataItem): string | number => {
   return value;
 };
 
-export interface PieRow {
+interface PieRow {
   name: string;
   value: string | number;
 }
@@ -115,7 +115,7 @@ export const extractPieRows = (series: Series[]): PieRow[] => {
   return rows;
 };
 
-export interface CategoryRow {
+interface CategoryRow {
   label: string | number;
   values: (string | number)[];
 }
@@ -132,7 +132,7 @@ export const extractCategoryRows = (labels: (string | number)[], series: Series[
   }));
 };
 
-export type ChartDataType = 'pie' | 'category';
+type ChartDataType = 'pie' | 'category';
 
 /**
  * Determines the type of chart data

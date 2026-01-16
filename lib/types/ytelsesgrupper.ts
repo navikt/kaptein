@@ -37,7 +37,7 @@ export const YTELSESGRUPPE_KODEVERK: IKodeverkSimpleValue[] = YTELSESGRUPPE_OPTI
   navn: label,
 }));
 
-export const YTELSESGRUPPER: Record<Ytelsesgruppe, string[]> = {
+const YTELSESGRUPPER: Record<Ytelsesgruppe, string[]> = {
   [Ytelsesgruppe.Bidragsområdet]: [
     Ytelse.BidragsområdetBarnebidrag,
     Ytelse.BidragsområdetBarnebortføring,

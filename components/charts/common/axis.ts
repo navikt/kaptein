@@ -1,10 +1,10 @@
-export interface YAxis {
+interface YAxis {
   axisDimension: 'y';
   axisIndex: 1;
   value: number;
 }
 
-export interface XAxis {
+interface XAxis {
   axisDimension: 'x';
   axisIndex: 0;
   value: string;

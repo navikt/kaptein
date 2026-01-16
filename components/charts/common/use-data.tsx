@@ -150,7 +150,7 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
   }, [behandlinger, ytelser, ytelsesgrupper, klageenheter, tilbakekreving]);
 };
 
-export const useNonTrFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
+const useNonTrFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [sakstyper] = useKaSakstyperFilter();
   const baseFiltered = useBaseFiltered(behandlinger);
 

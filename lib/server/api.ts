@@ -122,7 +122,7 @@ const getResponse = async (appName: AppName, path: string): Promise<Response> =>
   }
 };
 
-export const getData = async <T>(appName: AppName, path: string): Promise<T> => {
+const getData = async <T>(appName: AppName, path: string): Promise<T> => {
   const res = await getResponse(appName, path);
 
   const data: T = await res.json();
@@ -131,8 +131,6 @@ export const getData = async <T>(appName: AppName, path: string): Promise<T> => 
 };
 
 export const getUser = () => getData<IUserData>(AppName.KABAL_INNSTILLINGER, '/me/brukerdata');
-
-export const getKodeverk = (path: string) => getData(AppName.KLAGE_KODEVERK, `/kodeverk/${path}`);
 
 export const getYtelser = () => getData<IYtelse[]>(AppName.KLAGE_KODEVERK, '/kodeverk/ytelser');
 
@@ -151,7 +149,7 @@ export const getLovkildeToRegistreringshjemler = () =>
 export const getUtfallForSakstype = async (sakstype: Sakstype) =>
   getData<IKodeverkSimpleValue<Utfall>[]>(AppName.KLAGE_KODEVERK, `/kodeverk/sakstypertoutfall/${sakstype}`);
 
-export const getSakstyperToUtfall = async () =>
+const getSakstyperToUtfall = async () =>
   getData<SakstypeToUtfall[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstypertoutfall');
 
 export const getDefaultSakstyperToUtfall = async () => {

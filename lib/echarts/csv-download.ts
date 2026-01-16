@@ -92,7 +92,7 @@ const generateCategoryCsv = (
 /**
  * Generates CSV content from chart option
  */
-export const generateCsvContent = (option: ChartOption): string | null => {
+const generateCsvContent = (option: ChartOption): string | null => {
   const series = normalizeSeries(option);
 
   if (series.length === 0) {

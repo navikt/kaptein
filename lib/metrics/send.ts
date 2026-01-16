@@ -1,7 +1,7 @@
 'use client';
 
-import type { AmplitudeContextData } from '@/lib/amplitude/types';
 import { browserLog } from '@/lib/browser-log';
+import type { AmplitudeContextData } from '@/lib/metrics/types';
 import { grafana } from '@/lib/observability';
 
 export const sendMetricEvent = async (
