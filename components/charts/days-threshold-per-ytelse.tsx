@@ -7,6 +7,7 @@ import {
   COMMON_STACKED_BAR_CHART_PROPS,
 } from '@/components/charts/common/common-chart-props';
 import { DayPicker } from '@/components/charts/common/day-picker';
+import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/common/use-ytelse-chart-data';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { formatInt } from '@/lib/format';
@@ -36,42 +37,28 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
   helpText,
 }: Props<T>) => {
   const [maxDays, setMaxDays] = useAlderPerYtelseMaxDaysFilter();
+  const entries = useYtelseChartData(behandlinger, relevantYtelser);
 
   const { overSeriesData, underSeriesData, labels } = useMemo(() => {
-    const overMap: Map<string, number> = new Map();
-    const underMap: Map<string, number> = new Map();
     const threshold = maxDays ?? 0;
-
-    for (const behandling of behandlinger) {
-      const days = getDays(behandling);
-
-      if (days > threshold) {
-        const existing = overMap.get(behandling.ytelseId);
-        overMap.set(behandling.ytelseId, existing === undefined ? 1 : existing + 1);
-      } else {
-        const existing = underMap.get(behandling.ytelseId);
-        underMap.set(behandling.ytelseId, existing === undefined ? 1 : existing + 1);
-      }
-    }
 
     const overSeriesData: (number | null)[] = [];
     const underSeriesData: (number | null)[] = [];
     const labels: string[] = [];
 
-    for (const ytelse of relevantYtelser) {
-      const overCount = overMap.get(ytelse.id);
-      overSeriesData.push(overCount ?? null);
+    for (const entry of entries) {
+      const ytelseIds = getYtelseIdsForEntry(entry);
+      const { overCount, underCount } = countOverUnder(behandlinger, ytelseIds, threshold, getDays);
 
-      const underCount = underMap.get(ytelse.id);
-      underSeriesData.push(underCount ?? null);
+      overSeriesData.push(overCount > 0 ? overCount : null);
+      underSeriesData.push(underCount > 0 ? underCount : null);
 
-      const totalCount = (overCount ?? 0) + (underCount ?? 0);
-
-      labels.push(`${ytelse.navn} (${formatInt(totalCount)})`);
+      const totalCount = overCount + underCount;
+      labels.push(`${entry.navn} (${formatInt(totalCount)})`);
     }
 
     return { overSeriesData, underSeriesData, labels };
-  }, [relevantYtelser, behandlinger, getDays, maxDays]);
+  }, [entries, behandlinger, getDays, maxDays]);
 
   if (behandlinger.length === 0) {
     return <NoData title={title} />;
@@ -129,6 +116,31 @@ export const DaysThresholdPerYtelse = <T extends BaseBehandling>({
       />
     </VStack>
   );
+};
+
+/**
+ * Count behandlinger for a list of ytelseIds over/under threshold
+ */
+const countOverUnder = <T extends BaseBehandling>(
+  behandlinger: T[],
+  ytelseIds: string[],
+  threshold: number,
+  getDays: (b: T) => number,
+): { overCount: number; underCount: number } => {
+  let overCount = 0;
+  let underCount = 0;
+
+  for (const behandling of behandlinger) {
+    if (ytelseIds.includes(behandling.ytelseId)) {
+      if (getDays(behandling) > threshold) {
+        overCount++;
+      } else {
+        underCount++;
+      }
+    }
+  }
+
+  return { overCount, underCount };
 };
 
 const TWELVE_WEEKS_IN_DAYS = 12 * 7;

@@ -117,7 +117,7 @@ const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, yt
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Aktive saker i TR per ytelse og klageenhet"
           description={`Viser data for ${uferdige.length} aktive saker i TR`}
@@ -147,7 +147,7 @@ const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, yt
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <DaysThresholdPerYtelse
           title="Alder per ytelse"
           helpText={ALDER_HELP_TEXT}

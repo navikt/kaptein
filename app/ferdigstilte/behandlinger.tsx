@@ -166,7 +166,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <SakerPerYtelseOgSakstype
           title="Ferdigstilte saker per ytelse og sakstype"
           description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
@@ -194,7 +194,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <TildelteSakerPerYtelseOgKlageenhet
           title="Ferdigstilte saker per ytelse og klageenhet"
           description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
@@ -222,7 +222,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <VarsletFristPerYtelse
           title="Varslet frist per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
@@ -232,7 +232,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <FristPerYtelse
           title="Frist per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}
@@ -252,7 +252,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <DaysThresholdPerYtelse
           title="Behandlingstid per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} ferdigstilte saker`}

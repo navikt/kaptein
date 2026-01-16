@@ -2,6 +2,7 @@
 
 import { type ReactNode, useMemo } from 'react';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
+import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/common/use-ytelse-chart-data';
 import { NoData } from '@/components/no-data/no-data';
 import { DiffNumber, diffNumberHtml } from '@/components/numbers/diff-number';
 import { EChart } from '@/lib/echarts/echarts';
@@ -20,7 +21,7 @@ interface Props {
 }
 
 interface YtelseData {
-  ytelseId: string;
+  entryId: string;
   ytelseNavn: string;
   mottatt: number;
   ferdigstilt: number;
@@ -38,50 +39,48 @@ export const BelastningPerYtelse = ({
 }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
+  // Combine all behandlinger for useYtelseChartData
+  const allBehandlinger = useMemo(
+    () => [...mottattInPeriod, ...ferdigstilteInPeriod],
+    [mottattInPeriod, ferdigstilteInPeriod],
+  );
+
+  const entries = useYtelseChartData(allBehandlinger, ytelser);
+
   const ytelseData = useMemo<YtelseData[]>(() => {
-    // Create a map to count mottatt and ferdigstilt per ytelse
-    const ytelseMap = new Map<string, { mottatt: number; ferdigstilt: number }>();
-
-    // Count incoming cases
-    countMottattInPeriod(mottattInPeriod, fromFilter, toFilter, ytelseMap);
-    countMottattInPeriod(ferdigstilteInPeriod, fromFilter, toFilter, ytelseMap);
-
-    // Count completed cases
-    countFerdigstiltInPeriod(ferdigstilteInPeriod, fromFilter, toFilter, ytelseMap);
-
-    // Count unfinished cases per ytelse (outgoing)
-    const restanseMap = new Map<string, number>();
-
-    for (const behandling of outgoingRestanse) {
-      const count = restanseMap.get(behandling.ytelseId) ?? 0;
-      restanseMap.set(behandling.ytelseId, count + 1);
-    }
-
-    // Convert to array and calculate metrics
     const data: YtelseData[] = [];
 
-    for (const ytelse of ytelser) {
-      const counts = ytelseMap.get(ytelse.id);
-      if (counts === undefined) {
-        continue; // Skip ytelser with no data
-      }
+    for (const entry of entries) {
+      const ytelseIds = getYtelseIdsForEntry(entry);
 
-      const { mottatt, ferdigstilt } = counts;
+      // Count mottatt from both mottattInPeriod and ferdigstilteInPeriod
+      const mottattFromActive = countMottatt(mottattInPeriod, ytelseIds, fromFilter, toFilter);
+      const mottattFromFerdigstilte = countMottatt(ferdigstilteInPeriod, ytelseIds, fromFilter, toFilter);
+      const mottatt = mottattFromActive + mottattFromFerdigstilte;
+
+      // Count ferdigstilt
+      const ferdigstilt = countFerdigstilt(ferdigstilteInPeriod, ytelseIds, fromFilter, toFilter);
+
+      // Count restanse
+      const restanse = countRestanse(outgoingRestanse, ytelseIds);
+
       const diff = mottatt - ferdigstilt;
-      const restanse = restanseMap.get(ytelse.id) ?? 0;
 
-      data.push({
-        ytelseId: ytelse.id,
-        ytelseNavn: ytelse.navn,
-        mottatt,
-        ferdigstilt,
-        diff,
-        restanse,
-      });
+      // Only include entries with data
+      if (mottatt > 0 || ferdigstilt > 0 || restanse > 0) {
+        data.push({
+          entryId: entry.id,
+          ytelseNavn: entry.navn,
+          mottatt,
+          ferdigstilt,
+          diff,
+          restanse,
+        });
+      }
     }
 
     return data;
-  }, [ferdigstilteInPeriod, mottattInPeriod, ytelser, fromFilter, toFilter, outgoingRestanse]);
+  }, [entries, ferdigstilteInPeriod, mottattInPeriod, outgoingRestanse, fromFilter, toFilter]);
 
   const labels = useMemo(() => ytelseData.map((d) => d.ytelseNavn), [ytelseData]);
   const mottattData = useMemo(() => ytelseData.map(({ mottatt }) => mottatt), [ytelseData]);
@@ -227,34 +226,6 @@ export const BelastningPerYtelse = ({
   );
 };
 
-const countMottattInPeriod = (
-  behandlinger: BaseBehandling[],
-  fromFilter: string,
-  toFilter: string,
-  ytelseMap: Map<string, { mottatt: number; ferdigstilt: number }>,
-) => {
-  for (const b of behandlinger) {
-    if (b.mottattKlageinstans >= fromFilter && b.mottattKlageinstans <= toFilter) {
-      const existing = ytelseMap.get(b.ytelseId) ?? { mottatt: 0, ferdigstilt: 0 };
-      ytelseMap.set(b.ytelseId, { ...existing, mottatt: existing.mottatt + 1 });
-    }
-  }
-};
-
-const countFerdigstiltInPeriod = (
-  ferdigstilte: (BaseBehandling & Avsluttet)[],
-  fromFilter: string,
-  toFilter: string,
-  ytelseMap: Map<string, { mottatt: number; ferdigstilt: number }>,
-) => {
-  for (const b of ferdigstilte) {
-    if (b.avsluttetAvSaksbehandlerDate >= fromFilter && b.avsluttetAvSaksbehandlerDate <= toFilter) {
-      const existing = ytelseMap.get(b.ytelseId) ?? { mottatt: 0, ferdigstilt: 0 };
-      ytelseMap.set(b.ytelseId, { ...existing, ferdigstilt: existing.ferdigstilt + 1 });
-    }
-  }
-};
-
 const createStripeSvg = (): string => {
   const computedStyle = getComputedStyle(document.documentElement);
   const fillColor = computedStyle.getPropertyValue('--ax-meta-purple-500').trim();
@@ -267,6 +238,53 @@ const createStripeSvg = (): string => {
 
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 };
+
+/**
+ * Count mottatt for a list of ytelseIds
+ */
+const countMottatt = (
+  behandlinger: BaseBehandling[],
+  ytelseIds: string[],
+  fromFilter: string,
+  toFilter: string,
+): number =>
+  behandlinger.reduce((acc, b) => {
+    if (ytelseIds.includes(b.ytelseId) && b.mottattKlageinstans >= fromFilter && b.mottattKlageinstans <= toFilter) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
+
+/**
+ * Count ferdigstilt for a list of ytelseIds
+ */
+const countFerdigstilt = (
+  ferdigstilte: (BaseBehandling & Avsluttet)[],
+  ytelseIds: string[],
+  fromFilter: string,
+  toFilter: string,
+): number =>
+  ferdigstilte.reduce((acc, b) => {
+    if (
+      ytelseIds.includes(b.ytelseId) &&
+      b.avsluttetAvSaksbehandlerDate >= fromFilter &&
+      b.avsluttetAvSaksbehandlerDate <= toFilter
+    ) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
+
+/**
+ * Count restanse for a list of ytelseIds
+ */
+const countRestanse = (outgoingRestanse: BaseBehandling[], ytelseIds: string[]): number =>
+  outgoingRestanse.reduce((acc, b) => {
+    if (ytelseIds.includes(b.ytelseId)) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
 
 const getTooltip = ({ ytelseNavn, mottatt, ferdigstilt, diff, restanse }: YtelseData): string =>
   `

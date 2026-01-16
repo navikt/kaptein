@@ -5,6 +5,7 @@ import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
 } from '@/components/charts/common/common-chart-props';
+import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/common/use-ytelse-chart-data';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
@@ -26,26 +27,23 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
   description,
   helpText,
 }: Props) => {
+  const entries = useYtelseChartData(behandlinger, relevantYtelser);
+
   const series = useMemo(
     () =>
       klageenheter.map((enhet) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: enhet.navn,
-        data: relevantYtelser
-          .map(({ id }) =>
-            behandlinger.reduce(
-              (acc, curr) => (curr.ytelseId === id && curr.tildeltEnhet === enhet.id ? acc + 1 : acc),
-              0,
-            ),
-          )
+        data: entries
+          .map((entry) => countEnhet(behandlinger, getYtelseIdsForEntry(entry), enhet.id))
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, relevantYtelser, klageenheter],
+    [behandlinger, entries, klageenheter],
   );
 
   const labels = useMemo(
-    () => relevantYtelser.map((y, i) => `${y.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
-    [relevantYtelser, series],
+    () => entries.map((entry, i) => `${entry.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
+    [entries, series],
   );
 
   if (behandlinger.length === 0) {
@@ -66,3 +64,16 @@ export const TildelteSakerPerYtelseOgKlageenhet = ({
     />
   );
 };
+
+/**
+ * Count behandlinger for a list of ytelseIds with a specific klageenhet
+ */
+const countEnhet = (
+  behandlinger: (BaseBehandling & { tildeltEnhet: string })[],
+  ytelseIds: string[],
+  enhetId: string,
+): number =>
+  behandlinger.reduce(
+    (acc, curr) => (ytelseIds.includes(curr.ytelseId) && curr.tildeltEnhet === enhetId ? acc + 1 : acc),
+    0,
+  );

@@ -231,7 +231,7 @@ const BehandlingerData = ({
 
   return (
     <ChartsWrapper>
-      <Card span={4}>
+      <Card span={5}>
         <SakerPerYtelseOgSakstype
           title="Aktive saker per ytelse og sakstype"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
@@ -263,7 +263,7 @@ const BehandlingerData = ({
       )}
 
       {showsLedige ? null : (
-        <Card span={4}>
+        <Card span={5}>
           <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
             title="Årsaker for saker på vent gruppert etter ytelse"
             description={`Antall aktive saker på vent: ${filteredTildelte.length}`}
@@ -286,7 +286,7 @@ const BehandlingerData = ({
       )}
 
       {showsLedige ? null : (
-        <Card span={4}>
+        <Card span={5}>
           <TildelteSakerPerYtelseOgKlageenhet
             title="Tildelte saker per ytelse og klageenhet"
             description={`Viser data for ${filteredTildelte.length} tildelte saker`}
@@ -315,7 +315,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <VarsletFristPerYtelse
           title="Varslet frist per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
@@ -325,7 +325,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <FristPerYtelse
           title="Frist per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
@@ -344,7 +344,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={4}>
+      <Card span={5}>
         <DaysThresholdPerYtelse
           title="Alder per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}

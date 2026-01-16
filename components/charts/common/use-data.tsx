@@ -15,8 +15,10 @@ import {
   useTilbakekrevingFilter,
   useTrSakstyperFilter,
   useYtelserFilter,
+  useYtelsesgrupperFilter,
 } from '@/lib/query-state/query-state';
 import type { Avsluttet, BaseBehandling, BaseSakITR, Ferdigstilt, Frist } from '@/lib/types';
+import { expandYtelsesgrupperToYtelser } from '@/lib/types/ytelsesgrupper';
 
 export const useFerdigstilteInPeriod = (behandlinger: (BaseBehandling & Avsluttet & Ferdigstilt & Frist)[]) => {
   const baseFiltered = useNonTrFiltered(behandlinger);
@@ -119,6 +121,7 @@ const useResultatFiltered = <T extends BaseBehandling & Ferdigstilt & Avsluttet>
 
 export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {
   const [ytelser] = useYtelserFilter();
+  const [ytelsesgrupper] = useYtelsesgrupperFilter();
   const [klageenheter] = useKlageenheterFilter();
   const [tilbakekreving] = useTilbakekrevingFilter();
 
@@ -128,10 +131,15 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
         ? behandlinger
         : behandlinger.filter((b) => b.tilbakekreving === (tilbakekreving === TilbakekrevingFilter.KUN));
 
+    // Combine selected ytelser with ytelser from selected ytelsesgrupper
+    const ytelserFromGrupper = expandYtelsesgrupperToYtelser(ytelsesgrupper);
+    const allSelectedYtelser = [...new Set([...ytelser, ...ytelserFromGrupper])];
+
+    // If neither ytelser nor ytelsesgrupper are selected, show all; otherwise filter
     const filteredForYtelser =
-      ytelser.length === 0
+      allSelectedYtelser.length === 0
         ? filteredForTilbakekreving
-        : filteredForTilbakekreving.filter((b) => ytelser.includes(b.ytelseId));
+        : filteredForTilbakekreving.filter((b) => allSelectedYtelser.includes(b.ytelseId));
 
     const filteredForKlageenheter =
       klageenheter.length === 0
@@ -139,7 +147,7 @@ export const useBaseFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[
         : filteredForYtelser.filter((b) => b.tildeltEnhet !== null && klageenheter.includes(b.tildeltEnhet));
 
     return filteredForKlageenheter;
-  }, [behandlinger, ytelser, klageenheter, tilbakekreving]);
+  }, [behandlinger, ytelser, ytelsesgrupper, klageenheter, tilbakekreving]);
 };
 
 export const useNonTrFiltered = <T extends BaseBehandling>(behandlinger: T[]): T[] => {

@@ -5,6 +5,7 @@ import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
 } from '@/components/charts/common/common-chart-props';
+import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/common/use-ytelse-chart-data';
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
@@ -26,21 +27,18 @@ export const TildelteSakerPerKlageenhetOgYtelse = ({
   description = `Viser data for ${behandlinger.length} tildelte saker`,
   helpText,
 }: Props) => {
+  const entries = useYtelseChartData(behandlinger, relevantYtelser);
+
   const series = useMemo(
     () =>
-      relevantYtelser.map(({ id, navn }) => ({
+      entries.map((entry) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
-        name: navn,
+        name: entry.navn,
         data: klageenheter
-          .map((enhet) =>
-            behandlinger.reduce(
-              (acc, curr) => (curr.ytelseId === id && curr.tildeltEnhet === enhet.id ? acc + 1 : acc),
-              0,
-            ),
-          )
+          .map((enhet) => countEnhet(behandlinger, getYtelseIdsForEntry(entry), enhet.id))
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, relevantYtelser, klageenheter],
+    [behandlinger, entries, klageenheter],
   );
 
   const labels = useMemo(
@@ -97,3 +95,16 @@ export const TildelteSakerPerKlageenhetOgYtelse = ({
     />
   );
 };
+
+/**
+ * Count behandlinger for a list of ytelseIds with a specific klageenhet
+ */
+const countEnhet = (
+  behandlinger: (BaseBehandling & { tildeltEnhet: string })[],
+  ytelseIds: string[],
+  enhetId: string,
+): number =>
+  behandlinger.reduce(
+    (acc, curr) => (ytelseIds.includes(curr.ytelseId) && curr.tildeltEnhet === enhetId ? acc + 1 : acc),
+    0,
+  );
