@@ -23,11 +23,6 @@ export enum Utfall {
   IKKE_GJENOPPTATT = '22',
 }
 
-export const UTFALL = Object.values(Utfall);
-
-export const OMGJØRINGSUTFALL: Utfall[] = [Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD];
-export const IKKE_OMGJØRINGSUTFALL: Utfall[] = UTFALL.filter((u) => !OMGJØRINGSUTFALL.includes(u));
-
 export enum SakITRUtfall {
   // Anke i TR
   OPPHEVET = '3',
@@ -66,7 +61,7 @@ export const SAK_I_TR_IKKE_OMGJØRINGSUTFALL: SakITRUtfall[] = SAK_I_TR_UTFALL.f
 );
 
 // Employee from vedtaksinstans or KA.
-export interface INavEmployee {
+interface INavEmployee {
   navIdent: string;
   navn: string;
 }
@@ -244,7 +239,7 @@ interface SakITRBase {
 }
 
 // Begjæring om gjenopptak i Trygderetten
-export type BaseBegjæringOmGjenopptakITR = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN> & SakITRBase;
+type BaseBegjæringOmGjenopptakITR = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN> & SakITRBase;
 
 export type BegjæringOmGjenopptakITRLedig = BaseBegjæringOmGjenopptakITR & LedigSakITr;
 export type BegjæringOmGjenopptakITRTildelt = BaseBegjæringOmGjenopptakITR & TildeltSakITr;
@@ -257,7 +252,7 @@ export type BegjæringOmGjenopptakITRTildelteResponse = KapteinApiResponse<Begj�
 export type BegjæringOmGjenopptakITRFerdigstilteResponse = KapteinApiResponse<BegjæringOmGjenopptakITRFerdigstilt>;
 
 // Anke i Trygderetten
-export type BaseAnkeITR = BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN> & SakITRBase;
+type BaseAnkeITR = BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN> & SakITRBase;
 
 export type AnkeITRLedig = BaseAnkeITR & LedigSakITr;
 export type AnkeITRTildelt = BaseAnkeITR & TildeltSakITr;
@@ -307,6 +302,6 @@ export const isFerdigstilt = (b: BaseBehandling | Avsluttet): b is Avsluttet =>
   'avsluttetAvSaksbehandlerDate' in b && typeof b.avsluttetAvSaksbehandlerDate === 'string';
 
 export type FristBehandling = BaseBehandling & Frist & (Ferdigstilt | Ledig | Tildelt);
-export type FerdigstiltBehanding = BaseBehandling & Ferdigstilt;
-export type AktivBehandling = BaseBehandling & (Ledig | Tildelt);
+type FerdigstiltBehanding = BaseBehandling & Ferdigstilt;
+type AktivBehandling = BaseBehandling & (Ledig | Tildelt);
 export type Behandling = FerdigstiltBehanding | AktivBehandling;

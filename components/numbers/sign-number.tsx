@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 
-export const numberWithSign = (n: number): string => `${sign(n)}${Math.abs(n)}`;
-
-export const sign = (n: number): string => {
+const sign = (n: number): string => {
   if (n > 0) {
     return '+';
   }
@@ -11,6 +9,8 @@ export const sign = (n: number): string => {
   }
   return '';
 };
+
+export const numberWithSign = (n: number): string => `${sign(n)}${Math.abs(n)}`;
 
 interface SignedNumberProps {
   children: number;

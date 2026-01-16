@@ -1,7 +1,7 @@
 'use client';
 
-import { useSendMetricEvent } from '@/lib/amplitude/hook';
-import type { AmplitudeContextData, EventData } from '@/lib/amplitude/types';
+import { useSendMetricEvent } from '@/lib/metrics/hook';
+import type { AmplitudeContextData, EventData } from '@/lib/metrics/types';
 
 interface MetricEventProps {
   eventName?: string;

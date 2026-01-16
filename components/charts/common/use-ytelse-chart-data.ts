@@ -38,7 +38,7 @@ interface GruppeEntry extends BaseEntry {
   isGroup: true;
 }
 
-export type YtelseOrGruppeEntry = YtelseEntry | GruppeEntry;
+type YtelseOrGruppeEntry = YtelseEntry | GruppeEntry;
 
 /**
  * Get the "group ID" for sorting - either the group's ID or the parent group's ID
@@ -243,68 +243,3 @@ export const useYtelseChartData = <T extends Pick<BaseBehandling, 'ytelseId'>>(
     return sortedEntries.reverse();
   }, [behandlinger, ytelser, selectedYtelsesgrupper, selectedYtelser]);
 };
-
-/**
- * Aggregates behandlinger by ytelse or ytelsesgruppe.
- * Returns a map where keys are entry IDs (ytelseId or ytelsesgruppe ID)
- * and values are arrays of behandlinger.
- */
-export const useAggregatedBehandlinger = <T extends Pick<BaseBehandling, 'ytelseId'>>(
-  behandlinger: T[],
-  entries: YtelseOrGruppeEntry[],
-): Map<string, T[]> => {
-  return useMemo(() => {
-    const result = new Map<string, T[]>();
-
-    // Initialize all entries
-    for (const entry of entries) {
-      result.set(entry.id, []);
-    }
-
-    // Group behandlinger by their entry ID
-    for (const b of behandlinger) {
-      // Check if this behandling's ytelse is represented by a ytelsesgruppe entry
-      const parentGroup = getYtelsesgruppeForYtelse(b.ytelseId);
-
-      if (parentGroup !== null && result.has(parentGroup)) {
-        // Add to the group's behandlinger
-        result.get(parentGroup)?.push(b);
-      }
-
-      // Also add to individual ytelse entry if it exists
-      if (result.has(b.ytelseId)) {
-        result.get(b.ytelseId)?.push(b);
-      }
-    }
-
-    return result;
-  }, [behandlinger, entries]);
-};
-
-/**
- * Hook that combines useYtelseChartData and useAggregatedBehandlinger
- * for convenient use in chart components.
- */
-export const useYtelseOrGruppeChartData = <T extends Pick<BaseBehandling, 'ytelseId'>>(
-  behandlinger: T[],
-  ytelser: IKodeverkSimpleValue[],
-) => {
-  const entries = useYtelseChartData(behandlinger, ytelser);
-  const aggregatedBehandlinger = useAggregatedBehandlinger(behandlinger, entries);
-
-  return { entries, aggregatedBehandlinger };
-};
-
-/**
- * Creates chart labels from entries with counts.
- */
-export const getChartLabels = (entries: YtelseOrGruppeEntry[]): string[] =>
-  entries.map((entry) => `${entry.navn} (${entry.behandlingCount})`);
-
-/**
- * Creates chart labels from entries using custom count getter.
- */
-export const getChartLabelsWithCounts = (
-  entries: YtelseOrGruppeEntry[],
-  getCount: (entry: YtelseOrGruppeEntry) => number,
-): string[] => entries.map((entry) => `${entry.navn} (${getCount(entry)})`);

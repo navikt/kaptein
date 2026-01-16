@@ -2,6 +2,7 @@ import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import { usePathname } from 'next/navigation';
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import {
+  parseAsDateString,
   parseAsHjemlerModeFilter,
   parseAsTilbakekrevingFilter,
   parseAsTildelingFilter,
@@ -64,7 +65,7 @@ export const useFromFilter = () => {
 
   return useQueryState(
     QueryParam.FROM,
-    parseAsString
+    parseAsDateString
       .withDefault(path === RouteName.SAKSSTRØM ? SAKSSTRØM_DEFAULT_FROM : DEFAULT_FROM)
       .withOptions({ clearOnDefault: false }),
   );
@@ -75,7 +76,7 @@ export const useToFilter = () => {
 
   return useQueryState(
     QueryParam.TO,
-    parseAsString
+    parseAsDateString
       .withDefault(path === RouteName.SAKSSTRØM ? SAKSSTRØM_DEFAULT_TO : DEFAULT_TO)
       .withOptions({ clearOnDefault: false }),
   );

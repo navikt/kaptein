@@ -166,10 +166,6 @@ export enum ColorToken {
   Lime400A = 'meta-lime-400A',
 }
 
-const tokenNames = Object.values(ColorToken);
-
-export const isToken = (token: string): token is ColorToken => tokenNames.some((name) => name === token);
-
 // Ytelse IDs are sorted by ytelse name.
 export const YTELSE_COLOR_MAP: Record<string, string> = {
   '25': ColorToken.Accent500,
