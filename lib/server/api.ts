@@ -23,8 +23,6 @@ const logger = getLogger('api');
 
 const KAPTEIN_PROXY_TARGET = new URL('https://kaptein.intern.nav.no/api/proxy');
 
-const KABAL_API = new URL(isLocal ? `${KAPTEIN_PROXY_TARGET}/${AppName.KABAL_API}` : `http://${AppName.KABAL_API}`);
-
 const KABAL_INNSTILLINGER = new URL(
   isLocal ? `${KAPTEIN_PROXY_TARGET}/${AppName.KABAL_INNSTILLINGER}` : `http://${AppName.KABAL_INNSTILLINGER}`,
 );
@@ -62,7 +60,6 @@ const copyUrlWithPath = (url: URL, { path, searchParams }: UrlOptions) => {
 
 // Always returns a new URL instance to avoid mutating the original.
 export const SERVICE_URLS: Record<AppName, (urlOptions: UrlOptions) => URL> = {
-  [AppName.KABAL_API]: (urlOptions) => copyUrlWithPath(KABAL_API, urlOptions),
   [AppName.KABAL_INNSTILLINGER]: (urlOptions) => copyUrlWithPath(KABAL_INNSTILLINGER, urlOptions),
   [AppName.KLAGE_KODEVERK]: (urlOptions) => copyUrlWithPath(KLAGE_KODEVERK, urlOptions),
   [AppName.KAPTEIN_API]: (urlOptions) => copyUrlWithPath(KAPTEIN_API, urlOptions),
