@@ -4,6 +4,7 @@ ingresses:
 kafka_pool: nav-prod
 tenant: nav.no
 roles:
+  - bccc2468-3077-44f0-ab4d-df9896c24bb7 # Alle i NAV Klageinstans
   - 1c006e8b-c667-4622-9df7-43ed2fd494d6 # KABAL_OPPGAVESTYRING_ALLE_ENHETER
   - 95c25ca2-e3e9-423e-a55f-9bc327c29f96 # KABAL_MALTEKSTREDIGERING
   - 2b671b60-9650-4839-9139-40999bbb0f71 # KABAL_SAKSBEHANDLING
