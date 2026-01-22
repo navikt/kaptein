@@ -228,7 +228,7 @@ export const EChart = ({
 
       <div ref={ref} className="grow" />
 
-      <Modal ref={modalRef} header={{ heading: title }} className="min-w-xl max-w-[95vw]!" closeOnBackdropClick>
+      <Modal ref={modalRef} header={{ heading: title }} className="min-w-xl max-w-[95vw]" closeOnBackdropClick>
         <Modal.Body>
           <BodyLong size="small" spacing>
             {description}
