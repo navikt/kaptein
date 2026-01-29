@@ -41,7 +41,7 @@ export enum Ytelse {
   TvungenForvaltning = '39',
   OppfølgingssakNavLoven14a = '40',
   AaRegister = '41',
-  StøtteTilArbeidsOgUtdanningsreiser = '42',
+  TilleggstønadArbeiddsøker = '42',
   KompensasjonsytelseForSelvstendingNæringsdrivendeOgFrilansere = '43',
   Tilleggsstønad = '44',
   BidragsområdetFarOgMorskap = '45',
