@@ -55,4 +55,5 @@ export enum Ytelse {
   Partsinnsyn = '53',
   Ungdomsprogramytelsen = '54',
   GammelYrkesskade = '55',
+  TilleggsstønadArbeidssøkere = '56',
 }
