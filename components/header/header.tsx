@@ -6,9 +6,12 @@ import { InternalHeader } from '@navikt/ds-react/InternalHeader';
 import Link from 'next/link';
 import { AppThemeSwitcher } from '@/components/header/app-theme';
 import { Nav } from '@/components/header/nav';
+import { browserLog } from '@/lib/browser-log';
 import type { IUserData } from '@/lib/types';
 
 export const Header = ({ user }: { user: IUserData }) => {
+  browserLog.debug('User data:', user);
+
   return (
     <InternalHeader>
       <InternalHeader.Title href="/" as={Link}>
@@ -23,8 +26,8 @@ export const Header = ({ user }: { user: IUserData }) => {
         <ActionMenu.Trigger>
           <InternalHeader.UserButton
             data-testid="user-menu-button"
-            name={user.navn}
-            description={`Enhet: ${user.ansattEnhet?.navn ?? 'Ingen enhet'}`}
+            name={user?.navn ?? 'Ukjent bruker'}
+            description={`Enhet: ${user?.ansattEnhet?.navn ?? 'Ingen enhet'}`}
             className="whitespace-nowrap"
           />
         </ActionMenu.Trigger>
