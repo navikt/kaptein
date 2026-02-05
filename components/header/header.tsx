@@ -24,7 +24,7 @@ export const Header = ({ user }: { user: IUserData }) => {
           <InternalHeader.UserButton
             data-testid="user-menu-button"
             name={user.navn}
-            description={`Enhet: ${user.ansattEnhet.navn}`}
+            description={`Enhet: ${user.ansattEnhet?.navn ?? 'Ingen enhet'}`}
             className="whitespace-nowrap"
           />
         </ActionMenu.Trigger>
