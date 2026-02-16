@@ -15,7 +15,7 @@ import {
   useYtelsesgrupperFilter,
 } from '@/lib/query-state/query-state';
 import type { IKodeverkValue, IYtelse } from '@/lib/types';
-import { getYtelsesgruppeForYtelse } from '@/lib/types/ytelsesgrupper';
+import { expandYtelsesgrupperToYtelser, getYtelsesgruppeForYtelse } from '@/lib/types/ytelsesgrupper';
 
 interface Props {
   ytelser: IYtelse[] | undefined;
@@ -24,12 +24,20 @@ interface Props {
 
 const useYtelserAndHjemler = (ytelser: IYtelse[]) => {
   const [selectedYtelser, setSelectedYtelser] = useYtelserFilter();
+  const [selectedYtelsesgrupper] = useYtelsesgrupperFilter();
 
   const ytelserOptions = useMemo(() => ytelser.map(({ navn, id }) => ({ label: navn, value: id })), [ytelser]);
-  const relevantKodeverk = useMemo(
-    () => (selectedYtelser.length === 0 ? ytelser : ytelser.filter((y) => selectedYtelser.includes(y.id))),
-    [selectedYtelser, ytelser],
-  );
+
+  const relevantKodeverk = useMemo(() => {
+    if (selectedYtelser.length === 0 && selectedYtelsesgrupper.length === 0) {
+      return ytelser;
+    }
+
+    const ytelserFromGrupper = expandYtelsesgrupperToYtelser(selectedYtelsesgrupper);
+    const allSelectedYtelser = [...new Set([...selectedYtelser, ...ytelserFromGrupper])];
+
+    return ytelser.filter((y) => allSelectedYtelser.includes(y.id));
+  }, [selectedYtelser, selectedYtelsesgrupper, ytelser]);
 
   return { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk };
 };
@@ -38,15 +46,17 @@ export const YtelserAndRegistreringshjemler = ({ ytelser = [], lovkildeToRegistr
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedHjemler] = useRegistreringshjemlerFilter();
 
+  const resetHjemler = () => setSelectedHjemler(null);
+
   return (
     <>
-      <Ytelsesgrupper />
+      <Ytelsesgrupper onChange={resetHjemler} />
 
       <YtelserFilter
         selectedYtelser={selectedYtelser}
         setSelectedYtelser={setSelectedYtelser}
         ytelserOptions={ytelserOptions}
-        onYtelserChange={() => setSelectedHjemler(null)}
+        onYtelserChange={resetHjemler}
       />
 
       <SubFilter>
@@ -63,15 +73,17 @@ export const YtelserAndInnsendingshjemler = ({ ytelser = [] }: { ytelser: IYtels
   const { selectedYtelser, setSelectedYtelser, ytelserOptions, relevantKodeverk } = useYtelserAndHjemler(ytelser);
   const [, setSelectedHjemler] = useInnsendingshjemlerFilter();
 
+  const resetHjemler = () => setSelectedHjemler(null);
+
   return (
     <>
-      <Ytelsesgrupper />
+      <Ytelsesgrupper onChange={resetHjemler} />
 
       <YtelserFilter
         selectedYtelser={selectedYtelser}
         setSelectedYtelser={setSelectedYtelser}
         ytelserOptions={ytelserOptions}
-        onYtelserChange={() => setSelectedHjemler(null)}
+        onYtelserChange={resetHjemler}
       />
 
       <SubFilter>
@@ -89,18 +101,20 @@ export const YtelserAndInnsendingsAndRegistreringshjemler = ({
   const [, setSelectedInnsendingsHjemler] = useInnsendingshjemlerFilter();
   const [, setSelectedRegistreringsHjemler] = useRegistreringshjemlerFilter();
 
+  const resetHjemler = () => {
+    setSelectedInnsendingsHjemler(null);
+    setSelectedRegistreringsHjemler(null);
+  };
+
   return (
     <>
-      <Ytelsesgrupper />
+      <Ytelsesgrupper onChange={resetHjemler} />
 
       <YtelserFilter
         selectedYtelser={selectedYtelser}
         setSelectedYtelser={setSelectedYtelser}
         ytelserOptions={ytelserOptions}
-        onYtelserChange={() => {
-          setSelectedInnsendingsHjemler(null);
-          setSelectedRegistreringsHjemler(null);
-        }}
+        onYtelserChange={resetHjemler}
       />
 
       <SubFilter>
