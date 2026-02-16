@@ -64,6 +64,7 @@ const YTELSESGRUPPER: Record<Ytelsesgruppe, string[]> = {
     Ytelse.HjelpemidlerBilOgMotorkjøretøy,
     Ytelse.HjelpemidlerOrtopediske,
     Ytelse.HjelpemidlerTekniske,
+    Ytelse.StøtteTilArbeidsOgUtdanningsreiser,
   ],
   [Ytelsesgruppe.Oppfølgingssak]: [Ytelse.OppfølgingssakNavLoven14a, Ytelse.OppfølgingssakTiltaksplass],
   [Ytelsesgruppe.SupplerendeStønad]: [Ytelse.SupplerendeStønad, Ytelse.SupplerendeStønadTilUføreFlyktninger],
