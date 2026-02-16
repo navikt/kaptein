@@ -7,7 +7,11 @@ import { MultiselectFilter } from '@/components/filters/multi-select-filter';
 import { useYtelserFilter, useYtelsesgrupperFilter } from '@/lib/query-state/query-state';
 import { getYtelserForGroup, isYtelsesgruppe, YTELSESGRUPPE_OPTIONS } from '@/lib/types/ytelsesgrupper';
 
-export const Ytelsesgrupper = () => {
+interface Props {
+  onChange: () => void;
+}
+
+export const Ytelsesgrupper = ({ onChange }: Props) => {
   const [selectedYtelsesgrupper, setSelectedYtelsesgrupper] = useYtelsesgrupperFilter();
 
   const options = useMemo(
@@ -20,7 +24,10 @@ export const Ytelsesgrupper = () => {
       <MultiselectFilter
         label="Ytelsesgrupper"
         selected={selectedYtelsesgrupper}
-        setSelected={setSelectedYtelsesgrupper}
+        setSelected={(selected) => {
+          setSelectedYtelsesgrupper(selected);
+          onChange();
+        }}
         options={options}
       />
       {selectedYtelsesgrupper.length === 0 ? null : (
