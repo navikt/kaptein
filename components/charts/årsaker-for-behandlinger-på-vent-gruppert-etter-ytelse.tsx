@@ -9,6 +9,7 @@ import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/co
 import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { getPåVentReasonColor } from '@/lib/echarts/get-colors';
+import { percent } from '@/lib/percent';
 import {
   type BaseBehandling,
   type IKodeverkSimpleValue,
@@ -19,7 +20,6 @@ import {
 
 interface Props {
   title: string;
-  description: string;
   behandlinger: (BaseBehandling & Tildelt)[];
   relevantYtelser: IKodeverkSimpleValue[];
   påVentReasons: IKodeverkValue<PåVentReason>[];
@@ -27,7 +27,6 @@ interface Props {
 
 export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
   title,
-  description,
   behandlinger,
   relevantYtelser,
   påVentReasons,
@@ -57,10 +56,12 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
     return <NoData title={title} />;
   }
 
+  const påVent = behandlinger.filter((b) => b.sattPaaVentReasonId !== null).length;
+
   return (
     <EChart
       title={title}
-      description={description}
+      description={`Viser data for ${behandlinger.length} aktive saker, hvorav ${påVent} (${percent(påVent, behandlinger.length)}) er på vent.`}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },

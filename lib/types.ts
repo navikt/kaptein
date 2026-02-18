@@ -173,11 +173,6 @@ type LedigSakITr = {
   tildeltEnhet: string | null; // Is null for old migrated cases where the previous case is not known or possible to deduct.
 };
 
-type TildeltSakITr = {
-  isTildelt: true;
-  tildeltEnhet: string;
-};
-
 type FerdigstiltSakITr<U = SakITRUtfall> = {
   isTildelt: true;
   tildeltEnhet: string;
@@ -243,7 +238,7 @@ interface SakITRBase {
 type BaseBegjæringOmGjenopptakITR = BaseBehandling<Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN> & SakITRBase;
 
 export type BegjæringOmGjenopptakITRLedig = BaseBegjæringOmGjenopptakITR & LedigSakITr;
-export type BegjæringOmGjenopptakITRTildelt = BaseBegjæringOmGjenopptakITR & TildeltSakITr;
+export type BegjæringOmGjenopptakITRTildelt = BaseBegjæringOmGjenopptakITR & Tildelt;
 export type BegjæringOmGjenopptakITRFerdigstilt = BaseBegjæringOmGjenopptakITR &
   Avsluttet &
   FerdigstiltSakITr<SakITRUtfall>;
@@ -256,7 +251,7 @@ export type BegjæringOmGjenopptakITRFerdigstilteResponse = KapteinApiResponse<B
 type BaseAnkeITR = BaseBehandling<Sakstype.ANKE_I_TRYGDERETTEN> & SakITRBase;
 
 export type AnkeITRLedig = BaseAnkeITR & LedigSakITr;
-export type AnkeITRTildelt = BaseAnkeITR & TildeltSakITr;
+export type AnkeITRTildelt = BaseAnkeITR & Tildelt;
 export type AnkeITRFerdigstilt = BaseAnkeITR & Avsluttet & FerdigstiltSakITr<SakITRUtfall>;
 
 export type AnkerITRLedigeResponse = KapteinApiResponse<AnkeITRLedig>;

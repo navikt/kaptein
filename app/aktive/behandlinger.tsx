@@ -266,7 +266,6 @@ const BehandlingerData = ({
         <Card span={5}>
           <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
             title="Årsaker for saker på vent gruppert etter ytelse"
-            description={`Antall aktive saker på vent: ${filteredTildelte.length}`}
             behandlinger={filteredTildelte}
             relevantYtelser={relevantYtelser}
             påVentReasons={påVentReasons}
