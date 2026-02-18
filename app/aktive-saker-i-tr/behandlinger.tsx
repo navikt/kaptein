@@ -3,6 +3,7 @@
 import { BodyLong, BodyShort } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/aktive-saker-i-tr/skeleton';
+import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { useSakITRFilter } from '@/components/charts/common/use-data';
@@ -12,9 +13,12 @@ import { DaysThresholdPerYtelse } from '@/components/charts/days-threshold-per-y
 import { Tidsfordeling } from '@/components/charts/tidsfordeling';
 import { TildelteSakerPerKlageenhetOgYtelse } from '@/components/charts/tildelte-saker-per-klageenhet-og-ytelse';
 import { TildelteSakerPerYtelseOgKlageenhet } from '@/components/charts/tildelte-saker-per-ytelse-og-klageenhet';
+import { TildelteSakerPåVentIkkePåVent } from '@/components/charts/tildelte-saker-på-vent-ikke-på-vent';
+import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/charts/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
+import { useTildelingFilter } from '@/lib/query-state/query-state';
 import {
   type AnkeITRLedig,
   type AnkeITRTildelt,
@@ -25,13 +29,16 @@ import {
   type BegjæringOmGjenopptakITRTildelt,
   type BegjæringOmGjenopptakITRTildelteResponse,
   type IKodeverkSimpleValue,
+  type IKodeverkValue,
   type IYtelse,
+  type PåVentReason,
   Sakstype,
 } from '@/lib/types';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
   klageenheter: IKodeverkSimpleValue[];
+  påVentReasons: IKodeverkValue<PåVentReason>[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -94,7 +101,15 @@ interface DataProps extends KodeverkProps {
   tildelteGb: BegjæringOmGjenopptakITRTildelt[];
 }
 
-const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, ytelser, klageenheter }: DataProps) => {
+const BehandlingerData = ({
+  ledigeAnker,
+  tildelteAnker,
+  ledigeGb,
+  tildelteGb,
+  ytelser,
+  klageenheter,
+  påVentReasons,
+}: DataProps) => {
   const ledigeFiltered = useSakITRFilter([...ledigeAnker, ...ledigeGb]);
   const tildelteFiltered = useSakITRFilter([...tildelteAnker, ...tildelteGb]);
 
@@ -103,9 +118,29 @@ const BehandlingerData = ({ ledigeAnker, tildelteAnker, ledigeGb, tildelteGb, yt
     [ledigeFiltered, tildelteFiltered],
   );
   const relevantYtelser = useRelevantYtelser([...ledigeFiltered, ...tildelteFiltered], ytelser);
+  const [tildelingFilter] = useTildelingFilter();
+
+  const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
 
   return (
     <ChartsWrapper>
+      {showsLedige ? null : (
+        <Card>
+          <TildelteSakerPåVentIkkePåVent behandlinger={tildelteFiltered} påVentReasons={påVentReasons} />
+        </Card>
+      )}
+
+      {showsLedige ? null : (
+        <Card span={5}>
+          <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
+            title="Årsaker for saker på vent gruppert etter ytelse"
+            behandlinger={tildelteFiltered}
+            relevantYtelser={relevantYtelser}
+            påVentReasons={påVentReasons}
+          />
+        </Card>
+      )}
+
       <Card span={3}>
         <TildelteSakerPerKlageenhetOgYtelse
           title="Aktive saker i TR per klageenhet og ytelse"
