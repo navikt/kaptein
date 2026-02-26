@@ -4,15 +4,20 @@ import { ChevronDownIcon } from '@navikt/aksel-icons';
 import { ActionMenu, Button, Checkbox, CheckboxGroup, HStack, InlineMessage, TextField } from '@navikt/ds-react';
 import { useMemo, useState } from 'react';
 
-interface MultiSelectFilterProps {
+interface MultiSelectFilterProps<T extends string> {
   label: string;
-  selected: string[];
-  setSelected: (selected: string[] | null) => void;
-  options: { label: string; value: string }[];
+  selected: T[];
+  setSelected: (selected: T[] | null) => void;
+  options: { label: string; value: T }[];
   includeNone?: boolean;
 }
 
-export const MultiselectFilter = ({ selected, setSelected, options, label }: MultiSelectFilterProps) => {
+export const MultiselectFilter = <T extends string>({
+  selected,
+  setSelected,
+  options,
+  label,
+}: MultiSelectFilterProps<T>) => {
   const [value, setValue] = useState('');
 
   const selectedOptions = useMemo(

@@ -18,7 +18,8 @@ import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { useTildelingFilter } from '@/lib/query-state/query-state';
+import { useRelevantPåVentReasons } from '@/lib/hooks/use-relevant-på-vent-reasons';
+import { useTildelingFilter, useTrSakstyperFilter } from '@/lib/query-state/query-state';
 import {
   type AnkeITRLedig,
   type AnkeITRTildelt,
@@ -29,16 +30,16 @@ import {
   type BegjæringOmGjenopptakITRTildelt,
   type BegjæringOmGjenopptakITRTildelteResponse,
   type IKodeverkSimpleValue,
-  type IKodeverkValue,
   type IYtelse,
-  type PåVentReason,
   Sakstype,
+  type SakstypeToPåVentReasons,
+  TR_SAKSTYPER,
 } from '@/lib/types';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
   klageenheter: IKodeverkSimpleValue[];
-  påVentReasons: IKodeverkValue<PåVentReason>[];
+  sakstyperToPåVentReasons: SakstypeToPåVentReasons[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -108,10 +109,17 @@ const BehandlingerData = ({
   tildelteGb,
   ytelser,
   klageenheter,
-  påVentReasons,
+  sakstyperToPåVentReasons,
 }: DataProps) => {
   const ledigeFiltered = useSakITRFilter([...ledigeAnker, ...ledigeGb]);
   const tildelteFiltered = useSakITRFilter([...tildelteAnker, ...tildelteGb]);
+
+  const [selectedSakstyper] = useTrSakstyperFilter();
+
+  const påVentReasons = useRelevantPåVentReasons(
+    selectedSakstyper.length === 0 ? TR_SAKSTYPER : selectedSakstyper,
+    sakstyperToPåVentReasons,
+  );
 
   const uferdige = useMemo(
     () => [...ledigeFiltered.map((b) => ({ ...b, tildeltEnhet: b.tildeltEnhet ?? '4293' })), ...tildelteFiltered],

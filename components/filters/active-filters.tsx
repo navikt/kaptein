@@ -14,7 +14,7 @@ import {
   useYtelserFilter,
   useYtelsesgrupperFilter,
 } from '@/lib/query-state/query-state';
-import type { IKodeverkSimpleValue, RegistreringshjemlerMap } from '@/lib/types';
+import type { IKodeverkSimpleValue, RegistreringshjemlerMap, Sakstype } from '@/lib/types';
 import { YTELSESGRUPPE_KODEVERK } from '@/lib/types/ytelsesgrupper';
 
 interface Props {
@@ -59,7 +59,7 @@ export const ActiveFilters = ({
         />
       )}
       {sakstyperKodeverk === undefined ? null : isTr ? (
-        <Group
+        <Group<Sakstype>
           values={trSakstyper}
           setValues={setTrSakstyper}
           getName={getKodeverkName(sakstyperKodeverk)}
@@ -116,14 +116,14 @@ export const ActiveFilters = ({
   );
 };
 
-interface GroupProps {
+interface GroupProps<T extends string> {
   getName: (id: string) => string;
   color: ChipsProps['data-color'];
-  values: string[];
-  setValues: (values: string[] | null) => void;
+  values: T[];
+  setValues: (values: T[] | null) => void;
 }
 
-const Group = ({ getName, color, values, setValues }: GroupProps) => {
+const Group = <T extends string>({ getName, color, values, setValues }: GroupProps<T>) => {
   const children = useMemo(
     () =>
       values.map((v) => (

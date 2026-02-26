@@ -24,40 +24,41 @@ import { VarsletFristPerYtelse } from '@/components/charts/varslet-frist-per-yte
 import { ÅrsakerForBehandlingerPåVentGruppertEtterYtelse } from '@/components/charts/årsaker-for-behandlinger-på-vent-gruppert-etter-ytelse';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
-import { useTildelingFilter } from '@/lib/query-state/query-state';
-import type {
-  AnkeLedig,
-  AnkerLedigeResponse,
-  AnkerTildelteResponse,
-  AnkeTildelt,
-  BegjæringOmGjenopptakLedig,
-  BegjæringOmGjenopptakLedigeResponse,
-  BegjæringOmGjenopptakTildelt,
-  BegjæringOmGjenopptakTildelteResponse,
-  BetongLedig,
-  BetongLedigeResponse,
-  BetongTildelt,
-  BetongTildelteResponse,
-  IKodeverkSimpleValue,
-  IKodeverkValue,
-  IYtelse,
-  KlageLedig,
-  KlagerLedigeResponse,
-  KlagerTildelteResponse,
-  KlageTildelt,
-  OmgjøringskravLedig,
-  OmgjøringskravLedigeResponse,
-  OmgjøringskravTildelt,
-  OmgjøringskravTildelteResponse,
-  PåVentReason,
-  Sakstype,
+import { useRelevantPåVentReasons } from '@/lib/hooks/use-relevant-på-vent-reasons';
+import { useKaSakstyperFilter, useTildelingFilter } from '@/lib/query-state/query-state';
+import {
+  type AnkeLedig,
+  type AnkerLedigeResponse,
+  type AnkerTildelteResponse,
+  type AnkeTildelt,
+  type BegjæringOmGjenopptakLedig,
+  type BegjæringOmGjenopptakLedigeResponse,
+  type BegjæringOmGjenopptakTildelt,
+  type BegjæringOmGjenopptakTildelteResponse,
+  type BetongLedig,
+  type BetongLedigeResponse,
+  type BetongTildelt,
+  type BetongTildelteResponse,
+  type IKodeverkSimpleValue,
+  type IYtelse,
+  KA_SAKSTYPER,
+  type KlageLedig,
+  type KlagerLedigeResponse,
+  type KlagerTildelteResponse,
+  type KlageTildelt,
+  type OmgjøringskravLedig,
+  type OmgjøringskravLedigeResponse,
+  type OmgjøringskravTildelt,
+  type OmgjøringskravTildelteResponse,
+  type Sakstype,
+  type SakstypeToPåVentReasons,
 } from '@/lib/types';
 
 interface KodeverkProps {
   ytelser: IYtelse[];
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
   klageenheter: IKodeverkSimpleValue[];
-  påVentReasons: IKodeverkValue<PåVentReason>[];
+  sakstyperToPåVentReasons: SakstypeToPåVentReasons[];
 }
 
 export const Behandlinger = (kodeverk: KodeverkProps) => {
@@ -202,9 +203,16 @@ const BehandlingerData = ({
   sakstyper,
   ytelser,
   klageenheter,
-  påVentReasons,
+  sakstyperToPåVentReasons,
 }: Props & KodeverkProps) => {
   const [tildelingFilter] = useTildelingFilter();
+  const [selectedSakstyper] = useKaSakstyperFilter();
+
+  const påVentReasons = useRelevantPåVentReasons(
+    selectedSakstyper.length === 0 ? KA_SAKSTYPER : selectedSakstyper,
+    sakstyperToPåVentReasons,
+  );
+
   const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
   const showsAlle = tildelingFilter === TildelingFilter.ALL;
 

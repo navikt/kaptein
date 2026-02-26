@@ -9,7 +9,7 @@ import {
   useTrSakstyperFilter,
   useTrUtfallFilter,
 } from '@/lib/query-state/query-state';
-import type { SakstypeToUtfall } from '@/lib/types';
+import type { Sakstype, SakstypeToUtfall } from '@/lib/types';
 
 interface Props {
   sakstyperToUtfall: SakstypeToUtfall[] | undefined;
@@ -47,8 +47,8 @@ export const TrSakstyperAndUtfall = ({ sakstyperToUtfall = [] }: Props) => {
 
 interface FilterProps extends Props {
   sakstyperToUtfall: SakstypeToUtfall[];
-  selectedSakstyper: string[];
-  setSelectedSakstyper: (sakstyper: string[] | null) => void;
+  selectedSakstyper: Sakstype[];
+  setSelectedSakstyper: (sakstyper: Sakstype[] | null) => void;
   selectedUtfall: string[];
   setSelectedUtfall: (utfall: string[] | null) => void;
 }
