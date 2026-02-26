@@ -10,13 +10,7 @@ import { NoData } from '@/components/no-data/no-data';
 import { EChart } from '@/lib/echarts/echarts';
 import { getPåVentReasonColor } from '@/lib/echarts/get-colors';
 import { percent } from '@/lib/percent';
-import {
-  type BaseBehandling,
-  type IKodeverkSimpleValue,
-  type IKodeverkValue,
-  PåVentReason,
-  type Tildelt,
-} from '@/lib/types';
+import type { BaseBehandling, IKodeverkSimpleValue, IKodeverkValue, PåVentReason, Tildelt } from '@/lib/types';
 
 interface Props {
   title: string;
@@ -36,12 +30,12 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
 
   const series = useMemo(
     () =>
-      Object.values(PåVentReason).map((reason) => ({
+      påVentReasons.map(({ beskrivelse, id }) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
-        name: påVentReasons.find((r) => r.id === reason)?.beskrivelse ?? reason,
-        color: getPåVentReasonColor(reason),
+        name: beskrivelse,
+        color: getPåVentReasonColor(id),
         data: entries
-          .map((entry) => countPåVentReason(påVentBehandlinger, getYtelseIdsForEntry(entry), reason))
+          .map((entry) => countPåVentReason(påVentBehandlinger, getYtelseIdsForEntry(entry), id))
           .map((value) => (value === 0 ? null : value)),
       })),
     [påVentBehandlinger, påVentReasons, entries],

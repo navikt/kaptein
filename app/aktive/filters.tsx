@@ -9,7 +9,7 @@ import { KaSakstyper } from '@/components/filters/sakstyper';
 import { HelpForAktive, Tilbakekreving } from '@/components/filters/tilbakekreving';
 import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and-hjemler';
-import { getDefaultSakstyper, getInnsendingshjemlerMap, getKlageenheter, getYtelser } from '@/lib/server/api';
+import { getInnsendingshjemlerMap, getKASakstyper, getKlageenheter, getYtelser } from '@/lib/server/api';
 import type { IKodeverkSimpleValue, IYtelse, Sakstype } from '@/lib/types';
 
 export const Filters = async () => (
@@ -21,7 +21,7 @@ export const Filters = async () => (
 const AsyncFilters = async () => {
   const ytelser = await getYtelser();
   const klageenheter = await getKlageenheter();
-  const sakstyper = await getDefaultSakstyper();
+  const sakstyper = await getKASakstyper();
   const innsendingshjemlerMap = await getInnsendingshjemlerMap();
 
   return (

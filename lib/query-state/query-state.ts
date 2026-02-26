@@ -4,6 +4,7 @@ import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nu
 import {
   parseAsDateString,
   parseAsHjemlerModeFilter,
+  parseAsSakstype,
   parseAsTilbakekrevingFilter,
   parseAsTildelingFilter,
 } from '@/app/custom-query-parsers';
@@ -45,13 +46,13 @@ export const useInnsendingshjemlerFilter = () =>
 export const useKaSakstyperFilter = () =>
   useQueryState(
     QueryParam.KA_SAKSTYPER,
-    parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
+    parseAsArrayOf(parseAsSakstype).withDefault([]).withOptions({ clearOnDefault: true }),
   );
 
 export const useTrSakstyperFilter = () =>
   useQueryState(
     QueryParam.TR_SAKSTYPER,
-    parseAsArrayOf(parseAsString).withDefault([]).withOptions({ clearOnDefault: true }),
+    parseAsArrayOf(parseAsSakstype).withDefault([]).withOptions({ clearOnDefault: true }),
   );
 
 export const useTildelingFilter = () =>

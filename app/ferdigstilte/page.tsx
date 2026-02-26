@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Behandlinger } from '@/app/ferdigstilte/behandlinger';
-import { getDefaultSakstyper, getKlageenheter, getUtfall, getYtelser } from '@/lib/server/api';
+import { getKASakstyper, getKlageenheter, getUtfall, getYtelser } from '@/lib/server/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const ytelser = await getYtelser();
-  const sakstyper = await getDefaultSakstyper();
+  const sakstyper = await getKASakstyper();
   const klageenheter = await getKlageenheter();
   const utfall = await getUtfall();
 

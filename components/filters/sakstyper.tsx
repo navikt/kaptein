@@ -22,8 +22,8 @@ export const TrSakstyper = ({ sakstyper = [] }: Props) => {
 };
 
 interface FilterProps {
-  selected: string[];
-  setSelected: (sakstyper: string[] | null) => void;
+  selected: Sakstype[];
+  setSelected: (sakstyper: Sakstype[] | null) => void;
   sakstyper: IKodeverkSimpleValue<Sakstype>[];
 }
 

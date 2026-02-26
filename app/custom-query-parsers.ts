@@ -1,5 +1,6 @@
 import { createParser } from 'nuqs';
 import { HjemlerModeFilter, TilbakekrevingFilter, TildelingFilter } from '@/app/query-types';
+import { KA_SAKSTYPER, type Sakstype, TR_SAKSTYPER } from '@/lib/types';
 
 const TILDELT_FILTER_VALUES = Object.values(TildelingFilter);
 const TILBAKEKREVING_FILTER_VALUES = Object.values(TilbakekrevingFilter);
@@ -13,6 +14,9 @@ export const isTilbakekrevingFilter = (value: string): value is TilbakekrevingFi
 
 export const isHjemlerModeFilter = (value: string): value is HjemlerModeFilter =>
   HJEMLER_MODE_FILTER_VALUES.some((v) => v === value);
+
+const isSakstype = (value: string): value is Sakstype =>
+  KA_SAKSTYPER.some((s) => s === value) || TR_SAKSTYPER.some((s) => s === value);
 
 export const parseAsTildelingFilter = createParser({
   parse: (value): TildelingFilter => {
@@ -68,6 +72,18 @@ export const parseAsDateString = createParser({
   parse: (value): string => {
     if (!isDateString(value)) {
       throw new Error('Invalid date format, expected YYYY-MM-DD');
+    }
+
+    return value;
+  },
+
+  serialize: (value) => value,
+});
+
+export const parseAsSakstype = createParser({
+  parse: (value): Sakstype => {
+    if (!isSakstype(value)) {
+      throw new Error('Invalid sakstype');
     }
 
     return value;

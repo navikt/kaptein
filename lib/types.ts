@@ -278,17 +278,26 @@ export enum Sakstype {
   BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN = '7',
 }
 
-export enum PåVentReason {
+export enum PåVentReasonCommon {
+  SATT_I_BERO = '4',
+  ANNET = '5',
+}
+
+export enum PåVentReasonKa {
   VENTER_PAA_TILSVAR = '1',
   VENTER_PAA_DOKUMENTASJON = '2',
   VENTER_PAA_AVKLARING_OM_DOEDSBO = '3',
-  SATT_I_BERO = '4',
   ANNET_TIL_FORELEGGELSE = '6',
   VENTER_PAA_UTFYLLENDE_KLAGE = '7',
   VENTER_PAA_UTFYLLENDE_ANKE = '8',
-
-  ANNET = '5',
 }
+
+export enum PåVentReasonTr {
+  VENTER_PAA_AVGJOERELSE_OM_SOEKSMAAL_GJENOPPTAKSBEGJAERING = '9',
+  UTREDER_FOR_TRYGDERETTEN = '10',
+}
+
+export type PåVentReason = PåVentReasonCommon | PåVentReasonKa | PåVentReasonTr;
 
 export interface SakstypeToUtfall extends IKodeverkSimpleValue<Sakstype> {
   utfall: IKodeverkSimpleValue<Utfall>[];
@@ -301,3 +310,17 @@ export type FristBehandling = BaseBehandling & Frist & (Ferdigstilt | Ledig | Ti
 type FerdigstiltBehanding = BaseBehandling & Ferdigstilt;
 type AktivBehandling = BaseBehandling & (Ledig | Tildelt);
 export type Behandling = FerdigstiltBehanding | AktivBehandling;
+
+export interface SakstypeToPåVentReasons extends IKodeverkSimpleValue<Sakstype> {
+  sattPaaVentReasons: IKodeverkValue<PåVentReason>[];
+}
+
+export const KA_SAKSTYPER = [
+  Sakstype.KLAGE,
+  Sakstype.ANKE,
+  Sakstype.BEHANDLING_ETTER_TR_OPPHEVET,
+  Sakstype.OMGJØRINGSKRAV,
+  Sakstype.BEGJÆRING_OM_GJENOPPTAK,
+];
+
+export const TR_SAKSTYPER = [Sakstype.ANKE_I_TRYGDERETTEN, Sakstype.BEGJÆRING_OM_GJENOPPTAK_I_TRYGDERETTEN];

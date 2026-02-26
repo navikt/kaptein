@@ -11,8 +11,8 @@ import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbak
 import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndInnsendingshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and-hjemler';
 import {
-  getDefaultSakstyper,
   getInnsendingshjemlerMap,
+  getKASakstyper,
   getKlageenheter,
   getRegistreringshjemlerMap,
   getYtelser,
@@ -30,7 +30,7 @@ const AsyncFilters = async () => {
   const klageEnheter = await getKlageenheter();
   const registreringshjemler = await getRegistreringshjemlerMap();
   const innsendingshjemler = await getInnsendingshjemlerMap();
-  const sakstyper = await getDefaultSakstyper();
+  const sakstyper = await getKASakstyper();
 
   return (
     <RenderFilters

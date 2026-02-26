@@ -21,8 +21,10 @@ interface Props {
 const TITLE = 'Tildelte saker på vent / ikke på vent';
 const IKKE_PÅ_VENT_DESCRIPTION = 'Ikke på vent';
 const IKKE_PÅ_VENT_KEY = '-1';
+const OTHER_KEY = '-2';
+const OTHER_DESCRIPTION = 'Andre';
 
-type Key = PåVentReason | typeof IKKE_PÅ_VENT_KEY;
+type Key = PåVentReason | typeof IKKE_PÅ_VENT_KEY | typeof OTHER_KEY;
 
 interface Data {
   id: Key;
@@ -47,6 +49,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
           itemStyle: { color: getNotPåVentColor(theme) },
         },
       ],
+      [OTHER_KEY, { id: OTHER_KEY, name: OTHER_DESCRIPTION, value: 0, itemStyle: { color: getOtherColor(theme) } }],
       ...påVentReasons.map<Entry>((reason) => [
         reason.id,
         {
@@ -64,10 +67,19 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
       const existing = map.get(value);
 
       if (existing === undefined) {
-        browserLog.warn(`Could not find på vent reason with id: ${value}`);
+        browserLog.warn(`Could not find på vent reason with id: ${value}, behandling: ${JSON.stringify(behandling)}`);
+        const other = map.get(OTHER_KEY);
+
+        if (other !== undefined) {
+          other.value += 1;
+        }
       } else {
         existing.value += 1;
       }
+    }
+
+    if (map.get(OTHER_KEY)?.value === 0) {
+      map.delete(OTHER_KEY);
     }
 
     return Array.from(map.values());
@@ -109,5 +121,14 @@ const getNotPåVentColor = (theme: AppTheme): string => {
       return LIGHT[ColorToken.Success500];
     case AppTheme.DARK:
       return DARK[ColorToken.Success500];
+  }
+};
+
+const getOtherColor = (theme: AppTheme): string => {
+  switch (theme) {
+    case AppTheme.LIGHT:
+      return LIGHT[ColorToken.Neutral100];
+    case AppTheme.DARK:
+      return DARK[ColorToken.Neutral100];
   }
 };
