@@ -17,13 +17,13 @@ export const Innsendingshjemler = ({ relevantYtelser }: Props) => {
     const hjemler: Record<string, string> = {};
 
     for (const ytelse of relevantYtelser) {
-      for (const hjemmel of ytelse.innsendingshjemler) {
-        hjemler[hjemmel.id] = hjemmel.navn;
+      for (const { id, navn, utfases } of ytelse.innsendingshjemler) {
+        hjemler[id] = `${navn}${utfases ? ' (utfases)' : ''}`;
       }
     }
 
     return Object.entries(hjemler)
-      .map(([id, navn]) => ({ value: id, label: navn }))
+      .map(([value, label]) => ({ value, label }))
       .toSorted((a, b) => sortWithOrdinals(a.label, b.label));
   }, [relevantYtelser]);
 

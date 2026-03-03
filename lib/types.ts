@@ -114,7 +114,7 @@ export interface ILovKildeToRegistreringshjemmel {
 
 export interface IYtelse extends IKodeverkSimpleValue {
   lovKildeToRegistreringshjemler: ILovKildeToRegistreringshjemmel[];
-  innsendingshjemler: IKodeverkValue[];
+  innsendingshjemler: (IKodeverkValue & { utfases: boolean })[];
   enheter: IKodeverkSimpleValue[];
   klageenheter: IKodeverkSimpleValue[];
 }
