@@ -44,8 +44,15 @@ export const BelastningPerYtelse = ({
 
   const entries = useYtelseChartData(allBehandlinger, ytelser);
 
-  const ytelseData = useMemo<YtelseData[]>(() => {
+  const { ytelseData, totalMottatt, totalFerdigstilt, totalDiff } = useMemo(() => {
     const data: YtelseData[] = [];
+
+    // Avoid counting ytelser that are included both alone and as part of a group twice in total counts
+    const uniqueYtelseIds = [...new Set(entries.flatMap(getYtelseIdsForEntry))];
+    const totalMottatt =
+      countMottatt(mottattInPeriod, uniqueYtelseIds, fromFilter, toFilter) +
+      countMottatt(ferdigstilteInPeriod, uniqueYtelseIds, fromFilter, toFilter);
+    const totalFerdigstilt = countFerdigstilt(ferdigstilteInPeriod, uniqueYtelseIds, fromFilter, toFilter);
 
     for (const entry of entries) {
       const ytelseIds = getYtelseIdsForEntry(entry);
@@ -76,7 +83,7 @@ export const BelastningPerYtelse = ({
       }
     }
 
-    return data;
+    return { ytelseData: data, totalMottatt, totalFerdigstilt, totalDiff: totalMottatt - totalFerdigstilt };
   }, [entries, ferdigstilteInPeriod, mottattInPeriod, outgoingRestanse, fromFilter, toFilter]);
 
   const labels = useMemo(() => ytelseData.map((d) => d.ytelseNavn), [ytelseData]);
@@ -88,10 +95,6 @@ export const BelastningPerYtelse = ({
 
   const positiveDiff = useMemo(() => ytelseData.map((d) => (d.diff <= 0 ? 0 : d.diff)), [ytelseData]);
   const negativeDiff = useMemo(() => ytelseData.map((d) => (d.diff >= 0 ? 0 : Math.abs(d.diff))), [ytelseData]);
-
-  const totalMottatt = useMemo(() => ytelseData.reduce((sum, d) => sum + d.mottatt, 0), [ytelseData]);
-  const totalFerdigstilt = useMemo(() => ytelseData.reduce((sum, d) => sum + d.ferdigstilt, 0), [ytelseData]);
-  const totalDiff = useMemo(() => totalMottatt - totalFerdigstilt, [totalMottatt, totalFerdigstilt]);
 
   if (ytelseData.length === 0) {
     return <NoData title={title} />;
