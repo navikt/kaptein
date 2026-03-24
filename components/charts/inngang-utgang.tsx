@@ -100,13 +100,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       ut.push(v.ut);
       innTotal += v.inn;
       utTotal += v.ut;
-      if (v.ut === 0 && v.inn === 0) {
-        diff.push(0);
-      } else if (v.ut === 0) {
-        diff.push(v.inn);
-      } else {
-        diff.push(v.inn - v.ut);
-      }
+      diff.push(v.inn - v.ut);
     }
 
     const diffTotal = innTotal - utTotal;
@@ -303,7 +297,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
                   height: 4,
                 },
                 style: {
-                  fill: value < 0 ? 'var(--ax-danger-400A)' : 'var(--ax-success-400A)',
+                  fill: value < 0 ? 'var(--ax-success-400A)' : 'var(--ax-danger-400A)',
                 },
                 emphasisDisabled: true,
               };
