@@ -48,6 +48,7 @@ const PieTable = ({ series, isPercentage, ref }: PieTableProps) => {
       </Table.Header>
       <Table.Body className="whitespace-nowrap font-mono">
         {rows.map((row, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Stable
           <Table.Row key={index}>
             <Table.DataCell>{row.name}</Table.DataCell>
             <Table.DataCell align="right">{formatValue(row.value, isPercentage)}</Table.DataCell>
@@ -95,9 +96,11 @@ const CategoryTable = ({ labels, series, isPercentage, ref }: CategoryTableProps
       </Table.Header>
       <Table.Body className="whitespace-nowrap font-mono">
         {rows.map((row, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Stable
           <Table.Row key={index}>
             <Table.DataCell>{row.label}</Table.DataCell>
             {row.values.map((value, valueIndex) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: Stable
               <Table.DataCell key={valueIndex} align="right">
                 {formatValue(value, isPercentage)}
               </Table.DataCell>
