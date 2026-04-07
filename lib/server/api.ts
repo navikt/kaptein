@@ -12,7 +12,6 @@ import {
   type IUserData,
   type IYtelse,
   KA_SAKSTYPER,
-  type PåVentReason,
   type RegistreringshjemlerMap,
   type SakITRUtfall,
   type Sakstype,
@@ -169,9 +168,6 @@ export const getInnsendingshjemlerMap = () =>
 
 export const getRegistreringshjemlerMap = () =>
   getData<RegistreringshjemlerMap>(AppName.KLAGE_KODEVERK, '/kodeverk/registreringshjemlermap');
-
-export const getPåVentReasons = () =>
-  getData<IKodeverkValue<PåVentReason>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/satt-paa-vent-reasons');
 
 export const getKASakstyper = async () => {
   const sakstyper = await getData<IKodeverkSimpleValue<Sakstype>[]>(AppName.KLAGE_KODEVERK, '/kodeverk/sakstyper');
