@@ -49,7 +49,6 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
 }: Props) => {
   const { fromFilter, toFilter } = useDateFilter();
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ¯\_(ツ)_/¯
   const { labels, inn, ut, diff, innTotal, utTotal, diffTotal, innAverage, utAverage } = useMemo<Data>(() => {
     const buckets = createBuckets(fromFilter, toFilter);
 
