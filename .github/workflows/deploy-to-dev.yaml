@@ -42,8 +42,9 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-          registry-url: https://npm.pkg.github.com/
-          scope: "@navikt"
+          registries: |
+            https://registry.npmjs.org/
+            @navikt:https://npm.pkg.github.com/|$BUN_AUTH_TOKEN
 
       - name: Setup cache
         uses: actions/cache@v4
@@ -54,10 +55,6 @@ jobs:
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}-
-
-      - name: Generate bunfig.toml
-        run: |
-          echo -e "[install.scopes]\n\"@navikt\" = { token = \"${{ secrets.READER_TOKEN }}\", url = \"https://npm.pkg.github.com/\" }" > bunfig.toml
 
       - name: Install dependencies
         env:
