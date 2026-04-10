@@ -16,12 +16,9 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-          registry-url: https://npm.pkg.github.com/
-          scope: "@navikt"
-          
-      - name: Generate bunfig.toml
-        run: |
-          echo -e "[install.scopes]\n\"@navikt\" = { token = \"${{ secrets.READER_TOKEN }}\", url = \"https://npm.pkg.github.com/\" }" > bunfig.toml
+          registries: |
+            https://registry.npmjs.org/
+            @navikt:https://npm.pkg.github.com/|$BUN_AUTH_TOKEN
 
       - name: Install dependencies
         shell: bash
