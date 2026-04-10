@@ -28,7 +28,7 @@ jobs:
         env:
           BUN_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
         run: |
-          bun install --frozen-lockfile
+          bun install --frozen-lockfile --ignore-scripts
           
       - name: Build
         shell: bash

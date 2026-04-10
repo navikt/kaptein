@@ -5,7 +5,7 @@ Produksjonsinfo for Kabal
 
 1. Installer avhengigheter
 ```bash
-bun i
+bun i --ignore-scripts
 ```
 
 2. Start utviklingsserver
