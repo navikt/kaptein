@@ -1,11 +1,12 @@
 import { join } from 'node:path';
+import { SpanStatusCode, trace } from '@opentelemetry/api';
 import { headers } from 'next/headers';
 import { AppName } from '@/lib/app-name';
 import { isLocal } from '@/lib/environment';
 import { InternalServerError, UnauthorizedError } from '@/lib/errors';
 import { getLogger } from '@/lib/logger';
 import { getOboToken } from '@/lib/server/get-obo-token';
-import { generateTraceParent } from '@/lib/server/traceparent';
+import { recordSpanError } from '@/lib/tracing';
 import {
   type IKodeverkSimpleValue,
   type IKodeverkValue,
@@ -22,6 +23,8 @@ import {
 } from '@/lib/types';
 
 const logger = getLogger('api');
+
+const tracer = trace.getTracer('kaptein');
 
 const KAPTEIN_PROXY_TARGET = new URL('https://kaptein.intern.nav.no/api/proxy');
 
@@ -67,58 +70,67 @@ export const SERVICE_URLS: Record<AppName, (urlOptions: UrlOptions) => URL> = {
   [AppName.KAPTEIN_API]: (urlOptions) => copyUrlWithPath(KAPTEIN_API, urlOptions),
 };
 
-const getHeaders = async (appName: AppName, traceparent: string): Promise<Headers> => {
+const getHeaders = async (appName: AppName): Promise<Headers> => {
   const incomingHeaders = await headers();
 
   if (isLocal) {
-    const copiedHeaders = new Headers(incomingHeaders);
-    copiedHeaders.set('traceparent', traceparent);
-    return copiedHeaders;
+    return new Headers(incomingHeaders);
   }
 
   return new Headers({
     accept: 'application/json',
-    traceparent,
     authorization: `Bearer ${await getOboToken(appName, incomingHeaders)}`,
   });
 };
 
 const getResponse = async (appName: AppName, path: string): Promise<Response> => {
-  const { traceparent, traceId, spanId } = generateTraceParent();
   const url = SERVICE_URLS[appName]({ path });
 
-  try {
-    const res = await fetch(url, { method: 'GET', headers: await getHeaders(appName, traceparent) });
+  return tracer.startActiveSpan(`getResponse ${appName} ${path}`, async (span) => {
+    try {
+      const res = await fetch(url, { method: 'GET', headers: await getHeaders(appName) });
 
-    if (res.status === 401) {
-      throw new UnauthorizedError();
+      span.setAttribute('http.status_code', res.status);
+      span.setAttribute('http.url', url.toString());
+
+      if (res.status === 401) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: 'Unauthorized' });
+        throw new UnauthorizedError();
+      }
+
+      if (!res.ok) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: `Failed to fetch - ${res.status}` });
+        throw new InternalServerError(res.status, 'Kunne ikke hente data');
+      }
+
+      span.setStatus({ code: SpanStatusCode.OK });
+
+      return res;
+    } catch (error) {
+      recordSpanError(span, error);
+
+      if (error instanceof UnauthorizedError) {
+        logger.warn('Unauthorized', { url: url.toString(), status: 401 });
+      } else if (error instanceof InternalServerError) {
+        logger.error(`Failed to fetch ${url.toString()} - ${error.status}`, {
+          url: url.toString(),
+          status: error.status,
+        });
+      } else if (error instanceof Error) {
+        logger.error('Failed to fetch', {
+          url: url.toString(),
+          error: error.message,
+          stack: error.stack,
+        });
+      } else {
+        logger.error('Failed to fetch', { url: url.toString(), error: 'Unknown error' });
+      }
+
+      throw error;
+    } finally {
+      span.end();
     }
-
-    if (!res.ok) {
-      throw new InternalServerError(res.status, 'Kunne ikke hente data');
-    }
-
-    return res;
-  } catch (error) {
-    if (error instanceof UnauthorizedError) {
-      logger.warn('Unauthorized', traceId, spanId, { url: url.toString(), status: 401 });
-    } else if (error instanceof InternalServerError) {
-      logger.error(`Failed to fetch ${url.toString()} - ${error.status}`, traceId, spanId, {
-        url: url.toString(),
-        status: error.status,
-      });
-    } else if (error instanceof Error) {
-      logger.error('Failed to fetch', traceId, spanId, {
-        url: url.toString(),
-        error: error.message,
-        stack: error.stack,
-      });
-    } else {
-      logger.error('Failed to fetch', traceId, spanId, { url: url.toString(), error: 'Unknown error' });
-    }
-
-    throw error;
-  }
+  });
 };
 
 const getData = async <T>(appName: AppName, path: string): Promise<T> => {

@@ -1,10 +1,6 @@
 import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
 
-export const prepareProxyHeaders = (
-  { host }: URL,
-  req: Request,
-  overrideHeaders?: OutgoingHttpHeaders,
-): OutgoingHttpHeaders => {
+export const prepareProxyHeaders = ({ host }: URL, req: Request, authorization?: string): OutgoingHttpHeaders => {
   const headers: OutgoingHttpHeaders = { host };
 
   const incomingHeaders = req.headers.entries();
@@ -17,11 +13,11 @@ export const prepareProxyHeaders = (
     headers[key] = value;
   }
 
-  if (overrideHeaders === undefined) {
-    return headers;
+  if (authorization !== undefined) {
+    headers.authorization = authorization;
   }
 
-  return Object.assign(headers, overrideHeaders);
+  return headers;
 };
 
 export const getResponseHeaders = (res: IncomingMessage): Headers => {

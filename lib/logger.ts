@@ -1,3 +1,4 @@
+import { trace } from '@opentelemetry/api';
 import { VERSION } from '@/lib/version';
 
 enum LogLevel {
@@ -12,7 +13,24 @@ interface JsonObject {
   [key: string]: JsonValue;
 }
 
-type LoggerFn = (message: string, traceId: string, spanId: string, eventData?: JsonObject) => void;
+type LoggerFn = (message: string, eventData?: JsonObject) => void;
+
+interface TraceContext {
+  traceId: string | undefined;
+  spanId: string | undefined;
+}
+
+const getTraceContext = (): TraceContext => {
+  const span = trace.getActiveSpan();
+
+  if (span === undefined) {
+    return { traceId: undefined, spanId: undefined };
+  }
+
+  const { traceId, spanId } = span.spanContext();
+
+  return { traceId, spanId };
+};
 
 export const getLogger = (module: string, defaultEventData?: JsonObject) => ({
   debug: getLogLine(LogLevel.DEBUG, module, defaultEventData),
@@ -23,7 +41,9 @@ export const getLogger = (module: string, defaultEventData?: JsonObject) => ({
 
 type GetLogLineFn = (level: LogLevel, module: string, defaultEventData?: JsonObject) => LoggerFn;
 
-const getLogLine: GetLogLineFn = (level, module, defaultEventData) => (message, traceId, spanId, eventData) =>
+const getLogLine: GetLogLineFn = (level, module, defaultEventData) => (message, eventData) => {
+  const { traceId, spanId } = getTraceContext();
+
   // biome-ignore lint/suspicious/noConsole: Console needed
   console[level](
     JSON.stringify({
@@ -38,5 +58,6 @@ const getLogLine: GetLogLineFn = (level, module, defaultEventData) => (message, 
       '@timestamp': timestamp(),
     }),
   );
+};
 
 const timestamp = () => new Date().toISOString();
