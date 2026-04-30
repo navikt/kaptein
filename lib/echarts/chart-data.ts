@@ -5,7 +5,7 @@ interface SeriesData {
   value?: number | string;
 }
 
-export type SeriesDataItem = number | string | SeriesData | null | undefined;
+type SeriesDataItem = number | string | SeriesData | null | undefined;
 
 export interface Series {
   name?: string;
@@ -13,7 +13,7 @@ export interface Series {
   type?: string;
 }
 
-export interface AxisData {
+interface AxisData {
   data?: (string | number)[];
 }
 

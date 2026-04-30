@@ -75,7 +75,7 @@ export interface IUserData extends INavEmployee {
   tildelteYtelser: string[];
 }
 
-export enum Role {
+enum Role {
   ALLE_I_KA = 'ALLE_I_KA',
   KABAL_SAKSBEHANDLING = 'KABAL_SAKSBEHANDLING',
   KABAL_INNSYN_EGEN_ENHET = 'KABAL_INNSYN_EGEN_ENHET',
@@ -107,7 +107,7 @@ export interface IKodeverkValue<T extends string = string> extends IKodeverkSimp
   beskrivelse: string;
 }
 
-export interface ILovKildeToRegistreringshjemmel {
+interface ILovKildeToRegistreringshjemmel {
   lovkilde: IKodeverkValue;
   registreringshjemler: IKodeverkSimpleValue[];
 }
@@ -145,7 +145,7 @@ export interface Tildelt {
   tildeltEnhet: string;
 }
 
-export interface Resultat<U = Utfall> {
+interface Resultat<U = Utfall> {
   utfallId: U;
   registreringshjemmelIdList: string[];
 }
