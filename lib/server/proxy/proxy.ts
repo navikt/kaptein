@@ -13,17 +13,17 @@ interface TargetOptions {
   targetUrl: URL | string;
   method?: string;
   timeout?: number;
-  overrideHeaders?: OutgoingHttpHeaders;
+  authorization?: string;
   onEnd?: (info: EndInfo) => void;
 }
 
 export const handleProxyRequest = async (
   req: Request,
-  { targetUrl, method = 'GET', timeout = 0, overrideHeaders, onEnd }: TargetOptions,
+  { targetUrl, method = 'GET', timeout = 0, authorization, onEnd }: TargetOptions,
 ): Promise<Response> => {
   const url = typeof targetUrl === 'string' ? new URL(targetUrl) : targetUrl;
   const request = url.protocol === 'https:' || url.protocol === 'wss:' ? https.request : http.request;
-  const requestHeaders = prepareProxyHeaders(url, req, overrideHeaders);
+  const requestHeaders = prepareProxyHeaders(url, req, authorization);
 
   const start = performance.now();
 
