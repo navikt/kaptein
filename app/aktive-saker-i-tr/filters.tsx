@@ -7,7 +7,6 @@ import { Reset } from '@/components/filters/reset';
 import { ResetCacheButton } from '@/components/filters/reset-cache';
 import { TrSakstyper } from '@/components/filters/sakstyper';
 import { HelpForFerdigstilte, Tilbakekreving } from '@/components/filters/tilbakekreving';
-import { Tildeling } from '@/components/filters/tildeling';
 import { YtelserAndInnsendingsAndRegistreringshjemler } from '@/components/filters/ytelser-and-hjemler/ytelser-and-hjemler';
 import {
   getInnsendingshjemlerMap,
@@ -76,7 +75,6 @@ const RenderFilters = ({
         ytelser={ytelser}
         lovkildeToRegistreringshjemler={lovkildeToRegistreringshjemler}
       />
-      <Tildeling />
     </VStack>
 
     <VStack gap="space-16" flexGrow="1">
