@@ -3,7 +3,6 @@
 import { BodyLong, BodyShort } from '@navikt/ds-react';
 import { useMemo } from 'react';
 import { Skeleton } from '@/app/aktive-saker-i-tr/skeleton';
-import { TildelingFilter } from '@/app/query-types';
 import { Card } from '@/components/cards';
 import { LoadingError } from '@/components/charts/common/loading-error';
 import { useSakITRFilter } from '@/components/charts/common/use-data';
@@ -19,7 +18,7 @@ import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { TypeTag } from '@/components/type-tag/type-tag';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { useRelevantPåVentReasons } from '@/lib/hooks/use-relevant-på-vent-reasons';
-import { useTildelingFilter, useTrSakstyperFilter } from '@/lib/query-state/query-state';
+import { useTrSakstyperFilter } from '@/lib/query-state/query-state';
 import {
   type AnkeITRLedig,
   type AnkeITRTildelt,
@@ -123,28 +122,21 @@ const BehandlingerData = ({
 
   const uferdige = useMemo(() => [...ledigeFiltered, ...tildelteFiltered], [ledigeFiltered, tildelteFiltered]);
   const relevantYtelser = useRelevantYtelser([...ledigeFiltered, ...tildelteFiltered], ytelser);
-  const [tildelingFilter] = useTildelingFilter();
-
-  const showsLedige = tildelingFilter === TildelingFilter.LEDIGE;
 
   return (
     <ChartsWrapper>
-      {showsLedige ? null : (
-        <Card>
-          <TildelteSakerPåVentIkkePåVent behandlinger={tildelteFiltered} påVentReasons={påVentReasons} />
-        </Card>
-      )}
+      <Card>
+        <TildelteSakerPåVentIkkePåVent behandlinger={tildelteFiltered} påVentReasons={påVentReasons} />
+      </Card>
 
-      {showsLedige ? null : (
-        <Card span={5}>
-          <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
-            title="Årsaker for saker på vent gruppert etter ytelse"
-            behandlinger={tildelteFiltered}
-            relevantYtelser={relevantYtelser}
-            påVentReasons={påVentReasons}
-          />
-        </Card>
-      )}
+      <Card span={5}>
+        <ÅrsakerForBehandlingerPåVentGruppertEtterYtelse
+          title="Årsaker for saker på vent gruppert etter ytelse"
+          behandlinger={tildelteFiltered}
+          relevantYtelser={relevantYtelser}
+          påVentReasons={påVentReasons}
+        />
+      </Card>
 
       <Card span={3}>
         <TildelteSakerPerKlageenhetOgYtelse
