@@ -37,7 +37,8 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
     }
 
     // Create (iterable) array and sort
-    return Array.from(hjemler.entries())
+    return hjemler
+      .entries()
       .map(([lovkildeId, hjemlerMap]) => ({
         lovkildeId,
         lovkildeLabel: lovkildeToRegistreringshjemler.find((l) => l.id === lovkildeId)?.navn ?? lovkildeId,
@@ -45,6 +46,7 @@ export const Registreringshjemler = ({ relevantYtelser, lovkildeToRegistreringsh
           .toSorted(([, a], [, b]) => sortWithOrdinals(a, b))
           .map(([value, label]) => ({ label, value })),
       }))
+      .toArray()
       .toSorted((a, b) => sortWithOrdinals(a.lovkildeLabel, b.lovkildeLabel));
   }, [relevantYtelser, lovkildeToRegistreringshjemler]);
 

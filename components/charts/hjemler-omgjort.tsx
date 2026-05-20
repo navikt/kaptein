@@ -213,28 +213,31 @@ export const HjemlerOmgjort = ({
     // Populate series and get names
     const hjemmelNames = populateSeries(topHjemler, ytelserToHjemler, seriesMap, percentagesMap);
 
-    const series = Array.from(seriesMap.entries()).map(([ytelseId, counts]) => {
-      const percentages = percentagesMap.get(ytelseId) ?? [];
-      const dataWithPercentages = counts.map((count, index) => ({
-        value: count,
-        percentage: percentages[index] ?? 0,
-      }));
+    const series = seriesMap
+      .entries()
+      .map(([ytelseId, counts]) => {
+        const percentages = percentagesMap.get(ytelseId) ?? [];
+        const dataWithPercentages = counts.map((count, index) => ({
+          value: count,
+          percentage: percentages[index] ?? 0,
+        }));
 
-      return {
-        name: ytelserMap.get(ytelseId)?.navn ?? ytelseId,
-        type: 'bar' as const,
-        stack: 'total',
-        data: dataWithPercentages,
-        label: {
-          show: true,
-          position: 'inside' as const,
-          formatter: (params: { data: { value: number } }) => {
-            const count = params.data.value;
-            return count > 0 ? `${count}` : '';
+        return {
+          name: ytelserMap.get(ytelseId)?.navn ?? ytelseId,
+          type: 'bar' as const,
+          stack: 'total',
+          data: dataWithPercentages,
+          label: {
+            show: true,
+            position: 'inside' as const,
+            formatter: (params: { data: { value: number } }) => {
+              const count = params.data.value;
+              return count > 0 ? `${count}` : '';
+            },
           },
-        },
-      };
-    });
+        };
+      })
+      .toArray();
 
     return { hjemmelNames, series };
   }, [behandlinger, registreringshjemlerMap, ytelserMap, maxHjemler]);

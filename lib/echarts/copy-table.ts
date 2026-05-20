@@ -11,13 +11,15 @@ export const copyTable = async (
 
   // Extract plaintext from table - tab-separated values
   const rows = tableElement.querySelectorAll('tr');
-  const plaintext = Array.from(rows)
+  const plaintext = rows
+    .values()
     .map((row) => {
       const cells = row.querySelectorAll('th, td');
       return Array.from(cells)
         .map((cell) => cell.textContent?.trim() ?? '')
         .join('\t');
     })
+    .toArray()
     .join('\n');
 
   const clipboardItemData = {

@@ -108,7 +108,7 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
     return { labels, bucketValues, totalPerUtfall, usedUtfall };
   }, [ferdigstilte, fromFilter, toFilter]);
 
-  const totalSentToTR = Array.from(totalPerUtfall.values()).reduce((sum, count) => sum + count, 0);
+  const totalSentToTR = totalPerUtfall.values().reduce((sum, count) => sum + count, 0);
   const totalAnkeFerdigstilte = ferdigstilte.length;
   const totalSentToTRPercent = totalAnkeFerdigstilte === 0 ? 0 : totalSentToTR / totalAnkeFerdigstilte;
   const avgSentToTRPerMonth = labels.length === 0 ? 0 : totalSentToTR / labels.length;
