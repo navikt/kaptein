@@ -121,10 +121,7 @@ const BehandlingerData = ({
     sakstyperToPåVentReasons,
   );
 
-  const uferdige = useMemo(
-    () => [...ledigeFiltered.map((b) => ({ ...b, tildeltEnhet: b.tildeltEnhet ?? '4293' })), ...tildelteFiltered],
-    [ledigeFiltered, tildelteFiltered],
-  );
+  const uferdige = useMemo(() => [...ledigeFiltered, ...tildelteFiltered], [ledigeFiltered, tildelteFiltered]);
   const relevantYtelser = useRelevantYtelser([...ledigeFiltered, ...tildelteFiltered], ytelser);
   const [tildelingFilter] = useTildelingFilter();
 
