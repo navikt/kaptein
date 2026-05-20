@@ -82,7 +82,7 @@ export const TildelteSakerPåVentIkkePåVent = ({ behandlinger, påVentReasons }
       map.delete(OTHER_KEY);
     }
 
-    return Array.from(map.values());
+    return map.values().toArray();
   }, [behandlinger, påVentReasons, theme]);
 
   const total = behandlinger.length;
