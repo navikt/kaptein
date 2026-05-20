@@ -5,8 +5,10 @@ import {
   COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
   COMMON_STACKED_BAR_CHART_PROPS,
 } from '@/components/charts/common/common-chart-props';
+import { useKlageenheterWithUnknown } from '@/components/charts/common/use-klageenheter';
 import { getYtelseIdsForEntry, useYtelseChartData } from '@/components/charts/common/use-ytelse-chart-data';
 import { NoData } from '@/components/no-data/no-data';
+import { UNKNOWN_ENHET_ID } from '@/lib/constants';
 import { EChart } from '@/lib/echarts/echarts';
 import type { BaseBehandling, IKodeverkSimpleValue } from '@/lib/types';
 
@@ -14,7 +16,7 @@ interface Props {
   title: string;
   description?: string;
   helpText: ReactNode;
-  behandlinger: (BaseBehandling & { tildeltEnhet: string })[];
+  behandlinger: BaseBehandling[];
   relevantYtelser: IKodeverkSimpleValue[];
   klageenheter: IKodeverkSimpleValue[];
 }
@@ -28,22 +30,23 @@ export const TildelteSakerPerKlageenhetOgYtelse = ({
   helpText,
 }: Props) => {
   const entries = useYtelseChartData(behandlinger, relevantYtelser);
+  const enheter = useKlageenheterWithUnknown(behandlinger, klageenheter);
 
   const series = useMemo(
     () =>
       entries.map((entry) => ({
         ...COMMMON_STACKED_BAR_CHART_SERIES_PROPS,
         name: entry.navn,
-        data: klageenheter
+        data: enheter
           .map((enhet) => countEnhet(behandlinger, getYtelseIdsForEntry(entry), enhet.id))
           .map((value) => (value === 0 ? null : value)),
       })),
-    [behandlinger, entries, klageenheter],
+    [behandlinger, entries, enheter],
   );
 
   const labels = useMemo(
-    () => klageenheter.map((e, i) => `${e.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
-    [klageenheter, series],
+    () => enheter.map((e, i) => `${e.navn} (${series.reduce((acc, curr) => acc + (curr.data[i] ?? 0), 0)})`),
+    [enheter, series],
   );
 
   if (behandlinger.length === 0) {
@@ -99,12 +102,9 @@ export const TildelteSakerPerKlageenhetOgYtelse = ({
 /**
  * Count behandlinger for a list of ytelseIds with a specific klageenhet
  */
-const countEnhet = (
-  behandlinger: (BaseBehandling & { tildeltEnhet: string })[],
-  ytelseIds: string[],
-  enhetId: string,
-): number =>
+const countEnhet = (behandlinger: BaseBehandling[], ytelseIds: string[], enhetId: string): number =>
   behandlinger.reduce(
-    (acc, curr) => (ytelseIds.includes(curr.ytelseId) && curr.tildeltEnhet === enhetId ? acc + 1 : acc),
+    (acc, curr) =>
+      ytelseIds.includes(curr.ytelseId) && (curr.tildeltEnhet ?? UNKNOWN_ENHET_ID) === enhetId ? acc + 1 : acc,
     0,
   );
