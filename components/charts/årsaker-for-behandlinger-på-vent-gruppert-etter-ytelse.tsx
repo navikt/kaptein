@@ -50,12 +50,12 @@ export const ÅrsakerForBehandlingerPåVentGruppertEtterYtelse = ({
     return <NoData title={title} />;
   }
 
-  const påVent = behandlinger.filter((b) => b.sattPaaVentReasonId !== null).length;
+  const påVentCount = påVentBehandlinger.length;
 
   return (
     <EChart
       title={title}
-      description={`Viser data for ${behandlinger.length} aktive saker, hvorav ${påVent} (${percent(påVent, behandlinger.length)}) er på vent.`}
+      description={`Viser data for ${behandlinger.length} aktive saker, hvorav ${påVentCount} (${percent(påVentCount, behandlinger.length)}) er på vent.`}
       option={{
         ...COMMON_STACKED_BAR_CHART_PROPS,
         yAxis: { type: 'category', data: labels },
