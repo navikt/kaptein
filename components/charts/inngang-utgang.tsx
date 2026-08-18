@@ -14,7 +14,7 @@ type Buckets = Record<number, Bucket>;
 
 interface Props {
   ferdigstilte: (BaseBehandling & Avsluttet)[];
-  uferdigeList: (BaseBehandling & (Ledig | Tildelt))[];
+  uferdigeMottatteInPeriod: (BaseBehandling & (Ledig | Tildelt))[];
   getInBucketIndex: (b: BaseBehandling, from: string) => number;
   getOutBucketIndex: (b: Avsluttet, from: string) => number;
   createBuckets: (from: string, to: string) => Buckets;
@@ -38,7 +38,7 @@ interface Data {
 
 export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
   ferdigstilte,
-  uferdigeList,
+  uferdigeMottatteInPeriod,
   title,
   createBuckets,
   getInBucketIndex,
@@ -74,7 +74,7 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
       }
     }
 
-    for (const b of uferdigeList) {
+    for (const b of uferdigeMottatteInPeriod) {
       const bucket = buckets[getInBucketIndex(b, fromFilter)];
 
       if (bucket === undefined) {
@@ -107,9 +107,17 @@ export const AntallSakerInnTilKabalFerdigstiltIKabal = ({
     const innAverage = Math.round(innTotal / values.length);
 
     return { labels, inn, ut, diff, diffTotal, innTotal, utTotal, innAverage, utAverage };
-  }, [ferdigstilte, fromFilter, toFilter, createBuckets, getInBucketIndex, getOutBucketIndex, uferdigeList]);
+  }, [
+    ferdigstilte,
+    fromFilter,
+    toFilter,
+    createBuckets,
+    getInBucketIndex,
+    getOutBucketIndex,
+    uferdigeMottatteInPeriod,
+  ]);
 
-  if ((ferdigstilte.length === 0 && uferdigeList.length === 0) || labels.length === 0) {
+  if ((ferdigstilte.length === 0 && uferdigeMottatteInPeriod.length === 0) || labels.length === 0) {
     return <NoData title={title} />;
   }
 
