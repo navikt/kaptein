@@ -11,7 +11,7 @@ import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } 
 interface Props {
   title: string;
   helpText: ReactNode;
-  ferdigstilteInPeriod: (BaseBehandling & Avsluttet)[];
+  ferdigstilte: (BaseBehandling & Avsluttet)[];
   mottattInPeriod: (BaseBehandling & (Ledig | Tildelt))[];
   outgoingRestanse: BaseBehandling[];
   ytelser: IKodeverkSimpleValue[];
@@ -28,7 +28,7 @@ interface YtelseData {
 
 export const BelastningPerYtelse = ({
   title,
-  ferdigstilteInPeriod,
+  ferdigstilte,
   mottattInPeriod,
   outgoingRestanse,
   ytelser,
@@ -37,10 +37,7 @@ export const BelastningPerYtelse = ({
   const { fromFilter, toFilter } = useDateFilter();
 
   // Combine all behandlinger for useYtelseChartData
-  const allBehandlinger = useMemo(
-    () => [...mottattInPeriod, ...ferdigstilteInPeriod],
-    [mottattInPeriod, ferdigstilteInPeriod],
-  );
+  const allBehandlinger = useMemo(() => [...mottattInPeriod, ...ferdigstilte], [mottattInPeriod, ferdigstilte]);
 
   const entries = useYtelseChartData(allBehandlinger, ytelser);
 
@@ -51,19 +48,19 @@ export const BelastningPerYtelse = ({
     const uniqueYtelseIds = [...new Set(entries.flatMap(getYtelseIdsForEntry))];
     const totalMottatt =
       countMottatt(mottattInPeriod, uniqueYtelseIds, fromFilter, toFilter) +
-      countMottatt(ferdigstilteInPeriod, uniqueYtelseIds, fromFilter, toFilter);
-    const totalFerdigstilt = countFerdigstilt(ferdigstilteInPeriod, uniqueYtelseIds, fromFilter, toFilter);
+      countMottatt(ferdigstilte, uniqueYtelseIds, fromFilter, toFilter);
+    const totalFerdigstilt = countFerdigstilt(ferdigstilte, uniqueYtelseIds, fromFilter, toFilter);
 
     for (const entry of entries) {
       const ytelseIds = getYtelseIdsForEntry(entry);
 
-      // Count mottatt from both mottattInPeriod and ferdigstilteInPeriod
+      // Count mottatt from both mottattInPeriod and ferdigstilte
       const mottattFromActive = countMottatt(mottattInPeriod, ytelseIds, fromFilter, toFilter);
-      const mottattFromFerdigstilte = countMottatt(ferdigstilteInPeriod, ytelseIds, fromFilter, toFilter);
+      const mottattFromFerdigstilte = countMottatt(ferdigstilte, ytelseIds, fromFilter, toFilter);
       const mottatt = mottattFromActive + mottattFromFerdigstilte;
 
       // Count ferdigstilt
-      const ferdigstilt = countFerdigstilt(ferdigstilteInPeriod, ytelseIds, fromFilter, toFilter);
+      const ferdigstilt = countFerdigstilt(ferdigstilte, ytelseIds, fromFilter, toFilter);
 
       // Count restanse
       const restanse = countRestanse(outgoingRestanse, ytelseIds);
@@ -84,7 +81,7 @@ export const BelastningPerYtelse = ({
     }
 
     return { ytelseData: data, totalMottatt, totalFerdigstilt, totalDiff: totalMottatt - totalFerdigstilt };
-  }, [entries, ferdigstilteInPeriod, mottattInPeriod, outgoingRestanse, fromFilter, toFilter]);
+  }, [entries, ferdigstilte, mottattInPeriod, outgoingRestanse, fromFilter, toFilter]);
 
   const labels = useMemo(() => ytelseData.map((d) => d.ytelseNavn), [ytelseData]);
   const mottattData = useMemo(() => ytelseData.map(({ mottatt }) => mottatt), [ytelseData]);

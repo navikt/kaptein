@@ -19,12 +19,7 @@ import { Card } from '@/components/cards';
 import { BelastningPerYtelse } from '@/components/charts/belastning-per-ytelse';
 import { formatMonthFullLabel, formatMonthShortLabel } from '@/components/charts/common/labels';
 import { LoadingError } from '@/components/charts/common/loading-error';
-import {
-  getRestanseAfterDate,
-  useAktiveFiltered,
-  useFerdigstiltInPeriod,
-  useMottattInPeriod,
-} from '@/components/charts/common/use-data';
+import { getRestanseAfterDate, useAktiveFiltered, useMottattInPeriod } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { AntallSakerInnTilKabalFerdigstiltIKabal } from '@/components/charts/inngang-utgang';
 import { RestanseOverTid } from '@/components/charts/restanse-over-tid';
@@ -254,7 +249,6 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
   const ferdigstilteBaseFiltered = useAktiveFiltered(ferdigstilte);
   const uferdigeBaseFiltered = useAktiveFiltered(uferdige);
 
-  const ferdigstilteInPeriod = useFerdigstiltInPeriod(ferdigstilteBaseFiltered);
   const mottattInPeriod = useMottattInPeriod(uferdigeBaseFiltered);
 
   const restanseAfterToDate = getRestanseAfterDate(uferdigeBaseFiltered, ferdigstilteBaseFiltered, toFilter);
@@ -272,7 +266,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
               ferdigstilt, vises endringen i restanse som <code>-</code> og er markert i grønn skravering.
             </BodyLong>
           }
-          ferdigstilteInPeriod={ferdigstilteInPeriod}
+          ferdigstilte={ferdigstilteBaseFiltered}
           mottattInPeriod={mottattInPeriod}
           outgoingRestanse={restanseAfterToDate}
           ytelser={ytelser}
@@ -317,7 +311,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
               <BodyLong className="italic">Datoene gjelder fra og med - til og med</BodyLong>
             </>
           }
-          ferdigstilte={ferdigstilteInPeriod}
+          ferdigstilte={ferdigstilteBaseFiltered}
           uferdigeList={mottattInPeriod}
           createBuckets={createWeekBuckets}
           getInBucketIndex={getWeekInBucketIndex}
@@ -335,7 +329,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
               er markert i grønt.
             </BodyLong>
           }
-          ferdigstilte={ferdigstilteInPeriod}
+          ferdigstilte={ferdigstilteBaseFiltered}
           uferdigeList={mottattInPeriod}
           createBuckets={createMonthBuckets}
           getInBucketIndex={getMonthInBucketIndex}
