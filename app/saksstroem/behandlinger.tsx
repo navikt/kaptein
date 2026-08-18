@@ -249,7 +249,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
   const ferdigstilteBaseFiltered = useAktiveFiltered(ferdigstilte);
   const uferdigeBaseFiltered = useAktiveFiltered(uferdige);
 
-  const mottattInPeriod = useMottattInPeriod(uferdigeBaseFiltered);
+  const uferdigeMottattInPeriod = useMottattInPeriod(uferdigeBaseFiltered);
 
   const restanseAfterToDate = getRestanseAfterDate(uferdigeBaseFiltered, ferdigstilteBaseFiltered, toFilter);
 
@@ -267,7 +267,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
             </BodyLong>
           }
           ferdigstilte={ferdigstilteBaseFiltered}
-          mottattInPeriod={mottattInPeriod}
+          uferdigeMottattInPeriod={uferdigeMottattInPeriod}
           outgoingRestanse={restanseAfterToDate}
           ytelser={ytelser}
         />
@@ -312,7 +312,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
             </>
           }
           ferdigstilte={ferdigstilteBaseFiltered}
-          uferdigeList={mottattInPeriod}
+          uferdigeMottatteInPeriod={uferdigeMottattInPeriod}
           createBuckets={createWeekBuckets}
           getInBucketIndex={getWeekInBucketIndex}
           getOutBucketIndex={getWeekOutBucketIndex}
@@ -330,7 +330,7 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
             </BodyLong>
           }
           ferdigstilte={ferdigstilteBaseFiltered}
-          uferdigeList={mottattInPeriod}
+          uferdigeMottatteInPeriod={uferdigeMottattInPeriod}
           createBuckets={createMonthBuckets}
           getInBucketIndex={getMonthInBucketIndex}
           getOutBucketIndex={getMonthOutBucketIndex}
