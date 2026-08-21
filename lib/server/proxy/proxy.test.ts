@@ -1,5 +1,4 @@
-import { afterAll, beforeAll, describe, expect, mock, test } from 'bun:test';
-import { afterEach } from 'node:test';
+import { afterAll, afterEach, beforeAll, describe, expect, mock, test } from 'bun:test';
 import { ProxyError, TimeoutError } from '@/lib/server/proxy/errors';
 import { type EndInfo, handleProxyRequest } from '@/lib/server/proxy/proxy';
 
