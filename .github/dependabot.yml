@@ -1,0 +1,15 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    ignore:
+      # Internal actions, referenced by floating tag/branch on purpose.
+      - dependency-name: nais/*
+      - dependency-name: navikt/kaptein-e2e-tests
