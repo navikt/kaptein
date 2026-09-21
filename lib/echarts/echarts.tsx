@@ -1,7 +1,7 @@
 'use client';
 
 import { DownloadIcon, FilesIcon, TableIcon } from '@navikt/aksel-icons';
-import { BodyLong, Button, Heading, HelpText, HStack, Modal, Tooltip, VStack } from '@navikt/ds-react';
+import { BodyLong, Button, Dialog, Heading, HelpText, HStack, Tooltip, VStack } from '@navikt/ds-react';
 import { BarChart, CustomChart, LineChart, PieChart, SankeyChart, SunburstChart, TreemapChart } from 'echarts/charts';
 import {
   AriaComponent,
@@ -94,7 +94,7 @@ export const EChart = ({
   const [toDate] = useToFilter();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
-  const modalRef = useRef<HTMLDialogElement>(null);
+  const [tableOpen, setTableOpen] = useState(false);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const optionWithAria = useMemo(() => ({ ...option, aria: { show: true } }), [option]);
@@ -217,7 +217,7 @@ export const EChart = ({
             <Button
               variant="tertiary-neutral"
               size="xsmall"
-              onClick={() => modalRef.current?.showModal()}
+              onClick={() => setTableOpen(true)}
               icon={<TableIcon aria-hidden />}
             />
           </Tooltip>
@@ -228,35 +228,41 @@ export const EChart = ({
 
       <div ref={ref} className="grow" />
 
-      <Modal ref={modalRef} header={{ heading: title }} className="min-w-xl max-w-[95vw]" closeOnBackdropClick>
-        <Modal.Body>
-          <BodyLong size="small" spacing>
-            {description}
-          </BodyLong>
+      <Dialog open={tableOpen} onOpenChange={setTableOpen}>
+        <Dialog.Popup className="w-fit min-w-xl max-w-[95vw]">
+          <Dialog.Header>
+            <Dialog.Title>{title}</Dialog.Title>
+          </Dialog.Header>
 
-          <DataViewTable option={optionWithAria} isPercentage={isPercentage} ref={tableRef} />
-        </Modal.Body>
+          <Dialog.Body>
+            <BodyLong size="small" spacing>
+              {description}
+            </BodyLong>
 
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            size="small"
-            icon={<FilesIcon aria-hidden />}
-            onClick={() => copyTable(tableRef.current, titleRef.current, descriptionRef.current)}
-          >
-            Kopier tabell
-          </Button>
+            <DataViewTable option={optionWithAria} isPercentage={isPercentage} ref={tableRef} />
+          </Dialog.Body>
 
-          <Button
-            variant="secondary"
-            size="small"
-            icon={<DownloadIcon aria-hidden />}
-            onClick={() => downloadChartDataAsCsv(optionWithAria, title, { fromDate, toDate })}
-          >
-            Last ned som CSV (Excel)
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Dialog.Footer>
+            <Button
+              variant="secondary"
+              size="small"
+              icon={<FilesIcon aria-hidden />}
+              onClick={() => copyTable(tableRef.current, titleRef.current, descriptionRef.current)}
+            >
+              Kopier tabell
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="small"
+              icon={<DownloadIcon aria-hidden />}
+              onClick={() => downloadChartDataAsCsv(optionWithAria, title, { fromDate, toDate })}
+            >
+              Last ned som CSV (Excel)
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </VStack>
   );
 };
