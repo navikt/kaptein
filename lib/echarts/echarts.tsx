@@ -94,7 +94,6 @@ export const EChart = ({
   const [toDate] = useToFilter();
   const ref = useRef<HTMLDivElement>(null);
   const eChartsRef = useRef<ECharts | null>(null);
-  const [tableOpen, setTableOpen] = useState(false);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const optionWithAria = useMemo(() => ({ ...option, aria: { show: true } }), [option]);
@@ -179,56 +178,53 @@ export const EChart = ({
 
   return (
     <VStack height="100%" width="100%" gap="space-16">
-      <VStack align="center" position="relative">
-        <HStack gap="space-8" align="center" paddingInline="space-24">
-          <Heading size="small" level="1" ref={titleRef}>
-            {title}
-          </Heading>
+      <Dialog>
+        <VStack align="center" position="relative">
+          <HStack gap="space-8" align="center" paddingInline="space-24">
+            <Heading size="small" level="1" ref={titleRef}>
+              {title}
+            </Heading>
 
-          {helpText !== undefined && <HelpText>{helpText}</HelpText>}
-        </HStack>
+            {helpText !== undefined && <HelpText>{helpText}</HelpText>}
+          </HStack>
 
-        <BodyLong size="small" ref={descriptionRef}>
-          {description}
-        </BodyLong>
+          <BodyLong size="small" ref={descriptionRef}>
+            {description}
+          </BodyLong>
 
-        <HStack gap="space-4" position="absolute" top="space-0" right="space-0">
-          <Tooltip content="Kopier som bilde" describesChild>
-            <Button
-              variant="tertiary-neutral"
-              size="xsmall"
-              onClick={() => copyChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current)}
-              icon={<FilesIcon aria-hidden />}
-            />
-          </Tooltip>
+          <HStack gap="space-4" position="absolute" top="space-0" right="space-0">
+            <Tooltip content="Kopier som bilde" describesChild>
+              <Button
+                variant="tertiary-neutral"
+                size="xsmall"
+                onClick={() => copyChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current)}
+                icon={<FilesIcon aria-hidden />}
+              />
+            </Tooltip>
 
-          <Tooltip content="Last ned som bilde" describesChild>
-            <Button
-              variant="tertiary-neutral"
-              size="xsmall"
-              onClick={() =>
-                downloadChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current, { fromDate, toDate })
-              }
-              icon={<DownloadIcon aria-hidden />}
-            />
-          </Tooltip>
+            <Tooltip content="Last ned som bilde" describesChild>
+              <Button
+                variant="tertiary-neutral"
+                size="xsmall"
+                onClick={() =>
+                  downloadChartAsPng(eChartsRef.current, titleRef.current, descriptionRef.current, { fromDate, toDate })
+                }
+                icon={<DownloadIcon aria-hidden />}
+              />
+            </Tooltip>
 
-          <Tooltip content="Vis data som tabell" describesChild>
-            <Button
-              variant="tertiary-neutral"
-              size="xsmall"
-              onClick={() => setTableOpen(true)}
-              icon={<TableIcon aria-hidden />}
-            />
-          </Tooltip>
-        </HStack>
+            <Tooltip content="Vis data som tabell" describesChild>
+              <Dialog.Trigger>
+                <Button variant="tertiary-neutral" size="xsmall" icon={<TableIcon aria-hidden />} />
+              </Dialog.Trigger>
+            </Tooltip>
+          </HStack>
 
-        {headerContent}
-      </VStack>
+          {headerContent}
+        </VStack>
 
-      <div ref={ref} className="grow" />
+        <div ref={ref} className="grow" />
 
-      <Dialog open={tableOpen} onOpenChange={setTableOpen}>
         <Dialog.Popup className="w-fit min-w-xl max-w-[95vw]">
           <Dialog.Header>
             <Dialog.Title>{title}</Dialog.Title>
