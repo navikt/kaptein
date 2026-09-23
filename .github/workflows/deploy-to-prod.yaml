@@ -36,7 +36,7 @@ jobs:
         run: echo "image=${{ steps.image-registry.outputs.registry }}/kaptein:${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Deploy to prod
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@v3
         env:
           CLUSTER: prod-gcp
           VARS: nais/prod.yaml
