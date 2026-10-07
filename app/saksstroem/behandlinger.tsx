@@ -22,7 +22,7 @@ import { LoadingError } from '@/components/charts/common/loading-error';
 import { getRestanseAfterDate, useAktiveFiltered, useMottattInPeriod } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
 import { AntallSakerInnTilKabalFerdigstiltIKabal } from '@/components/charts/inngang-utgang';
-import { RestanseOverTid } from '@/components/charts/restanse-over-tid';
+import { RestanseOverTid, RestanseOverTidPerMåned } from '@/components/charts/restanse-over-tid';
 import { ChartsWrapper } from '@/components/charts-wrapper/charts-wrapper';
 import { useClientKapteinApiFetch } from '@/lib/client/use-client-fetch';
 import { ISO_DATE_FORMAT, ISO_DATE_TIME_FORMAT, PRETTY_DATE_FORMAT } from '@/lib/date';
@@ -275,22 +275,14 @@ const BehandlingerData = ({ ledige, tildelte, ferdigstilte, ytelser }: DataProps
       <Card fullWidth span={3}>
         <RestanseOverTid
           title="Restanse over tid"
-          helpText={
-            <>
-              <BodyLong spacing>
-                Viser hvordan restansene utvikler seg over tid. Restanse ved periodestart er antall aktive saker på
-                første dato i valgt periode. Restanse ved periodeslutt er antall aktive saker på siste dato i valgt
-                periode. Dersom det er mottatt flere saker enn det er ferdigstilt, vises endringen i restanse som{' '}
-                <code>+</code>. Dersom det er mottatt færre saker enn det er ferdigstilt, vises endringen i restanse som{' '}
-                <code>-</code>.
-              </BodyLong>
-
-              <BodyLong>
-                I X-aksen vises antall aktive saker per tidspunkt, slik at du kan se hvordan restansen endrer seg over
-                tid.
-              </BodyLong>
-            </>
-          }
+          ferdigstilte={ferdigstilteBaseFiltered}
+          uferdige={uferdigeBaseFiltered}
+          ytelser={ytelser}
+        />
+      </Card>
+      <Card fullWidth span={3}>
+        <RestanseOverTidPerMåned
+          title="Restanse over tid per måned"
           ferdigstilte={ferdigstilteBaseFiltered}
           uferdige={uferdigeBaseFiltered}
           ytelser={ytelser}
