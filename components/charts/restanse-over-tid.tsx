@@ -1,7 +1,10 @@
 'use client';
 
-import { eachDayOfInterval, format, parse } from 'date-fns';
-import { type ReactNode, useMemo } from 'react';
+import { BodyLong } from '@navikt/ds-react';
+import { eachDayOfInterval, eachMonthOfInterval, format, parse } from 'date-fns';
+import type { LineSeriesOption } from 'echarts/charts';
+import type { XAXisOption } from 'echarts/types/dist/shared';
+import { useMemo } from 'react';
 import { resetDataZoomOnDblClick } from '@/components/charts/common/reset-data-zoom';
 import { getRestanseAfterDate } from '@/components/charts/common/use-data';
 import { useDateFilter } from '@/components/charts/common/use-date-filter';
@@ -12,18 +15,27 @@ import { YTELSE_COLOR_MAP } from '@/lib/echarts/color-token';
 import { EChart } from '@/lib/echarts/echarts';
 import type { Avsluttet, BaseBehandling, IKodeverkSimpleValue, Ledig, Tildelt } from '@/lib/types';
 
-interface Props {
-  title: string;
-  helpText: ReactNode;
+interface CommonProps {
   ferdigstilte: (BaseBehandling & Avsluttet)[];
   uferdige: (BaseBehandling & (Ledig | Tildelt))[];
   ytelser: IKodeverkSimpleValue[];
 }
 
-export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpText }: Props) => {
+interface ConsumerProps {
+  title: string;
+}
+
+interface RestanseOverTidProps extends ConsumerProps, CommonProps {
+  axisLabel?: XAXisOption['axisLabel'];
+  markLine?: LineSeriesOption['markLine'];
+}
+
+const DEFAULT_AXIS_LABEL: XAXisOption['axisLabel'] = { rotate: 45 };
+
+const useRestanseOverTidData = ({ ferdigstilte, uferdige, ytelser }: CommonProps) => {
   const { fromFilter, toFilter } = useDateFilter();
 
-  const { labels, ytelseSeriesData } = useMemo(() => {
+  const { days, ytelseSeriesData } = useMemo(() => {
     const from = parse(fromFilter, ISO_DATE_FORMAT, new Date());
     const to = parse(toFilter, ISO_DATE_FORMAT, new Date());
 
@@ -36,7 +48,7 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpTe
     const ytelseSeriesData = calculateYtelseTimeSeries(ytelseMap, restansePerDayPerYtelse);
 
     return {
-      labels: days,
+      days,
       ytelseSeriesData,
     };
   }, [ferdigstilte, uferdige, fromFilter, toFilter, ytelser]);
@@ -58,7 +70,13 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpTe
     return { startRestanse, endRestanse };
   }, [ytelseSeriesData]);
 
-  if (labels.length === 0 || ytelseSeriesData.length === 0) {
+  return { days, ytelseSeriesData, startRestanse, endRestanse };
+};
+
+const RestanseOverTidCommon = ({ title, axisLabel = DEFAULT_AXIS_LABEL, markLine, ...props }: RestanseOverTidProps) => {
+  const { days, ytelseSeriesData, startRestanse, endRestanse } = useRestanseOverTidData(props);
+
+  if (days.length === 0 || ytelseSeriesData.length === 0) {
     return <NoData title={title} />;
   }
 
@@ -73,7 +91,7 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpTe
           {endRestanse} <strong>Endring:</strong> <DiffNumber>{diff}</DiffNumber>.
         </>
       }
-      helpText={helpText}
+      helpText={<RestanseOverTidHelpText />}
       getInstance={resetDataZoomOnDblClick}
       option={{
         grid: { bottom: 225 },
@@ -99,10 +117,10 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpTe
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: labels,
-          axisLabel: { rotate: 45 },
+          data: days,
+          axisLabel,
         },
-        series: ytelseSeriesData.map(({ ytelseId, ytelseNavn, restanseOverTime }) => ({
+        series: ytelseSeriesData.map(({ ytelseId, ytelseNavn, restanseOverTime }, index) => ({
           id: ytelseId,
           name: ytelseNavn,
           type: 'line',
@@ -124,6 +142,8 @@ export const RestanseOverTid = ({ title, ferdigstilte, uferdige, ytelser, helpTe
           emphasis: {
             focus: 'series',
           },
+          // echarts renders markLine once per series it's set on, so only set it on one series
+          markLine: index === 0 ? markLine : undefined,
         })),
       }}
     />
@@ -194,3 +214,49 @@ const calculateYtelseTimeSeries = (
     .toArray()
     .toSorted((a, b) => a.ytelseNavn.localeCompare(b.ytelseNavn, 'nb'));
 };
+
+export const RestanseOverTid = (props: ConsumerProps & CommonProps) => <RestanseOverTidCommon {...props} />;
+
+export const RestanseOverTidPerMåned = (props: ConsumerProps & CommonProps) => {
+  const { fromFilter, toFilter } = useDateFilter();
+
+  const firstOfMonths = eachMonthOfInterval({
+    start: parse(fromFilter, ISO_DATE_FORMAT, new Date()),
+    end: parse(toFilter, ISO_DATE_FORMAT, new Date()),
+  })
+    .map((d) => format(d, ISO_DATE_FORMAT))
+    .filter((d) => d >= fromFilter);
+
+  return (
+    <RestanseOverTidCommon
+      {...props}
+      axisLabel={{
+        rotate: 45,
+        // Only show labels for the 1st of each month
+        interval: (_index, value) => value.endsWith('-01'),
+      }}
+      markLine={{
+        symbol: ['none', 'none'],
+        animation: false,
+        label: { show: false },
+        lineStyle: { type: 'dashed', color: 'var(--ax-border-strong)' },
+        data: firstOfMonths.map((xAxis) => ({ xAxis })),
+      }}
+    />
+  );
+};
+
+const RestanseOverTidHelpText = () => (
+  <>
+    <BodyLong spacing>
+      Viser hvordan restansene utvikler seg over tid. Restanse ved periodestart er antall aktive saker på første dato i
+      valgt periode. Restanse ved periodeslutt er antall aktive saker på siste dato i valgt periode. Dersom det er
+      mottatt flere saker enn det er ferdigstilt, vises endringen i restanse som <code>+</code>. Dersom det er mottatt
+      færre saker enn det er ferdigstilt, vises endringen i restanse som <code>-</code>.
+    </BodyLong>
+
+    <BodyLong>
+      I X-aksen vises antall aktive saker per tidspunkt, slik at du kan se hvordan restansen endrer seg over tid.
+    </BodyLong>
+  </>
+);
