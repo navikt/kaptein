@@ -14,9 +14,9 @@ export const Tildeling = () => {
       value={ledige}
       onChange={(v) => setLedige(isTildelingFilter(v) ? v : TildelingFilter.ALL)}
     >
-      <ToggleGroup.Item value={TildelingFilter.LEDIGE}>Ledige</ToggleGroup.Item>
-      <ToggleGroup.Item value={TildelingFilter.TILDELTE}>Tildelte</ToggleGroup.Item>
-      <ToggleGroup.Item value={TildelingFilter.ALL}>Alle</ToggleGroup.Item>
+      <ToggleGroup.Item value={TildelingFilter.LEDIGE} label="Ledige" />
+      <ToggleGroup.Item value={TildelingFilter.TILDELTE} label="Tildelte" />
+      <ToggleGroup.Item value={TildelingFilter.ALL} label="Alle" />
     </ToggleGroup>
   );
 };

@@ -64,15 +64,17 @@ const HjemlerMode = ({ mode, setMode }: Props) => {
           </HStack>
         }
       >
-        <ToggleGroup.Item className="whitespace-nowrap" value={HjemlerModeFilter.INCLUDE_FOR_SOME}>
-          Minst én
-        </ToggleGroup.Item>
-        <ToggleGroup.Item className="whitespace-nowrap" value={HjemlerModeFilter.INCLUDE_ALL_SELECTED}>
-          Alle valgte
-        </ToggleGroup.Item>
-        <ToggleGroup.Item className="whitespace-nowrap" value={HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING}>
-          Kun valgte
-        </ToggleGroup.Item>
+        <ToggleGroup.Item className="whitespace-nowrap" value={HjemlerModeFilter.INCLUDE_FOR_SOME} label="Minst én" />
+        <ToggleGroup.Item
+          className="whitespace-nowrap"
+          value={HjemlerModeFilter.INCLUDE_ALL_SELECTED}
+          label="Alle valgte"
+        />
+        <ToggleGroup.Item
+          className="whitespace-nowrap"
+          value={HjemlerModeFilter.INCLUDE_ALL_IN_BEHANDLING}
+          label="Kun valgte"
+        />
       </ToggleGroup>
     </HStack>
   );

@@ -173,8 +173,7 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
     errorFerdigstilteGb !== null
   ) {
     return (
-      <LoadingError>
-        <BodyLong spacing>Feil ved lasting av data:</BodyLong>
+      <LoadingError title="Feil ved lasting av data">
         <List>
           {klagerLedigeError === null ? null : <List.Item>{klagerLedigeError}</List.Item>}
           {klagerTildelteError === null ? null : <List.Item>{klagerTildelteError}</List.Item>}
