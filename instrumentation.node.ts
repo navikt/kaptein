@@ -5,14 +5,14 @@ import { NetInstrumentation } from '@opentelemetry/instrumentation-net';
 import { UndiciInstrumentation } from '@opentelemetry/instrumentation-undici';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 const sdk = new NodeSDK({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'kaptein',
   }),
-  spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
+  spanProcessors: [new BatchSpanProcessor({ exporter: new OTLPTraceExporter() })],
   instrumentations: [
     new DnsInstrumentation(),
     new HttpInstrumentation(),

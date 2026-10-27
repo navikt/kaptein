@@ -93,7 +93,7 @@ export const BelastningPerYtelse = ({
     [ytelseData],
   );
 
-  const positiveDiff = useMemo(() => ytelseData.map((d) => (d.diff <= 0 ? 0 : d.diff)), [ytelseData]);
+  const positiveDiff = useMemo(() => ytelseData.map((d) => Math.max(0, d.diff)), [ytelseData]);
   const negativeDiff = useMemo(() => ytelseData.map((d) => (d.diff >= 0 ? 0 : Math.abs(d.diff))), [ytelseData]);
 
   if (ytelseData.length === 0) {

@@ -43,14 +43,14 @@ export const MultiselectFilter = <T extends string>({
           data-color="neutral"
           icon={<ChevronDownIcon aria-hidden />}
           iconPosition="right"
-          className="justify-between! w-full"
+          className="w-full justify-between!"
         >
           {label} ({selectedOptions.length})
         </Button>
       </ActionMenu.Trigger>
 
       <ActionMenu.Content className="relative">
-        <HStack wrap={false} className="sticky top-0 z-1 bg-ax-bg-default">
+        <HStack wrap={false} className="bg-ax-bg-default sticky top-0 z-1">
           <TextField
             autoFocus
             className="grow"
