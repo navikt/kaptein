@@ -48,7 +48,7 @@ const UserDropdown = () => (
         as="a"
         href="/oauth2/logout"
         data-testid="logout-link"
-        className="cursor-pointer text-ax-text-danger-decoration"
+        className="text-ax-text-danger-decoration cursor-pointer"
         variant="danger"
         icon={<LeaveIcon />}
       >

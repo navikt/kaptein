@@ -1,6 +1,7 @@
 # AGENTS.md
 
 ## Commands
+
 - Install dependencies: `bun i --ignore-scripts`
 - Start dev server: `bun dev`
 - Run unit tests: `bun test`
@@ -10,6 +11,7 @@
 - Find unused exports and files: `bun knip`
 
 ## Code style
+
 - TypeScript strict mode
 - No implicit boolean conversions
 - No type coercion
