@@ -184,8 +184,8 @@ export const SendtTilTROverTid = ({ ferdigstilte, title, helpText, utfall }: Pro
       getInstance={resetDataZoomOnDblClick}
       headerContent={
         <ToggleGroup value={mode} onChange={(v) => setMode(parseMode(v) ?? Mode.COUNT)} size="small">
-          <ToggleGroup.Item value={Mode.COUNT}>Antall</ToggleGroup.Item>
-          <ToggleGroup.Item value={Mode.PERCENT}>Prosent</ToggleGroup.Item>
+          <ToggleGroup.Item value={Mode.COUNT} label="Antall" />
+          <ToggleGroup.Item value={Mode.PERCENT} label="Prosent" />
         </ToggleGroup>
       }
       option={{

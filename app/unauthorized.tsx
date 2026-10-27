@@ -1,4 +1,4 @@
-import { Alert, Box, Button } from '@navikt/ds-react';
+import { Box, Button, LocalAlert } from '@navikt/ds-react';
 import { MetricEvent } from '@/components/metrics';
 import { getCurrentPath } from '@/lib/server/current-path';
 
@@ -9,14 +9,16 @@ export default async function Unauthorized() {
     <Box padding="space-32">
       <MetricEvent eventName="unauthorized" domain="unauthorized" context={{ path, page: 'unauthorized' }} />
 
-      <Alert variant="error">
-        <div className="flex items-center gap-4">
-          Du ser ut til å være logget ut
+      <LocalAlert status="error">
+        <LocalAlert.Header>
+          <LocalAlert.Title>Du ser ut til å være logget ut</LocalAlert.Title>
+        </LocalAlert.Header>
+        <LocalAlert.Content>
           <Button variant="primary" as="a" href="/oauth2/login">
             Logg inn
           </Button>
-        </div>
-      </Alert>
+        </LocalAlert.Content>
+      </LocalAlert>
     </Box>
   );
 }

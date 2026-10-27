@@ -68,11 +68,9 @@ export const DayPicker = ({ value, setValue, title, options }: Props) => {
         }}
       >
         {options.map(({ numDays, label }) => (
-          <ToggleGroup.Item key={numDays} value={String(numDays)}>
-            {label}
-          </ToggleGroup.Item>
+          <ToggleGroup.Item key={numDays} value={String(numDays)} label={label} />
         ))}
-        <ToggleGroup.Item value="custom">Egendefinert</ToggleGroup.Item>
+        <ToggleGroup.Item value="custom" label="Egendefinert" />
       </ToggleGroup>
 
       <TextField

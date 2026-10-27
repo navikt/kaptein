@@ -90,23 +90,23 @@ export const Behandlinger = (kodeverk: KodeverkProps) => {
   }
 
   if (errorKlager !== null) {
-    return <LoadingError>Feil ved lasting av data: {errorKlager}</LoadingError>;
+    return <LoadingError title={`Feil ved lasting av data: ${errorKlager}`} />;
   }
 
   if (errorAnker !== null) {
-    return <LoadingError>Feil ved lasting av data: {errorAnker}</LoadingError>;
+    return <LoadingError title={`Feil ved lasting av data: ${errorAnker}`} />;
   }
 
   if (betongFerdigstilteError !== null) {
-    return <LoadingError>Feil ved lasting av data: {betongFerdigstilteError}</LoadingError>;
+    return <LoadingError title={`Feil ved lasting av data: ${betongFerdigstilteError}`} />;
   }
 
   if (omgjøringskravFerdigstilteError !== null) {
-    return <LoadingError>Feil ved lasting av data: {omgjøringskravFerdigstilteError}</LoadingError>;
+    return <LoadingError title={`Feil ved lasting av data: ${omgjøringskravFerdigstilteError}`} />;
   }
 
   if (errorFerdigstilteGb !== null) {
-    return <LoadingError>Feil ved lasting av data: {errorFerdigstilteGb}</LoadingError>;
+    return <LoadingError title={`Feil ved lasting av data: ${errorFerdigstilteGb}`} />;
   }
 
   return (

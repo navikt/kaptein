@@ -1,5 +1,5 @@
-import { BarChartIcon } from '@navikt/aksel-icons';
-import { Alert, Heading, VStack } from '@navikt/ds-react';
+import { BarChartIcon, InformationSquareIcon } from '@navikt/aksel-icons';
+import { Heading, InfoCard, VStack } from '@navikt/ds-react';
 
 interface Props {
   title: string;
@@ -12,7 +12,9 @@ export const NoData = ({ title }: Props) => (
       {title}
     </Heading>
     <VStack align="center" justify="center" className="z-1 grow">
-      <Alert variant="info">Ingen data</Alert>
+      <InfoCard data-color="info">
+        <InfoCard.Message icon={<InformationSquareIcon aria-hidden />}>Ingen data</InfoCard.Message>
+      </InfoCard>
     </VStack>
   </VStack>
 );

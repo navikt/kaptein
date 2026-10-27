@@ -21,9 +21,9 @@ export const Tilbakekreving = ({ help }: Props) => {
       onChange={(v) => setTilbakekreving(isTilbakekrevingFilter(v) ? v : TilbakekrevingFilter.MED)}
       label={help}
     >
-      <ToggleGroup.Item value={TilbakekrevingFilter.MED}>Med tilbakekreving</ToggleGroup.Item>
-      <ToggleGroup.Item value={TilbakekrevingFilter.UTEN}>Uten tilbakekreving</ToggleGroup.Item>
-      <ToggleGroup.Item value={TilbakekrevingFilter.KUN}>Kun tilbakekreving</ToggleGroup.Item>
+      <ToggleGroup.Item value={TilbakekrevingFilter.MED} label="Med tilbakekreving" />
+      <ToggleGroup.Item value={TilbakekrevingFilter.UTEN} label="Uten tilbakekreving" />
+      <ToggleGroup.Item value={TilbakekrevingFilter.KUN} label="Kun tilbakekreving" />
     </ToggleGroup>
   );
 };
