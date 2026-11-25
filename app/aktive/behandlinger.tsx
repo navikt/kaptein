@@ -350,7 +350,7 @@ const BehandlingerData = ({
         />
       </Card>
 
-      <Card span={5}>
+      <Card span={6}>
         <DaysThresholdPerYtelse
           title="Alder per ytelse"
           description={`Viser data for ${filteredBehandlinger.length} aktive saker`}
